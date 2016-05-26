@@ -1,0 +1,232 @@
+<h2>${lang('phastafari', 'task progress', 'Task progress')} - ${description_task}</h2>
+<i class="fa fa-cog fa-spin fa-5x fa-fw margin-bottom" id="gear"></i>
+<div id="progressbar"><div class="progress-label">${lang('phastafari/dashboard', 'processing_task', 'Processing task...')}</div></div>
+<div id="no_progress" style="border: solid #cbcbcb 1px;height:150px;overflow:scroll;padding:2px;"></div>
+<script>
+    
+    position=0;
+    yes_progress=1;
+    yes_position=0;
+    last_status=0;
+    
+    var progressbar = $( "#progressbar" ),
+    progressLabel = $( ".progress-label" );
+    
+        progressbar.progressbar({
+          value: false,
+          change: function() {
+            progressLabel.text( progressbar.progressbar( "value" ) + "%" );
+          },
+          complete: function() {
+            //progressLabel.text( "Complete!" );
+          }
+        });
+    
+    
+    function update_progress()
+    {
+        
+     var objDiv = document.getElementById("no_progress");
+     /*
+    (function poll(){
+        $.ajax({ url: "${make_admin_url('pastafari/tasks')}?task_id=${task_id}&position="+position, success: function(data){
+                
+                
+            }, dataType: "json", complete: poll, timeout: 30000 });
+        })();*/
+    
+     function update_messages_queue(message)
+     {
+         
+         setTimeout(function () {
+             
+             $('#no_progress').append(message);
+             objDiv.scrollTop = objDiv.scrollHeight;
+             
+         }, 500);
+         
+     }
+     
+     function update_progress_messages_queue(message, progress)
+     {
+         
+         setTimeout(function () {
+             
+            progress=parseInt(progress);
+                        
+            progressbar.progressbar( "value", progress );
+            
+            $('#no_progress').append(message+'<br />');
+            
+            objDiv.scrollTop = objDiv.scrollHeight;
+             
+         }, 500);
+         
+     }
+     
+     function finish_progress_error(progress)
+     {
+         
+        progressbar.progressbar( "value", progress );
+        progressLabel.text( "ERROR, please see the log" );
+         
+     }
+     
+     $.ajax({
+        url: "${make_admin_url('pastafari/tasks')}?task_id=${task_id}&position="+position,
+        method: "POST",
+        dataType: "json",
+        data: {}
+        }).done(function(data) {
+            
+            if(!data.hasOwnProperty("wait"))
+            {
+                
+                x=data.length;
+                
+                for(k=0;k<x;k++)
+                {
+                    
+                    if(data[k].no_progress==1)
+                    {
+                        //yes_progress=0;
+                        //$('#no_progress').append(data[k].message+'<br />');
+                        update_messages_queue(data[k].message+'<br />');
+                        
+                        //Scroll
+                        
+                    }
+                    else
+                    if(data[k].no_progress==0)
+                    {
+                        
+                        
+                        update_progress_messages_queue(data[k].message, data[k].progress);
+                        
+                        /*data[k].progress=parseInt(data[k].progress);
+                        
+                        progressbar.progressbar( "value", data[k].progress );
+                        
+                        $('#no_progress').append(data[k].message+'<br />');
+                        
+                        objDiv.scrollTop = objDiv.scrollHeight;*/
+                        
+                        /*if(data[k].progress<100)
+                        {
+                        
+                            perc=data[k].progress/100;
+                        
+                            $('#no_progress').append(data[k].message+'<br />');
+                            
+                            objDiv.scrollTop = objDiv.scrollHeight;
+                            
+                            data[k].progress=parseInt(data[k].progress)
+                            
+                            progressbar.progressbar( "value", data[k].progress );
+                            
+                        }
+                        else
+                        {
+                            
+                            //line.animate(1);
+                            //$('#text_progress').html('100% - '+data[k].msg);
+                            
+                            data[k].progress=parseInt(data[k].progress);
+                            
+                            progressbar.progressbar( "value", data[k].progress );
+                            
+                            $('#no_progress').append(data[k].message+'<br />');
+                            
+                            objDiv.scrollTop = objDiv.scrollHeight;
+                            //$('#loading').hide();
+                            
+                            //Refresh dashboard
+                            
+                            
+                        }*/
+                        
+                    }
+                    
+                    if(data[k].status!=1)
+                    {
+                        position+=1;
+                        last_status=0;
+                        
+                    }
+                    else
+                    {
+                        
+                        last_status=1;
+                        
+                        if(data[k].error==1)
+                        {
+                            
+                            /*progressbar.progressbar( "value", data[k].progress );
+                            progressLabel.text( "ERROR, please see the log" );*/
+                            
+                            finish_progress_error(data[k].progress);
+                            
+                        }
+                        else
+                        {
+                            
+                            progressLabel.text( "Complete!" );
+                            
+                        }
+                        
+                        //clearTimeout(update_interval);
+                        
+                        $('#gear').removeClass('fa-spin');
+                        
+                    }
+                    
+                }
+                
+                if(last_status==0)
+                {
+                    
+                    update_interval = setTimeout(update_progress, 1000);
+                    
+                }
+        
+            }
+            else
+            {
+                
+                update_interval = setTimeout(update_progress, 1000);
+                
+            }
+            
+            
+        
+        }).fail(function (data) {
+            
+                alert(JSON.stringify(data));
+            
+        });
+    }
+    
+    update_progress();
+    
+</script>
+<%def name="style_progress()">
+  <style>
+  .ui-progressbar {
+    position: relative;
+  }
+  .progress-label {
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+  }
+  </style>
+</%def>
+${add_header_home(style_progress())}
+
+${add_css_home_local('jquery-ui.min.css', 'pastafari')}
+${add_css_home_local('jquery-ui.theme.min.css', 'pastafari')}
+${add_js_home_local('jquery,min.js', 'admin')}
+${add_js_home_local('jquery-ui.min.js', 'pastafari')}

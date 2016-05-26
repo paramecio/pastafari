@@ -1,0 +1,12 @@
+<h2>Add new server</h2>
+<p><a href="${make_admin_url('pastafari/servers')}">${lang('pastafari', 'servers', 'Servers')}</a> &gt;&gt; ${lang('pastafari', 'add_server', 'Add new server')}</p>
+<div class="title">
+    Info
+</div>
+<div class="cont">
+    Remember, you need access to server with the root password. Pastafari will create all requirements for add the server to its network.
+</div>
+<form method="post" action="${url}">
+${form_server|n}
+<input type="submit" value="${lang('common', 'send', 'Send')}" />
+</form>

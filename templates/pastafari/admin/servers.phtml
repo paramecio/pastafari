@@ -1,0 +1,20 @@
+<%def name="show_menu(type_op)">
+    % if type_op=="":
+        ${lang('pastafari', 'all_servers', 'All servers')}
+    % else:
+        <a href="${make_url('admin/pastafari/servers')}">${lang('pastafari', 'all_servers', 'All servers')}</a>
+    % endif
+    % if type_op=="":    
+        - <a href="${make_url('admin/pastafari/servers?type=down')}">${lang('pastafari', 'servers_down', 'Servers down')}</a>
+    % elif type_op=="down":
+        - ${lang('pastafari', 'servers_down', 'Servers down')}
+    % endif
+    - <a href="${make_url('admin/pastafari/servers?type=heavy')}">${lang('pastafari', 'servers_heavy_loaded', 'Servers heavily loaded')}</a>
+    - <a href="${make_url('admin/pastafari/servers?type=disks')}">${lang('pastafari', 'servers_bloated_disks', 'Servers with bloated disks')}</a>
+    - <a href="${make_url('admin/pastafari/servers?type=update_servers')}">${lang('pastafari', 'servers_to_update', 'Servers to update')}</a>
+</%def>
+<p><a href="${make_url('admin/pastafari/servers?op=1')}">${lang('pastafari', 'add_existent_server', 'Add existing server')}</a></p>
+<p>
+    ${show_menu(type_op)}
+</p>
+${show_servers|n}

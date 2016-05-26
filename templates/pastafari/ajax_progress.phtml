@@ -1,0 +1,72 @@
+<div class="title">Progress - ${title}</div>
+<div class="cont">
+    <div id="progress"></div>
+    <div id="text_progress"></div>
+    <p><a href="${url_return}">${lang('common', 'go_back', 'Go Back')}</a></p>
+</div>
+<script language="javascript">
+$(document).ready( function () {
+    
+        var line = new ProgressBar.Line('#progress', {
+
+            color: '#337ab7',
+            strokeWidth:  5,
+            duration: 500,
+
+        });
+    
+        update_interval = setInterval(update_progress, 1000);
+    
+        function update_progress()
+        {
+        
+            $.ajax({
+            url: "${url_progress}",
+            method: "GET",
+            dataType: "json",
+            data: {}
+            }).done(function(data) {
+                
+                if(data.progress<100)
+                {
+                
+                    perc=data.progress/100;
+                
+                    line.animate(perc);
+                    
+                    $('#text_progress').html(Math.round(perc*100)+'% '+data.message);
+                    
+                }
+                else
+                {
+                    
+                    line.animate(1);
+                    $('#text_progress').html('100%');
+                    
+                    //$('#loading').hide();
+                    
+                    clearInterval(update_interval);
+                    
+                    $('#text_progress').html('Done');
+                    
+                    //setTimeout(function(){ location.href="${url_return}"; }, 2000);
+                    
+                    //Refresh dashboard
+                    
+                    
+                }
+            
+            }).fail(function (data) {
+                
+                    alert(JSON.stringify(data));
+                    clearInterval(update_interval);
+                
+            });
+        
+        }
+    
+    });
+    
+    
+</script>
+<script language="javascript" src="${make_media_url('js/progressbar.min.js')}"></script>

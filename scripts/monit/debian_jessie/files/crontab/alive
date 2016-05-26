@@ -1,0 +1,2 @@
+*/2 * * * * pzoo /home/spanel/modules/pastafari/scripts/monit/debian_jessie/files/get_info.py
+
