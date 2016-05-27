@@ -312,74 +312,78 @@ def admin(**args):
             
             c_elements=0
             
-            data_net=cur.fetchone()
+            if cur.rowcount>0:
             
-            first_recv=data_net['bytes_recv']
-            first_sent=data_net['bytes_sent']
-            
-            for data_net in cur:
+                data_net=cur.fetchone()
                 
-                timestamp=datetime.obtain_timestamp(data_net['date'], True)
+                first_recv=data_net['bytes_recv']
+                first_sent=data_net['bytes_sent']
                 
-                diff_time=timestamp-substract_time
-                
-                if substract_time!=0 and diff_time>300:
+                for data_net in cur:
                     
-                    count_time=timestamp
+                    timestamp=datetime.obtain_timestamp(data_net['date'], True)
                     
-                    while substract_time<=count_time:
-            
-                        form_time=datetime.timestamp_to_datetime(substract_time)
+                    diff_time=timestamp-substract_time
+                    
+                    if substract_time!=0 and diff_time>300:
+                        
+                        count_time=timestamp
+                        
+                        while substract_time<=count_time:
+                
+                            form_time=datetime.timestamp_to_datetime(substract_time)
+                            
+                            arr_net.append({'date': datetime.format_time(form_time)})
+                                    
+                            substract_time+=60
+                    
+                    bytes_sent=round((data_net['bytes_sent']-first_sent)/1024)
+                    bytes_recv=round((data_net['bytes_recv']-first_recv)/1024)
+                    cpu=arr_cpu[x]
+
+                    arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu})
+                    
+                    first_sent=data_net['bytes_sent']
+                    first_recv=data_net['bytes_recv']
+                    
+                    c_hours12=timestamp
+                    
+                    substract_time=int(timestamp)
+                    
+                    c_elements+=1
+                    
+                    x+=1
+                    
+                # If the last time is more little that now make a loop 
+                
+                while c_hours12<=now:
+                
+                    form_time=datetime.timestamp_to_datetime(c_hours12)
+                    
+                    seconds=form_time[-2:]
+                        
+                    #print(form_time)
+                    
+                    if seconds=='00':
                         
                         arr_net.append({'date': datetime.format_time(form_time)})
-                                
-                        substract_time+=60
-                
-                bytes_sent=round((data_net['bytes_sent']-first_sent)/1024)
-                bytes_recv=round((data_net['bytes_recv']-first_recv)/1024)
-                cpu=arr_cpu[x]
-
-                arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu})
-                
-                first_sent=data_net['bytes_sent']
-                first_recv=data_net['bytes_recv']
-                
-                c_hours12=timestamp
-                
-                substract_time=int(timestamp)
-                
-                c_elements+=1
-                
-                x+=1
-                
-            # If the last time is more little that now make a loop 
-            
-            while c_hours12<=now:
-            
-                form_time=datetime.timestamp_to_datetime(c_hours12)
-                
-                seconds=form_time[-2:]
+                            
+                        # if secons is 00 and z=1 put value
+                        #arr_net.append({'date': datetime.format_time(form_time)})
+                            
+                        pass
                     
-                #print(form_time)
+                    c_hours12+=1
                 
-                if seconds=='00':
+                cur.close()
+                
+                if c_elements>2:
                     
-                    arr_net.append({'date': datetime.format_time(form_time)})
-                        
-                    # if secons is 00 and z=1 put value
-                    #arr_net.append({'date': datetime.format_time(form_time)})
-                        
-                    pass
-                
-                c_hours12+=1
-            
-            cur.close()
-            
-            if c_elements>2:
-                
-                return json.dumps(arr_net)
-            else:
-                
+                    return json.dumps(arr_net)
+                else:
+                    
+                    return {}
+                    
                 return {}
             
         return  {}
@@ -432,7 +436,13 @@ def admin(**args):
                 
         servers_list=SimpleList(server, url, t)
         
+        yes_form=0
+        
         type_op=''
+        
+        #servers_list.arr_extra_fields=[I18n.lang('common', 'options', 'Options')]
+        
+        servers_list.arr_extra_options=[server_options]
         
         if 'type' in getpost.get:
             
@@ -455,19 +465,24 @@ def admin(**args):
                 servers_list.model.set_conditions("where ip IN (select ip from statusdisk where percent>90)", [])
                 
             elif getpost.get['type']=='update_servers':
+                
                 servers_list.model.set_conditions("where num_updates>0", [])
+                
+                servers_list.arr_extra_fields=[I18n.lang('common', 'update_server', 'Update server')]
+        
+                servers_list.arr_extra_options=[server_update_options]
+                
+                servers_list.yes_search=False
+                
+                yes_form=1
                 
             type_op=getpost.get['type']
                 
         servers_list.fields_showed=['hostname', 'ip', 'num_updates', 'date']
-        
-        #servers_list.arr_extra_fields=[I18n.lang('common', 'options', 'Options')]
-        
-        servers_list.arr_extra_options=[server_options]
 
         show_servers=servers_list.show()
         
-        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op)
+        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form)
     
     
     return ""
@@ -480,3 +495,11 @@ def server_options(url, id, arr_row):
     
     return arr_options
     
+
+def server_update_options(url, id, arr_row):
+    
+    arr_options=[]
+    
+    arr_options.append('<input type="checkbox" name="server_'+str(id)+'" id="server_'+str(id)+'" class="server_checkbox" value="'+str(id)+'" />')
+    
+    return arr_options

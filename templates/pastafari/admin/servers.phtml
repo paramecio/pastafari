@@ -1,20 +1,68 @@
 <%def name="show_menu(type_op)">
-    % if type_op=="":
+    % if type_op!="":
+        <a href="${make_url('admin/pastafari/servers')}">
+    % endif
         ${lang('pastafari', 'all_servers', 'All servers')}
-    % else:
-        <a href="${make_url('admin/pastafari/servers')}">${lang('pastafari', 'all_servers', 'All servers')}</a>
+    % if type_op!="":
+        </a>
     % endif
-    % if type_op=="":    
-        - <a href="${make_url('admin/pastafari/servers?type=down')}">${lang('pastafari', 'servers_down', 'Servers down')}</a>
-    % elif type_op=="down":
-        - ${lang('pastafari', 'servers_down', 'Servers down')}
+    - 
+    % if type_op!="down":
+        <a href="${make_url('admin/pastafari/servers?type=down')}">
     % endif
-    - <a href="${make_url('admin/pastafari/servers?type=heavy')}">${lang('pastafari', 'servers_heavy_loaded', 'Servers heavily loaded')}</a>
-    - <a href="${make_url('admin/pastafari/servers?type=disks')}">${lang('pastafari', 'servers_bloated_disks', 'Servers with bloated disks')}</a>
-    - <a href="${make_url('admin/pastafari/servers?type=update_servers')}">${lang('pastafari', 'servers_to_update', 'Servers to update')}</a>
+        ${lang('pastafari', 'servers_down', 'Servers down')}
+    % if type_op!="down":
+        </a>
+    % endif
+    - 
+    % if type_op!="heavy":
+        <a href="${make_url('admin/pastafari/servers?type=heavy')}">
+    % endif
+        ${lang('pastafari', 'servers_heavy_loaded', 'Servers heavily loaded')}
+    % if type_op!="heavy":
+    </a>
+    % endif
+    - 
+    % if type_op!="disks":
+        <a href="${make_url('admin/pastafari/servers?type=disks')}">
+    % endif
+        ${lang('pastafari', 'servers_bloated_disks', 'Servers with bloated disks')}
+    % if type_op!="disks":
+        </a>
+    % endif
+    - 
+    % if type_op!="update_servers":
+        <a href="${make_url('admin/pastafari/servers?type=update_servers')}">
+    % endif
+        ${lang('pastafari', 'servers_to_update', 'Servers to update')}
+    % if type_op!="update_servers":
+        </a>
+    % endif
 </%def>
 <p><a href="${make_url('admin/pastafari/servers?op=1')}">${lang('pastafari', 'add_existent_server', 'Add existing server')}</a></p>
 <p>
-    ${show_menu(type_op)}
+${show_menu(type_op)}
 </p>
+% if yes_form==1:
+<form method="post" name="update_servers" id="update_servers" action="${make_url('pastafari/updateservers')}">
+% endif
 ${show_servers|n}
+% if yes_form==1:
+<input type="submit" value="${lang('pastafari', 'update_selected_servers', 'Update selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/updateservers')}';" value="${lang('pastafari', 'update_all_servers', 'Update all servers')}" />
+</form>
+<script>
+
+$('#update_servers').submit( function () {
+
+    if(!$('.server_checkbox').prop('checked'))
+    {
+        
+        alert('No servers selected');
+        
+        return false;
+        
+    }
+
+});
+</script>
+% endif

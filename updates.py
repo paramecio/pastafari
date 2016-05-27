@@ -18,13 +18,19 @@ pastafari_folder='pastafari'
 if hasattr(config, 'pastafari_folder'):
     pastafari_folder=config.pastafari_folder
 
+num_updated_servers=2
+
+if hasattr(config, 'num_updated_servers'):
+    num_updated_servers=config.num_updated_servers
+
 load_lang(['paramecio', 'admin'], ['paramecio', 'common'])
 
 env=env_theme(__file__)
 
 env.directories.insert(1, 'paramecio/modules/admin/templates')
 
-@route('/'+pastafari_folder)
+@post('/'+pastafari_folder+'/updateservers')
+@get('/'+pastafari_folder+'/updateservers')
 def home():
     
     connection=WebModel.connection()
@@ -37,7 +43,9 @@ def home():
     if 'login' in s:
         
         if s['privileges']==2:
-                
+            
+            getpost=GetPostFiles()            
+            
             #Load menu
             
             menu=get_menu(config_admin.modules_admin)
@@ -46,7 +54,7 @@ def home():
             
             content_index=''
 
-            return t.load_template('admin/content.html', title='Dashboard', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+            return t.load_template('admin/content.html', title='Updating servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
             redirect(config.admin_folder)
