@@ -25,9 +25,11 @@ class Task(WebModel):
         self.register(corefields.BooleanField('status'))
         self.register(corefields.CharField('url_return'))
         self.register(IpField('server'), True)
+        self.register(corefields.TextField('where_sql_server'))
         self.register(corefields.CharField('user'))
         self.register(corefields.CharField('password'))
         self.register(corefields.CharField('path'))
+    
 
 class LogTask(WebModel):
     
@@ -37,6 +39,7 @@ class LogTask(WebModel):
         
         self.register(DateField('date'))
         self.register(corefields.ForeignKeyField('task_id', Task(connection)), True)
+        self.register(IpField('server'))
         self.register(corefields.DoubleField('progress'))
         self.register(corefields.BooleanField('no_progress'))
         self.register(corefields.TextField('message'), True)

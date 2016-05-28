@@ -187,7 +187,7 @@ class Task:
                     
                     progress+=percent
                     
-                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'uploading_files', 'Uploading file: ')+source_file, 'error': 0})
+                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'uploading_files', 'Uploading file: ')+source_file, 'error': 0, 'server': self.server})
                     
                 except:
                     
@@ -200,7 +200,7 @@ class Task:
                 self.txt_error='Error: '+traceback.format_exc()
                 return False
      
-        self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'upload_successful', 'Files uploaded successfully...'), 'error': 0})
+        self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'upload_successful', 'Files uploaded successfully...'), 'error': 0, 'server': self.server})
         
         return True
 
@@ -223,7 +223,7 @@ class Task:
                     
                     progress+=percent
                     
-                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'cleaning_files', 'Cleaning file: ')+filepath, 'error': 0})
+                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'cleaning_files', 'Cleaning file: ')+filepath, 'error': 0, 'server': self.server})
                     
                 except IOError:
                     
@@ -246,7 +246,7 @@ class Task:
                 
                     progress+=percent
                     
-                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'cleaning_directories', 'Cleaning directory: ')+path, 'error': 0})
+                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'cleaning_directories', 'Cleaning directory: ')+path, 'error': 0, 'server': self.server})
 
                 else:
                     self.txt_error+="Sorry, cannot remove directory "+path+" from server."
@@ -303,7 +303,7 @@ class Task:
             
             self.task.reset_require()
             
-            self.task.insert({'name_task': self.name, 'description_task': self.description})
+            self.task.insert({'name_task': self.name, 'description_task': self.description, 'server': self.server})
             
             self.id=self.task.insert_id()
         
@@ -311,7 +311,7 @@ class Task:
             self.task.conditions=['WHERE id=%s', [self.id]]
             self.task.update({'error': 1, 'status': 1})
             
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1})
+            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
             return False
         
@@ -319,11 +319,11 @@ class Task:
             self.task.conditions=['WHERE id=%s', [self.id]]
             self.task.update({'error': 1, 'status': 1})
             
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1})
+            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
             return False
 
-        self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': 'Executing commands...', 'error': 0, 'status': 0})
+        self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': 'Executing commands...', 'error': 0, 'status': 0, 'server': self.server})
 
         # Execute commands
         
@@ -352,7 +352,7 @@ class Task:
                             self.task.conditions=['WHERE id=%s', [self.id]]
                             self.task.update({'error': 1, 'status': 1})
                             
-                            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': 'Malformed json code: '+str(line), 'error': 1})
+                            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': 'Malformed json code: '+str(line), 'error': 1, 'server': self.server})
                             
                             return False
                             
@@ -369,7 +369,7 @@ class Task:
                         #self.task.conditions=['WHERE id=%s', [self.id]]
                         #self.task.update({'error': 0, 'status':0})
                         
-                        self.logtask.insert({'task_id': self.id, 'progress': 0, 'no_progress': 1, 'message': str(line), 'error': 0, 'status': 0})
+                        self.logtask.insert({'task_id': self.id, 'progress': 0, 'no_progress': 1, 'message': str(line), 'error': 0, 'status': 0, 'server': self.server})
                         
                         #return False
                 
@@ -389,7 +389,7 @@ class Task:
                     
                     self.logtask.set_conditions('where id=%s', [last_log_id])
                     
-                    self.logtask.update({'progress': 100, 'error': 1, 'line': line, 'status': 1})
+                    self.logtask.update({'progress': 100, 'error': 1, 'line': line, 'status': 1, 'server': self.server})
                     
                     return False
                 
@@ -398,7 +398,7 @@ class Task:
                 self.task.conditions=['WHERE id=%s', [self.id]]
                 self.task.update({'error': 1, 'status': 1})
                 
-                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': traceback.format_exc(), 'error': 1, 'status': 1})
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': traceback.format_exc(), 'error': 1, 'status': 1, 'server': self.server})
 
                 return False
         
@@ -409,7 +409,7 @@ class Task:
             self.task.conditions=['WHERE id=%s', [self.id]]
             self.task.update({'error': 1, 'status': 1})
                 
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1})
+            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
             return False
         
@@ -419,7 +419,7 @@ class Task:
 
         # FInish task
         
-        self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1})
+        self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
         
         self.task.conditions=['WHERE id=%s', [self.id]]
         self.task.update({'error': 0, 'status': 1})

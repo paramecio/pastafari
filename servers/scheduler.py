@@ -118,11 +118,13 @@ def progress(api_key, task_id):
 
 app = application  = default_app()
 
+def run_app(app):
+    run(app=app, host=pastafari_host, port=pastafari_port, debug=config.debug, server='gevent', reloader=config.reloader)
+    
 #app.add_hook('after_request', WebModel.close)
 
 if __name__=='__main__':
     #pass
     #server='gevent', 
-    
-    run(app=app, host=pastafari_host, port=pastafari_port, debug=config.debug, reloader=config.reloader)
+    run_app(app)
 

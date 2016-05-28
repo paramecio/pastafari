@@ -7,49 +7,101 @@ from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models import servers, tasks
 from modules.pastafari.libraries.task import Task
 from modules.pastafari.libraries.configclass import config_task
+from multiprocessing.pool import Pool
 
-parser = argparse.ArgumentParser(description='A daemon used for make a task in a server.The results are saved in a sql database using task class')
-parser.add_argument('--task_id', help='The task to execute', required=True)
+num_tasks=10
 
-args = parser.parse_args()
+if hasattr(config, 'num_tasks'):
+    num_tasks=config.num_tasks
 
-task_id=int(args.task_id)
+def start():
 
-conn=WebModel.connection()
+    parser = argparse.ArgumentParser(description='A daemon used for make a task in a server.The results are saved in a sql database using task class')
+    parser.add_argument('--task_id', help='The task to execute', required=True)
 
-task_model=tasks.Task(conn)
+    args = parser.parse_args()
 
-arr_task=task_model.select_a_row(task_id)
+    task_id=int(args.task_id)
 
-if arr_task:
-    
-    if arr_task['user']!='' and arr_task['password']!='' and arr_task['path']!='':
+    conn=WebModel.connection()
+
+    task_model=tasks.Task(conn)
+
+    arr_task=task_model.select_a_row(task_id)
+
+    if arr_task:
         
-        config_task.remote_user=arr_task['user']
-        config_task.remote_password=arr_task['password']
-        config_task.remote_path=arr_task['path']
+        if arr_task['user']!='' and arr_task['password']!='' and arr_task['path']!='':
+            
+            config_task.remote_user=arr_task['user']
+            config_task.remote_password=arr_task['password']
+            config_task.remote_path=arr_task['path']
+            
+            task_model.create_forms()
+            task_model.reset_require()
+            
+            task_model.set_conditions('WHERE id=%s', [task_id])
+            
+            task_model.update({'password': ''})
         
-        task_model.create_forms()
-        task_model.reset_require()
+        task=Task(arr_task['server'], task_id)
         
-        task_model.set_conditions('WHERE id=%s', [task_id])
+        task.files=task_model.fields['files'].loads(arr_task['files'])
         
-        task_model.update({'password': ''})
+        task.commands_to_execute=task_model.fields['files'].loads(arr_task['commands_to_execute'])
+        
+        task.delete_files=task_model.fields['files'].loads(arr_task['delete_files'])
+        
+        task.delete_directories=task_model.fields['files'].loads(arr_task['delete_directories'])
+        
+        if arr_task['where_sql_server']=='':
+        
+            task.exec()
+        else:
+            
+            # Select the servers and make all tasks asynchronous
+            
+            server_model=servers.Server(conn)
+            
+            server_model.set_conditions(arr_task['where_sql_server'])
+            
+            server_model.yes_reset_conditions=False
+            
+            c=server_model.select_count()
+            
+            z=0
+            
+            while z<c:
+                
+                # Set the num of pools
+                
+                server_model.set_limit([z, num_tasks])
+                
+                arr_servers=server_model.select_to_array()
+                
+                num_pools=len(arr_servers)
+                
+                with Pool(processes=num_pools) as pool:
+                    
+                    #for x in range(num_pools)
+                        #pool.
+                    pass
+                
+                z+=num_tasks
+            
+            pass
+        
+        if not task.files:
+            print('Error: no task files')
+            exit(1)
+
+    exit(0)
+
+def execute_multitask(task, server):
     
-    task=Task(arr_task['server'], task_id)
-    
-    task.files=task_model.fields['files'].loads(arr_task['files'])
-    
-    task.commands_to_execute=task_model.fields['files'].loads(arr_task['commands_to_execute'])
-    
-    task.delete_files=task_model.fields['files'].loads(arr_task['delete_files'])
-    
-    task.delete_directories=task_model.fields['files'].loads(arr_task['delete_directories'])
+    task.server=server
     
     task.exec()
-    
-    if not task.files:
-        print('Error: no task files')
-        exit(1)
 
-exit(0)
+if __name__=='__main__':
+    start()
