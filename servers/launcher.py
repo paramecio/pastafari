@@ -15,7 +15,7 @@ if hasattr(config, 'num_tasks'):
     num_tasks=config.num_tasks
 
 def start():
-
+    
     parser = argparse.ArgumentParser(description='A daemon used for make a task in a server.The results are saved in a sql database using task class')
     parser.add_argument('--task_id', help='The task to execute', required=True)
 
@@ -28,7 +28,7 @@ def start():
     task_model=tasks.Task(conn)
 
     arr_task=task_model.select_a_row(task_id)
-
+    
     if arr_task:
         
         if arr_task['user']!='' and arr_task['password']!='' and arr_task['path']!='':
@@ -48,14 +48,26 @@ def start():
         
         task.files=task_model.fields['files'].loads(arr_task['files'])
         
+        if task.files==False:
+            task.files=[]
+        
         task.commands_to_execute=task_model.fields['files'].loads(arr_task['commands_to_execute'])
+        
+        if task.commands_to_execute==False:
+            task.commands_to_execute=[]
         
         task.delete_files=task_model.fields['files'].loads(arr_task['delete_files'])
         
+        if task.delete_files==False:
+            task.delete_files=[]
+        
         task.delete_directories=task_model.fields['files'].loads(arr_task['delete_directories'])
         
-        if arr_task['where_sql_server']=='':
+        if task.delete_directories==False:
+            task.delete_directories=[]
         
+        if arr_task['where_sql_server']=='':
+            
             task.exec()
         else:
             
@@ -63,7 +75,7 @@ def start():
             
             server_model=servers.Server(conn)
             
-            server_model.set_conditions(arr_task['where_sql_server'])
+            server_model.set_conditions(arr_task['where_sql_server'], [])
             
             server_model.yes_reset_conditions=False
             
@@ -82,6 +94,13 @@ def start():
                 num_pools=len(arr_servers)
                 
                 with Pool(processes=num_pools) as pool:
+
+                    arr_task=[]
+                    
+                    for s in arr_servers:
+                        arr_task.append([task, s['ip']])
+                    
+                    pool.map(execute_multitask, arr_task)
                     
                     #for x in range(num_pools)
                         #pool.
@@ -91,13 +110,17 @@ def start():
             
             pass
         
-        if not task.files:
+        if not task.commands_to_execute:
             print('Error: no task files')
             exit(1)
 
     exit(0)
 
-def execute_multitask(task, server):
+def execute_multitask(arr_task=[]):
+    
+    
+    task=arr_task[0]
+    server=arr_task[1]
     
     task.server=server
     

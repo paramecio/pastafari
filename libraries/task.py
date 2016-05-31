@@ -22,6 +22,8 @@ class Task:
 
         self.txt_error=''
         
+        self.os_server=''
+        
         self.files=[]
         
         # Format first array element is command with the interpreter, the task is agnostic, the files in os directory. The commands are setted with 750 permission.
@@ -126,81 +128,86 @@ class Task:
         
         c=len(self.files)
         
-        percent=100/c
+        if c>0:
         
-        progress=0
-        
-        for f in self.files:
+            percent=100/c
             
-            source_file=f[0]
-            permissions=f[1]
-            dest_file=self.config.remote_path+'/'+source_file
+            progress=0
             
-            try:
+            for f in self.files:
                 
-                if not os.path.isfile(source_file):
-                    self.txt_error="Sorry, you don't have source file to upload"
-                    return False
+                source_file=f[0]
                 
-                dir_file=os.path.dirname(source_file)
+                source_file=source_file.replace('${os_server}', self.os_server)
                 
-                parts_dir_file=dir_file.split('/')
-                    
-                # Create remote directory
+                permissions=f[1]
+                dest_file=self.config.remote_path+'/'+source_file
                 
                 try:
                     
-                    f_stat=sftp.stat(dir_file)
-
-                except IOError:
-
+                    if not os.path.isfile(source_file):
+                        self.txt_error="Sorry, you don't have source file to upload"
+                        return False
+                    
+                    dir_file=os.path.dirname(source_file)
+                    
+                    parts_dir_file=dir_file.split('/')
+                        
+                    # Create remote directory
+                    
                     try:
                         
-                        final_path=''
-                        
-                        for d in parts_dir_file:
+                        f_stat=sftp.stat(dir_file)
+
+                    except IOError:
+
+                        try:
                             
-                            final_path+=d+'/'
+                            final_path=''
                             
-                            #print(self.config.remote_path+'/'+final_path)
-                            
-                            try:
+                            for d in parts_dir_file:
                                 
-                                f_stat=sftp.stat(final_path)
+                                final_path+=d+'/'
+                                
+                                #print(self.config.remote_path+'/'+final_path)
+                                
+                                try:
+                                    
+                                    f_stat=sftp.stat(final_path)
+                                
+                                except IOError:
+                                
+                                    sftp.mkdir(final_path)
                             
-                            except IOError:
+                        except:
                             
-                                sftp.mkdir(final_path)
+                            self.txt_error='Sorry, error creating the directories for the files: '+traceback.format_exc()
+                            return False
+                    
+                    # Upload file
+                    
+                    try:
+                    
+                        sftp.put(source_file, dest_file, callback=None, confirm=True)
+                        
+                        sftp.chmod(dest_file, permissions)
+                        
+                        progress+=percent
+                        
+                        self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'uploading_files', 'Uploading file: ')+source_file, 'error': 0, 'server': self.server})
                         
                     except:
                         
-                        self.txt_error='Sorry, error creating the directories for the files: '+traceback.format_exc()
+                        self.txt_error='Sorry, cannot upload file '+source_file+': '+traceback.format_exc()
                         return False
+                    
+                    # Create directory recursively if not exists
                 
-                # Upload file
-                
-                try:
-                
-                    sftp.put(source_file, dest_file, callback=None, confirm=True)
-                    
-                    sftp.chmod(dest_file, permissions)
-                    
-                    progress+=percent
-                    
-                    self.logtask.insert({'task_id': self.id, 'progress': progress, 'message': I18n.lang('pastafari', 'uploading_files', 'Uploading file: ')+source_file, 'error': 0, 'server': self.server})
-                    
                 except:
-                    
-                    self.txt_error='Sorry, cannot upload file '+source_file+': '+traceback.format_exc()
+                    self.txt_error='Error: '+traceback.format_exc()
                     return False
-                
-                # Create directory recursively if not exists
-            
-            except:
-                self.txt_error='Error: '+traceback.format_exc()
-                return False
-     
-        self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'upload_successful', 'Files uploaded successfully...'), 'error': 0, 'server': self.server})
+         
+            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'upload_successful', 'Files uploaded successfully...'), 'error': 0, 'server': self.server})
         
         return True
 
@@ -217,6 +224,8 @@ class Task:
             progress=0
             
             for filepath in self.delete_files:
+                
+                filepath=filepath.replace('${os_server}', self.os_server)
                 
                 try:
                     sftp.remove(self.config.remote_path+'/'+filepath)
@@ -241,6 +250,8 @@ class Task:
             progress=0
 
             for path in self.delete_directories:
+
+                path=path.replace('${os_server}', self.os_server)
 
                 if self.delete_dir(path, sftp):
                 
@@ -332,6 +343,8 @@ class Task:
             try:
                 command=c[0]
                 
+                command=command.replace('${os_server}', self.os_server)
+                
                 arguments=c[1]
                 
                 #, get_pty=True
@@ -378,18 +391,20 @@ class Task:
                 if stdout.channel.recv_exit_status()>0:
                     #line=stdout.readlines()
                     #logging.warning(action.codename+" WARNING: "+line)
+                    final_text='Error executing the command: %s' % command
                     
                     self.task.conditions=['WHERE id=%s', [self.id]]
                     self.task.update({'error': 1, 'status': 1})
                     
-                    final_text=line
+                    for line in stdout:
+                        final_text+=' '+line
                     
                     for line in stderr:
-                        final_text+=line
+                        final_text+=' '+line
                     
                     self.logtask.set_conditions('where id=%s', [last_log_id])
                     
-                    self.logtask.update({'progress': 100, 'error': 1, 'line': line, 'status': 1, 'server': self.server})
+                    self.logtask.update({'progress': 100, 'error': 1, 'message': final_text, 'status': 1, 'server': self.server})
                     
                     return False
                 

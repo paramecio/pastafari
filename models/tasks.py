@@ -24,7 +24,7 @@ class Task(WebModel):
         self.register(corefields.BooleanField('error'))
         self.register(corefields.BooleanField('status'))
         self.register(corefields.CharField('url_return'))
-        self.register(IpField('server'), True)
+        self.register(IpField('server'))
         self.register(corefields.TextField('where_sql_server'))
         self.register(corefields.CharField('user'))
         self.register(corefields.CharField('password'))

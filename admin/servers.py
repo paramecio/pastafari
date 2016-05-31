@@ -142,6 +142,7 @@ def admin(**args):
                             files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', 0o750])
                             files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', 0o750])
                             files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', 0o750])
+                            files.append(['modules/pastafari/scripts/standard/'+os_server+'/upgrade.sh', 0o750])
                             files.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', 0o750])
                             #files.append(['monit/'+os_server+'/files/alive.sh', 0o750];
                             files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_info.py', 0o750])
@@ -492,6 +493,7 @@ def server_options(url, id, arr_row):
     arr_options=[]
     
     arr_options.append('<a href="%s">%s</a>' % (make_admin_url('pastafari/servers', {'op': str(2), 'id': str(id)}), 'Server graphs'))
+    arr_options.append('<a href="%s">%s</a>' % (make_admin_url('pastafari/serverslogs', {'id': str(id)}), 'Server logs'))
     
     return arr_options
     

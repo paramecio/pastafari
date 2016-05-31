@@ -101,6 +101,16 @@ if check_url.match(args.url):
     
     print('Script installed successfully')
     
+    # Copy script for upgrades in /usr/local/bin
+    
+    if call("mkdir /home/"+args.user+"/bin/ && cp modules/pastafari/scripts/standard/debian_jessie/upgrade.sh /home/"+args.user+"/bin/ && chown -R "+args.user+":"+args.user+" /home/"+args.user+"/bin/", shell=True) > 0:
+        print('Error, cannot install upgrade.py in /home/'+args.user+'/bin/')
+        exit(1)
+    else:
+        print('Added /home/'+args.user+'/bin/upgrade.py')
+    
+    print('Script installed successfully')
+    
     # Making first call to site
 
     if subprocess.call('/usr/local/bin/get_info.py',  shell=True) > 0:
