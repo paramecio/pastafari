@@ -81,6 +81,16 @@ def start():
             
             c=server_model.select_count()
             
+            #Update task with number of servers
+            
+            task_model.set_conditions('WHERE id=%s', [task_id])
+            
+            task_model.reset_require()
+            
+            task_model.valid_fields=['num_servers']
+            
+            task_model.update({'num_servers': c})
+            
             z=0
             
             while z<c:
@@ -97,8 +107,8 @@ def start():
 
                     arr_task=[]
                     
-                    for s in arr_servers:
-                        arr_task.append([task, s['ip']])
+                    for server in arr_servers:
+                        arr_task.append([task, server['ip']])
                     
                     pool.map(execute_multitask, arr_task)
                     

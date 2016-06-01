@@ -130,6 +130,8 @@ def getservers(task_id):
             logtask=LogTask(conn)
             server=Server(conn)
             
+            arr_task=task.select_a_row(task_id)
+            
             server.set_conditions('WHERE ip IN (select DISTINCT ip from logtask where task_id=%s)', [task_id])
             
             arr_server=server.select_to_array(['hostname', 'ip'])

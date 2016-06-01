@@ -61,6 +61,7 @@ def home():
             
             task=Task(connection)
             logtask=LogTask(connection)
+            server=Server(connection)
             
             #Load menu
             
@@ -114,7 +115,11 @@ def home():
                         #return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...') #"Load template with ajax..."
                     else:
                         
-                        content_index=t.load_template('pastafari/updates.phtml', task_id=task_id)
+                        server.set_conditions(where_sql, [])
+                        
+                        num_servers=server.select_count()
+                        
+                        content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), num_servers=num_servers)
                 
                 except:
                     
@@ -122,7 +127,7 @@ def home():
                     
                     task.update({'status': 1, 'error': 1})
                     
-                    content_index="Error:cannot connect to task server, check the url for it..."
+                    content_index="Error:cannot connect to task server, check the url for it..."+traceback.format_exc()
                     
             else:
                 content_index="Error: cannot insert the task: "+task.show_errors()
