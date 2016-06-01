@@ -48,13 +48,14 @@ ${show_menu(type_op)}
 % endif
 ${show_servers|n}
 % if yes_form==1:
+${csrf_token()|n}
 <input type="submit" value="${lang('pastafari', 'update_selected_servers', 'Update selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/updateservers')}';" value="${lang('pastafari', 'update_all_servers', 'Update all servers')}" />
 </form>
 <script>
 
 $('#update_servers').submit( function () {
 
-    if(!$('.server_checkbox').prop('checked'))
+    if(!$("input:checkbox:checked").length > 0)
     {
         
         alert('No servers selected');

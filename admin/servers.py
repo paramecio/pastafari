@@ -3,6 +3,7 @@
 from paramecio.citoplasma.generate_admin_class import GenerateAdminClass
 from paramecio.citoplasma.lists import SimpleList
 from paramecio.citoplasma.httputils import GetPostFiles
+from paramecio.cromosoma.formsutils import csrf_token
 from paramecio.citoplasma.urls import make_url
 from paramecio.citoplasma import datetime
 from modules.pastafari.models import servers, tasks
@@ -205,7 +206,7 @@ def admin(**args):
                                     
                                     return "Error:cannot connect to task server, check the url for it..."
                                 
-                                return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id)
+                                return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, position=0)
                                 #return "Server is building..."
                                 #redirect('servers?op=2&task_id='+str(task_id))
                 
@@ -483,7 +484,7 @@ def admin(**args):
 
         show_servers=servers_list.show()
         
-        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form)
+        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token())
     
     
     return ""
@@ -493,7 +494,7 @@ def server_options(url, id, arr_row):
     arr_options=[]
     
     arr_options.append('<a href="%s">%s</a>' % (make_admin_url('pastafari/servers', {'op': str(2), 'id': str(id)}), 'Server graphs'))
-    arr_options.append('<a href="%s">%s</a>' % (make_admin_url('pastafari/serverslogs', {'id': str(id)}), 'Server logs'))
+    arr_options.append('<a href="%s">%s</a>' % (make_url('pastafari/serverslogs', {'id': str(id)}), 'Server logs'))
     
     return arr_options
     

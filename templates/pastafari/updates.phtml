@@ -1,0 +1,38 @@
+<h2>${lang('pastafari', 'servers_updating', 'Servers updating')}</h2>
+<p>${lang('pastafari', 'num_servers', 'Number of servers')}: <span id="num_servers"></span></p>
+<table class="table_servers">
+    <tr class="row_server" id="father_server" style="display:none;">
+        <td class="hostname">Hostname</td>
+        <td class="progress">In progress <i class="fa fa-cog fa-spin fa-fw" id="gear"></i> <a href="" target="_blank">${lang('pastafari', 'server_log', 'Server log')}</a></td>
+    </tr>
+</table>
+<script>
+     $.ajax({
+        url: "${make_url('pastafari/getservers')}/${task_id}",
+        method: "GET",
+        dataType: "json",
+        data: {}
+        }).done(function(data) {
+            
+            c=data.length;
+            
+            for(x=0;x<c;x++) {
+                
+                row=$('#father_server').clone().appendTo('.table_servers');
+                
+                row.attr('id', data[x].ip)
+                
+                row.css('display', 'block');
+                
+                row.children('.hostname').html(data[x].hostname);
+                
+            }
+            
+        
+        }).fail(function (data) {
+            
+                alert(JSON.stringify(data));
+            
+        });
+</script>
+

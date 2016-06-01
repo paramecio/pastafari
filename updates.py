@@ -10,11 +10,14 @@ from bottle import route, get,post,response,request
 from settings import config
 from settings import config_admin
 from paramecio.citoplasma.httputils import GetPostFiles
+from paramecio.cromosoma.formsutils import request_type
 from paramecio.cromosoma.webmodel import WebModel
 from bottle import redirect
 from modules.pastafari.models.tasks import Task, LogTask
+from modules.pastafari.models.servers import Server
 from modules.pastafari.libraries.configclass import config_task
 import requests
+import json
 
 server_task=config_task.server_task
 
@@ -45,6 +48,11 @@ def home():
     
     t=PTemplate(env)
     
+    getpost=GetPostFiles()            
+
+    if request_type()=='POST':
+        getpost.obtain_post()
+    
     s=get_session()
     
     if 'login' in s:
@@ -53,8 +61,6 @@ def home():
             
             task=Task(connection)
             logtask=LogTask(connection)
-            
-            getpost=GetPostFiles()            
             
             #Load menu
             
@@ -66,11 +72,28 @@ def home():
             
             # Send request to server
             
+            arr_servers=[]
+            
+            where_sql='WHERE num_updates>0'
+            
+            for server_id in getpost.post.values():
+                
+                try:
+                    server_id=int(server_id)
+                    
+                    if server_id>0:
+                        arr_servers.append(str(server_id))
+                except:
+                    pass
+            
+            if len(arr_servers)>0:
+                where_sql='WHERE id IN (%s)' % ",".join(arr_servers)
+            
             commands_to_execute=[['bin/upgrade.sh', '']]
             
             task.create_forms()
             
-            if task.insert({'name_task': 'update_server','description_task': I18n.lang('pastafari', 'update_servers', 'Updating servers...'), 'url_return': '', 'commands_to_execute': commands_to_execute, 'server': '', 'where_sql_server': 'WHERE num_updates>0'}):
+            if task.insert({'name_task': 'update_server','description_task': I18n.lang('pastafari', 'update_servers', 'Updating servers...'), 'url_return': '', 'commands_to_execute': commands_to_execute, 'server': '', 'where_sql_server': where_sql}):
                                                 
                 task_id=task.insert_id()
                                 
@@ -89,6 +112,9 @@ def home():
                         content_index="Error:Wrong format of json data..."
                         
                         #return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...') #"Load template with ajax..."
+                    else:
+                        
+                        content_index=t.load_template('pastafari/updates.phtml', task_id=task_id)
                 
                 except:
                     
@@ -110,7 +136,3 @@ def home():
     
         redirect(config.admin_folder)
 
-
-if config.default_module=="pastafari":
-
-    home = route("/")(home)
