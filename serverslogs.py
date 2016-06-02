@@ -164,14 +164,6 @@ def getprogress(task_id):
             
             arr_task=task.select_a_row(task_id)
             
-            #server.set_conditions('WHERE ip IN (select DISTINCT ip from logtask where task_id=%s and status=0)', [task_id])
-            
-            #arr_server=server.select_to_array(['hostname', 'ip'])
-            
-            #logtask.set_conditions('WHERE ip IN ()', [])
-            
-            #arr_logs=logtask.select_to_array(['ip'])
-            
             try:
                 
                 servers=json.loads(getpost.post['servers'])
