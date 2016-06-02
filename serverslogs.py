@@ -146,4 +146,59 @@ def getservers(task_id):
 @post('/'+pastafari_folder+'/getprogress/<task_id:int>')
 def getprogress(task_id):
     
-    return ""
+    conn=WebModel.connection()
+    
+    s=get_session()
+    
+    if 'login' in s:
+        
+        if s['privileges']==2:
+            
+            getpost=GetPostFiles() 
+            
+            getpost.obtain_post([], True)
+    
+            task=Task(conn)
+            logtask=LogTask(conn)
+            server=Server(conn)
+            
+            arr_task=task.select_a_row(task_id)
+            
+            #server.set_conditions('WHERE ip IN (select DISTINCT ip from logtask where task_id=%s and status=0)', [task_id])
+            
+            #arr_server=server.select_to_array(['hostname', 'ip'])
+            
+            #logtask.set_conditions('WHERE ip IN ()', [])
+            
+            #arr_logs=logtask.select_to_array(['ip'])
+            
+            try:
+                
+                servers=json.loads(getpost.post['servers'])
+                
+            except:
+                
+                servers={}
+            
+            #for ip in servers:
+            
+            logtask.set_order(['id'], ['DESC'])
+            
+            logtask.set_conditions('WHERE task_id=%s and status=1 and server IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
+            
+            arr_log=logtask.select_to_array(['status', 'error', 'server'])
+            
+            logtask.set_order(['id'], ['DESC'])
+            
+            logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
+            
+            arr_log2=logtask.select_to_array(['status', 'error', 'server'])
+            
+            arr_log=arr_log2+arr_log
+            
+            response.set_header('Content-type', 'text/plain')
+            
+            return json.dumps(arr_log)
+
+    else:
+        return {}

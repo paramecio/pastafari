@@ -1,14 +1,21 @@
 <h2>${title_task}</h2>
 <p>${lang('pastafari', 'num_servers', 'Number of servers')}: <span id="num_servers">${num_servers}</span></p>
+<p>${lang('pastafari', 'completed_tasks', 'Completed tasks')}: <span id="num_completed">0</span></p>
 <table class="table_servers">
     <tr class="row_server" id="father_server" style="display:none;">
         <td class="hostname">Hostname</td>
-        <td class="progress">In progress <i class="fa fa-cog fa-spin fa-fw" id="gear"></i> <a href="" target="_blank">${lang('pastafari', 'server_log', 'Server log')}</a></td>
+        <td class="progress">In progress <i class="fa fa-cog fa-spin fa-fw"></i> <a href="" target="_blank">${lang('pastafari', 'server_log', 'Server log')}</a></td>
     </tr>
 </table>
+<div id="finished" style="display:none;">
+    <p><strong>All tasks were finished.</strong></p>
+</div>
 <script>
     
     total_servers=${num_servers};
+    total_servers_done=0;
+    
+    arr_servers=[]
     
      $.ajax({
         url: "${make_url('pastafari/getservers')}/${task_id}",
@@ -29,7 +36,11 @@
                 
                 row.children('.hostname').html(data[x].hostname);
                 
+                arr_servers.push(data[x].ip);
+                
             }
+            
+            get_progress_servers();
             
         
         }).fail(function (data) {
@@ -37,5 +48,88 @@
                 alert(JSON.stringify(data));
             
         });
+        
+    function get_progress_servers() {
+        
+        $.ajax({
+        url: "${make_url('pastafari/getprogress')}/${task_id}",
+        method: "POST",
+        dataType: "json",
+        data: {servers: JSON.stringify(arr_servers)}
+        }).done(function(data) {
+           
+           for(x in data) {
+               
+                if(data[x].status==1) {
+                
+                    server_index=arr_servers.indexOf(data[x].server)
+                    
+                    server_dom=$(document.getElementById(data[x].server));
+                    
+                    if(server_index>-1) {
+                    
+                        arr_servers.splice(server_index, 1);
+                        
+                    }
+                
+                    if(data[x].error==1) {
+                        //alert($('#'+data[x].server).attr('id'));
+                        //$('#'+data[x].server);
+                        
+                        server_dom.children('.progress').children('i').removeClass('fa-cog fa-spin fa-fw');
+                        server_dom.children('.progress').children('i').addClass('fa-ban');
+                        server_dom.children('.progress').children('i').css('color', '#ff0000');
+                        server_dom.children('.progress').append(' Error: please, review the log')
+                        
+                        //alert('#'+data[x].server);
+                        
+                    }
+                    else {
+                        
+                        server_dom.children('.progress').children('i').removeClass('fa-cog fa-spin fa-fw');
+                        server_dom.children('.progress').children('i').addClass('fa-check');
+                        server_dom.children('.progress').children('i').css('color', '#005a00');
+                        
+                        setTimeout(function () {
+                            
+                            server_dom.fadeOut(1000, function() {
+                                
+                                this.remove();
+                                
+                            });
+                            
+                        }, 5000);
+                        
+                    }
+                    
+                    total_servers_done+=1;
+                    
+                    $('#num_completed').html(total_servers_done);
+                }
+               
+           }
+           
+            if(total_servers_done<total_servers) {
+           
+                setTimeout(get_progress_servers, 1000);
+        
+            }
+            else {
+                
+                $('#finished').fadeIn(1000);
+                
+            }
+        
+        }).fail(function (data) {
+            
+                alert(JSON.stringify(data));
+            
+        });
+        
+    }
+    
+    
+    
+    
 </script>
 
