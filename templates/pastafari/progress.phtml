@@ -27,13 +27,6 @@
     {
         
      var objDiv = document.getElementById("no_progress");
-     /*
-    (function poll(){
-        $.ajax({ url: "${make_admin_url('pastafari/tasks')}?task_id=${task_id}&position="+position, success: function(data){
-                
-                
-            }, dataType: "json", complete: poll, timeout: 30000 });
-        })();*/
     
      function update_messages_queue(message)
      {
@@ -73,7 +66,7 @@
      }
      
      $.ajax({
-        url: "${make_admin_url('pastafari/tasks')}?task_id=${task_id}&position="+position,
+        url: "${make_url('admin/pastafari/tasks')}?task_id=${task_id}&server=${server}&position="+position,
         method: "POST",
         dataType: "json",
         data: {}

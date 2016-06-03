@@ -206,7 +206,7 @@ def admin(**args):
                                     
                                     return "Error:cannot connect to task server, check the url for it..."
                                 
-                                return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, position=0)
+                                return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, server=ip, position=0)
                                 #return "Server is building..."
                                 #redirect('servers?op=2&task_id='+str(task_id))
                 

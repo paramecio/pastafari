@@ -35,6 +35,7 @@ def admin(**args):
     getpostfiles.get['op']=getpostfiles.get.get('op', '')
     getpostfiles.get['task_id']=getpostfiles.get.get('task_id', '0')
     getpostfiles.get['position']=getpostfiles.get.get('position', '0')
+    getpostfiles.get['server']=getpostfiles.get.get('server', '')
     
     try:
     
@@ -61,6 +62,10 @@ def admin(**args):
         tasklog.set_order(['id'], ['ASC'])
         
         tasklog.conditions=['WHERE task_id=%s', [task_id]]
+        
+        if getpostfiles.get['server']!='':
+            tasklog.conditions=['WHERE task_id=%s and logtask.server=%s', [task_id, getpostfiles.get['server']]]
+            
         
         #tasklog.set_limit([position, 1])
         

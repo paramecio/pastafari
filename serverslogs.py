@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import traceback, sys
+import traceback, sys, time
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.i18n import load_lang, I18n
 from paramecio.citoplasma.urls import make_url, add_get_parameters
@@ -113,6 +113,39 @@ def home():
     else:
     
         redirect(config.admin_folder)
+        
+@get('/'+pastafari_folder+'/showprogress/<task_id:int>/<server>')
+def showprogress(task_id, server):
+    
+    t=PTemplate(env)
+    
+    conn=WebModel.connection()
+    
+    s=get_session()
+    
+    if 'login' in s:
+        
+        if s['privileges']==2:
+            
+            conn=WebModel.connection()
+            task=Task(conn)
+            
+            arr_task=task.select_a_row(task_id)
+            
+            if arr_task:
+            
+                menu=get_menu(config_admin.modules_admin)
+            
+                lang_selected=get_language(s)           
+                
+                #arr_task=
+                
+                content_index=t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, server=server, position=0)
+        
+        return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
+            
+    
+    return ""
 
 
 @get('/'+pastafari_folder+'/getservers/<task_id:int>')
@@ -132,7 +165,7 @@ def getservers(task_id):
             
             arr_task=task.select_a_row(task_id)
             
-            server.set_conditions('WHERE ip IN (select DISTINCT ip from logtask where task_id=%s)', [task_id])
+            server.set_conditions('WHERE ip IN (select DISTINCT server from logtask where task_id=%s)', [task_id])
             
             arr_server=server.select_to_array(['hostname', 'ip'])
             

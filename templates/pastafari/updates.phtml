@@ -1,10 +1,11 @@
 <h2>${title_task}</h2>
 <p>${lang('pastafari', 'num_servers', 'Number of servers')}: <span id="num_servers">${num_servers}</span></p>
 <p>${lang('pastafari', 'completed_tasks', 'Completed tasks')}: <span id="num_completed">0</span></p>
+<p id="detecting_servers">Detecting servers in progress... <i class="fa fa-cog fa-spin fa-fw"></i></p>
 <table class="table_servers">
     <tr class="row_server" id="father_server" style="display:none;">
         <td class="hostname">Hostname</td>
-        <td class="progress">In progress <i class="fa fa-cog fa-spin fa-fw"></i> <a href="" target="_blank">${lang('pastafari', 'server_log', 'Server log')}</a></td>
+        <td class="progress">In progress <i class="fa fa-cog fa-spin fa-fw"></i> <a href="#" class="server_log" target="_blank">${lang('pastafari', 'server_log', 'Server log')}</a></td>
     </tr>
 </table>
 <div id="finished" style="display:none;">
@@ -17,6 +18,17 @@
     
     arr_servers=[]
     
+    if(total_servers>0)
+    {
+        get_servers();
+    }
+    else
+    {
+        $('#detecting_servers').html('Sorry, no servers to update');
+    }
+    
+    function get_servers() {
+    
      $.ajax({
         url: "${make_url('pastafari/getservers')}/${task_id}",
         method: "GET",
@@ -26,28 +38,44 @@
             
             c=data.length;
             
-            for(x=0;x<c;x++) {
+            if(c>0)
+            {
+            
+                for(x=0;x<c;x++) {
+                    
+                    row=$('#father_server').clone().appendTo('.table_servers');
+                    
+                    row.attr('id', data[x].ip)
+                    
+                    row.css('display', 'block');
+                    
+                    row.children('.hostname').html(data[x].hostname);
+                    
+                    row.children('.progress').children('a').attr('href', '${make_url("pastafari/showprogress")}/${task_id}/'+data[x].ip);
+                    
+                    
+                    arr_servers.push(data[x].ip);
+                    
+                }
                 
-                row=$('#father_server').clone().appendTo('.table_servers');
+                $('#detecting_servers').fadeOut(1);
                 
-                row.attr('id', data[x].ip)
+                get_progress_servers();
+            }
+            else
+            {
                 
-                row.css('display', 'block');
-                
-                row.children('.hostname').html(data[x].hostname);
-                
-                arr_servers.push(data[x].ip);
+                get_servers();
                 
             }
-            
-            get_progress_servers();
-            
         
         }).fail(function (data) {
             
                 alert(JSON.stringify(data));
             
         });
+     
+    }
         
     function get_progress_servers() {
         
