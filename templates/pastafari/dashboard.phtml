@@ -1,0 +1,186 @@
+<div class="dashboard_cont">
+    <h3 class="title_cont">
+        Total hosts
+    </h3>
+    <div class="content_cont">
+        <span id="total_servers"></span>
+    </div>
+</div>
+<div class="dashboard_cont">
+    <h3 class="title_cont">
+        Hosts down
+    </h3>
+    <div class="content_cont">
+       <div id="all_hosts_running" style="display:none;">
+        All hosts running and ok!!!
+        </div>
+        <div id="error_hosts_running" style="display:none;">
+            <p><span class="error"><span id="hosts_down"></span> HOSTS DOWN, HOSTS DOWN</span></p>
+            <p><a href="#">View Servers down</a></p>
+        </div>
+    </div>
+</div>
+<div class="dashboard_cont">
+     <h3 class="title_cont">
+        Servers that need updates
+    </h3>
+    <div class="content_cont">
+        <div id="servers_need_updates" style="display:none;">
+            Servers need updates
+            <p><a href="#">Update the servers</a></p>
+        </div>
+        <div id="no_servers_need_updates" style="display:none;">
+            No servers need updates
+        </div>
+    </div>
+</div>
+<div class="dashboard_cont">
+    <h3 class="title_cont">
+        Disks
+    </h3>
+    <div class="content_cont">
+        <div class="pie">
+            <canvas id="canvas_disk"></canvas>
+        </div>
+        <div id="bloated_disks" style="display:none;">
+        <a href="#">Hosts with heavy use of disks</a>
+        </div>
+    </div>
+</div>
+<div class="dashboard_cont">
+    <h3 class="title_cont">
+        Network use
+    </h3>
+    <div class="content_cont">
+        <div class="pie">
+            <canvas id="canvas_net"></canvas>
+        </div>
+        <!--View servers with heavy use of network-->
+    </div>
+</div>
+<div class="dashboard_cont">
+    <h3 class="title_cont">
+        Hosts load
+    </h3>
+    <div class="content_cont">
+        <div class="pie">
+            <canvas id="canvas"></canvas>
+        </div>
+       <div id="heavy_servers" style="display:none;">
+            <p><a href="">View heavily loaded servers</a></p>
+        </div>
+    </div>
+</div>
+<script>
+    
+    var ctx = document.getElementById("canvas").getContext("2d");
+    
+    var data = {
+        labels: [
+            "0% - 30%",
+            "30% - 70%",
+            "70% - 100%"
+        ],
+        datasets: [
+            {
+                data: [0, 0, 0],
+                backgroundColor: [
+                    "#FF6384",
+                    "#8f1100",
+                    "#FF0000"
+                ]
+            }]
+    };
+    
+    options={
+        title: {
+            display: true,
+            text: 'Global load of servers'
+        },
+        responsive: true,
+        legend: {
+                position: 'bottom',
+        }
+    };
+    
+    var myPieChart = new Chart(ctx,{
+        type: 'pie',
+        data: data,
+        options: options
+    });
+    
+    //Disks
+    
+    var ctx_disk = document.getElementById("canvas_disk").getContext("2d");
+    
+    var data = {
+        labels: [
+            "Used",
+            "Free"
+        ],
+        datasets: [
+            {
+                data: [0, 0],
+                backgroundColor: [
+                    "#FF0000",
+                    "#0000FF"
+                ]
+            }]
+    };
+    
+    options={
+        title: {
+            display: true,
+            text: 'Global use of disks'
+        },
+        responsive: true,
+        legend: {
+                position: 'bottom',
+        }
+    };
+    
+    var disk_pie = new Chart(ctx_disk,{
+        type: 'pie',
+        data: data,
+        options: options
+    });
+    
+    //Charts for networking
+    
+    var ctx_net = document.getElementById("canvas_net").getContext("2d");
+    
+    var data_net = {
+        labels: [
+            "Out",
+            "In"
+        ],
+        datasets: [
+            {
+                data: [0, 0],
+                backgroundColor: [
+                    "#0000FF",
+                    "#FF0000"
+                ]
+            }]
+    };
+    
+    options_net={
+        title: {
+            display: true,
+            text: 'Bytes transfered by network since date'
+        },
+        responsive: true,
+        legend: {
+                position: 'bottom',
+        }
+    };
+    
+    var net_pie = new Chart(ctx_net,{
+        type: 'pie',
+        data: data_net,
+        options: options_net
+    });
+
+</script>
+${add_js_home_local('jquery.min.js', 'admin')}
+${add_js_home_local('Chart.min.js', 'pastafari')}

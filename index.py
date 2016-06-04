@@ -44,7 +44,7 @@ def home():
         
             lang_selected=get_language(s)
             
-            content_index=''
+            content_index=t.load_template('pastafari/dashboard.phtml')
 
             return t.load_template('admin/content.html', title='Dashboard', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
