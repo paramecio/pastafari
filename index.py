@@ -12,6 +12,8 @@ from settings import config_admin
 from paramecio.citoplasma.httputils import GetPostFiles
 from paramecio.cromosoma.webmodel import WebModel
 from bottle import redirect
+from modules.pastafari.models import servers
+from paramecio.citoplasma import datetime
 
 pastafari_folder='pastafari'
 
@@ -54,6 +56,44 @@ def home():
     else:
     
         redirect(config.admin_folder)
+
+@route('/'+pastafari_folder+'/getinfo')
+def getinfo():
+    
+    connection=WebModel.connection()
+
+    server=servers.Server(connection)
+    
+    status_disk=servers.StatusDisk(connection)
+    
+    c=server.select_count()
+    
+    now=datetime.now(True)
+        
+    timestamp_now=datetime.obtain_timestamp(now)
+
+    five_minutes=int(timestamp_now)-300
+    
+    five_minutes_date=datetime.timestamp_to_datetime(five_minutes)
+    
+    server.set_conditions('WHERE date<%s', [five_minutes_date])
+    
+    c_down=server.select_count()
+    
+    server.set_conditions('WHERE num_updates>%s', [0])
+    
+    c_updates=server.select_count()
+    
+    with status_disk.query('select sum(used) as total_used, sum(free) as total_free from statusdisk') as cur:
+        arr_disk=cur.fetchone()
+        
+    status_disk.set_conditions('WHERE percent>%s', [85])
+    
+    c_bloated_disk=status_disk.select_count()
+    
+    arr_json={'num_servers': c, 'num_servers_down': c_down, 'num_servers_updates': c_updates, 'disk_info': arr_disk, 'num_servers_bloated': c_bloated_disk}
+    
+    return arr_json
 
 
 if config.default_module=="pastafari":

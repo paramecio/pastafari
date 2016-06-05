@@ -16,7 +16,7 @@
         </div>
         <div id="error_hosts_running" style="display:none;">
             <p><span class="error"><span id="hosts_down"></span> HOSTS DOWN, HOSTS DOWN</span></p>
-            <p><a href="#">View Servers down</a></p>
+            <p><a target="_blank" href="${make_url('admin/pastafari/servers', {'type': 'down'})}">View Servers down</a></p>
         </div>
     </div>
 </div>
@@ -27,7 +27,7 @@
     <div class="content_cont">
         <div id="servers_need_updates" style="display:none;">
             Servers need updates
-            <p><a href="#">Update the servers</a></p>
+            <p><a target="_blank" href="${make_url('admin/pastafari/servers', {'type': 'update_servers'})}">Update servers</a></p>
         </div>
         <div id="no_servers_need_updates" style="display:none;">
             No servers need updates
@@ -42,8 +42,8 @@
         <div class="pie">
             <canvas id="canvas_disk"></canvas>
         </div>
-        <div id="bloated_disks" style="display:none;">
-        <a href="#">Hosts with heavy use of disks</a>
+        <div id="servers_bloated_disks" style="display:none;">
+        <a target="_blank" href="${make_url('admin/pastafari/servers', {'type': 'disks'})}">Hosts with heavy use of disks</a>
         </div>
     </div>
 </div>
@@ -113,7 +113,7 @@
     
     var ctx_disk = document.getElementById("canvas_disk").getContext("2d");
     
-    var data = {
+    var data_disk = {
         labels: [
             "Used",
             "Free"
@@ -131,7 +131,7 @@
     options={
         title: {
             display: true,
-            text: 'Global use of disks'
+            text: 'Global use of disks in gygabytes'
         },
         responsive: true,
         legend: {
@@ -141,7 +141,7 @@
     
     var disk_pie = new Chart(ctx_disk,{
         type: 'pie',
-        data: data,
+        data: data_disk,
         options: options
     });
     
@@ -180,6 +180,81 @@
         data: data_net,
         options: options_net
     });
+    
+    function get_servers() {
+    
+     $.ajax({
+        url: "${make_url('pastafari/getinfo')}",
+        method: "GET",
+        dataType: "json",
+        data: {}
+        }).done(function(data) {
+            
+            //alert(JSON.stringify(data));
+            
+            $('#total_servers').html(data.num_servers)
+            
+            if(data.num_servers_down>0)
+            {
+                $('#error_hosts_running').fadeIn(1000);
+                $('#all_hosts_running').fadeOut(1000);
+                
+                $('#hosts_down').html(data.num_servers_down);
+                
+                
+            }
+            else
+            {
+                
+                $('#error_hosts_running').fadeOut(1000);
+                $('#all_hosts_running').fadeIn(1000);
+                
+            }
+            
+            if(data.num_servers_updates>0)
+            {
+                $('#servers_need_updates').fadeIn(1000);
+                $('#no_servers_need_updates').fadeOut(1000);
+                
+                
+            }
+            else
+            {
+                
+                $('#servers_need_updates').fadeOut(1000);
+                $('#no_servers_need_updates').fadeIn(1000);
+                
+            }
+        
+            //alert(JSON.stringify(disk_pie.data.datasets[0].data));
+            
+            disk_pie.data.datasets[0].data[0]=((((data.disk_info.total_used)/1024)/1024)/1024).toFixed(2);
+            disk_pie.data.datasets[0].data[1]=((((data.disk_info.total_free)/1024)/1024)/1024).toFixed(2);
+            
+            disk_pie.update();
+            
+            if(data.num_servers_bloated>0)
+            {
+                
+                $('#servers_bloated_disks').fadeIn(1000);
+                
+            }
+            else
+            {
+                
+                $('#servers_bloated_disks').fadeOut(1000);
+                
+            }
+        
+        }).fail(function (data) {
+            
+            alert(JSON.stringify(data));
+            
+        });
+     
+    }
+    
+    get_servers();
 
 </script>
 ${add_js_home_local('jquery.min.js', 'admin')}
