@@ -92,6 +92,7 @@ class StatusNet(WebModel):
         self.register(corefields.IntegerField('errout'))
         self.register(corefields.IntegerField('dropin'))
         self.register(corefields.IntegerField('dropout'))
+        self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
 
 class StatusCpu(WebModel):
@@ -102,6 +103,7 @@ class StatusCpu(WebModel):
         self.register(IpField('ip'), True)
         self.fields['ip'].indexed=True
         self.register(corefields.DoubleField('idle'))
+        self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
         
 class StatusDisk(WebModel):

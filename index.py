@@ -66,6 +66,8 @@ def getinfo():
     
     status_disk=servers.StatusDisk(connection)
     
+    status_net=servers.StatusNet(connection)
+    
     c=server.select_count()
     
     now=datetime.now(True)
@@ -91,7 +93,53 @@ def getinfo():
     
     c_bloated_disk=status_disk.select_count()
     
-    arr_json={'num_servers': c, 'num_servers_down': c_down, 'num_servers_updates': c_updates, 'disk_info': arr_disk, 'num_servers_bloated': c_bloated_disk}
+    # Network use
+    
+    twelve_hours=int(timestamp_now)-43200
+    
+    twelve_hours_date=datetime.timestamp_to_datetime(twelve_hours)
+    
+    #status_net.set_conditions('WHERE date>%s', [twelve_hours_date])
+    
+    #SELECT(t2.sub1 - t1.sub1) AS sub1, (t2.sub2 - t1.sub2) AS sub2
+    #FROM table t1 CROSS JOIN
+    # table t2
+    #WHERE t1.date = '2014-11-08' AND t2.id = '2014-11-07';
+    
+    # select (t1.bytes_sent+t2,bytes_sent) as bytes_sent from statusnet t1 CROSS JOIN statusnet t2
+    
+    arr_net={'total_bytes_recv': 0, 'total_bytes_sent': 0}
+    
+    #status_net.set_conditions('WHERE date>%s', [twelve_hours_date])
+    
+    #status_net.set_order('date', 'ASC')
+    
+    #select bytes_sent, bytes_recv, ip from statusnet WHERE date>'20160606093229' and last_updated=1 group by ip
+    
+    status_net.set_conditions('WHERE date>%s and last_updated=1 group by ip', [twelve_hours_date])
+    
+    with status_net.select(['bytes_recv', 'bytes_sent']) as cur:
+        
+        # I think that this loop can be optimized
+        
+        for net in cur:
+            arr_net['total_bytes_recv']+=net['bytes_recv']
+            arr_net['total_bytes_sent']+=net['bytes_sent']
+        
+    arr_cpu={'0-30': 0, '30-70': 0, '70-100': 0}
+    
+    with server.select(['actual_idle']) as cur:
+        
+        for cpu in cur:
+            if cpu['actual_idle']>70:
+                arr_cpu['70-100']+=1
+            elif cpu['actual_idle']>30:
+                arr_cpu['30-70']+=1
+            else:
+                arr_cpu['0-30']+=1
+    #print(c_net)
+    
+    arr_json={'num_servers': c, 'num_servers_down': c_down, 'num_servers_updates': c_updates, 'disk_info': arr_disk, 'num_servers_bloated': c_bloated_disk, 'net_info': arr_net, 'cpu_info': arr_cpu}
     
     return arr_json
 
