@@ -77,6 +77,22 @@ class Server(WebModel):
         self.register(corefields.IntegerField('num_updates'))
         self.register(corefields.DoubleField('actual_idle'))
         self.register(LastUpdatedField('date'))
+        
+class ServerGroup(WebModel):
+    
+    def __init__(self, connection):
+        
+        super().__init__(connection)
+
+        self.register(corefields.CharField('name'), True)
+
+class ServerGroupItem(WebModel):
+    
+    def __init__(self, connection):
+        
+        super().__init__(connection)
+
+        self.register(corefields.ForeignKeyField('server_id', ServerGroup(connection)), True)
 
 class StatusNet(WebModel):
     

@@ -54,6 +54,8 @@ class Task:
         self.logtask.reset_require()
         self.task.reset_require()
         
+        self.just_one=False
+        
         pass
 
     def prepare_connection(self):
