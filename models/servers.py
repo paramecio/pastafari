@@ -85,6 +85,7 @@ class ServerGroup(WebModel):
         super().__init__(connection)
 
         self.register(corefields.CharField('name'), True)
+        self.register(corefields.CharField('group_code'), True)
 
 class ServerGroupItem(WebModel):
     

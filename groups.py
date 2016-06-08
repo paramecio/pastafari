@@ -69,8 +69,10 @@ def home():
         redirect(config.admin_folder)
 
 
-@route('/'+pastafari_folder+'/runtaskgroup/<group_id:int>')
+@route('/'+pastafari_folder+'/configure/<group_id:int>')
 def execute_task(group_id):
+    
+    # Get python file with the code
     
     return ""
 
@@ -79,6 +81,8 @@ def task_options(url, id, arr_row):
     
     arr_list=SimpleList.standard_options(url, id, arr_row)
     
-    arr_list.append('<a href="%s">Execute task</a>' % (make_url(pastafari_folder+'/runtaskgroup/%i') % id))
+    arr_list.append('<a href="%s">Edit servers</a>' % (make_url(pastafari_folder+'/editservers/%i') % id))
+    
+    arr_list.append('<a href="%s">Configure group</a>' % (make_url(pastafari_folder+'/configure/%i') % id))
     
     return arr_list
