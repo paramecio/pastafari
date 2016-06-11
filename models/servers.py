@@ -5,6 +5,7 @@ from paramecio.cromosoma import corefields
 from paramecio.cromosoma.extrafields.dictfield import DictField
 from paramecio.cromosoma.extrafields.datefield import DateField
 from paramecio.cromosoma.extrafields.ipfield import IpField
+from paramecio.cromosoma.extrafields.parentfield import ParentField
 from paramecio.citoplasma.urls import make_media_url_module
 from paramecio.citoplasma import datetime
 
@@ -83,9 +84,9 @@ class ServerGroup(WebModel):
     def __init__(self, connection):
         
         super().__init__(connection)
-
+        # name, related_table, size=11, required=False, identifier_field='id', named_field="id", select_fields=[]):
         self.register(corefields.CharField('name'), True)
-        self.register(corefields.CharField('group_code'), True)
+        self.register(ParentField('parent_id', 11, False, 'name'))
 
 class ServerGroupItem(WebModel):
     
@@ -93,7 +94,8 @@ class ServerGroupItem(WebModel):
         
         super().__init__(connection)
 
-        self.register(corefields.ForeignKeyField('server_id', ServerGroup(connection)), True)
+        self.register(corefields.ForeignKeyField('group_id', ServerGroup(connection)), True)
+        self.register(corefields.ForeignKeyField('server_id', Server(connection)), True)
 
 class StatusNet(WebModel):
     

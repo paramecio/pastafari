@@ -7,6 +7,10 @@ class ConfigClass:
     def __init__(self):
     
         #Local paths
+        
+        # Scheme: code task: {description task, module task}
+
+        self.libraries={}
 
         self.base_path=os.path.dirname(os.path.dirname(__file__))
 

@@ -16,6 +16,7 @@ from paramecio.cromosoma.webmodel import WebModel
 from bottle import redirect
 from modules.pastafari.models import servers
 from paramecio.citoplasma import datetime
+from paramecio.citoplasma.hierarchy_links import HierarchyModelLinks
 
 pastafari_folder='pastafari'
 
@@ -42,7 +43,15 @@ def home():
     if 'login' in s:
         
         if s['privileges']==2:
-                
+            
+            getpostfiles=GetPostFiles()
+            
+            getpostfiles.obtain_get()
+            
+            parent_id=getpostfiles.get.get('parent_id', '0')
+            
+            parent_id=int(parent_id)
+            
             #Load menu
             
             menu=get_menu(config_admin.modules_admin)
@@ -51,13 +60,24 @@ def home():
             
             groups=servers.ServerGroup(connection)
             
-            group_list=GenerateAdminClass(groups, make_url(pastafari_folder+'/groups'), t)
+            groups.create_forms()
+            
+            groups.forms['parent_id'].default_value=parent_id
+            
+            hierarchy=HierarchyModelLinks(groups, 'All groups', 'name', 'parent_id', make_url('pastafari/groups'))
+            
+            hierarchy.prepare()
+            
+            group_list=GenerateAdminClass(groups, make_url(pastafari_folder+'/groups', {'parent_id': str(parent_id)}), t)
+            
+            groups.set_conditions('WHERE parent_id=%s', [parent_id])
             
             group_list.list.fields_showed=['name']
             
             group_list.list.arr_extra_options=[task_options]
             
-            content_index=group_list.show()
+            content_index=t.load_template('pastafari/groups.phtml', group_list=group_list, hierarchy_links=hierarchy, son_id=parent_id)
+            #group_list.show()
 
             return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups', 'Server\'s Group'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
@@ -68,9 +88,47 @@ def home():
     
         redirect(config.admin_folder)
 
+@route('/'+pastafari_folder+'/editservers/<parent_id:int>')
+def edit_servers(parent_id):
+    
+    connection=WebModel.connection()
+    #Fix, make local variable
+    
+    t=PTemplate(env)
+    
+    s=get_session()
+    
+    if 'login' in s:
+        
+        if s['privileges']==2:
+                
+            #Load menu
+            
+            group=servers.ServerGroup(connection)
+            
+            arr_group=group.select_a_row(parent_id)
+            
+            menu=get_menu(config_admin.modules_admin)
+        
+            lang_selected=get_language(s)
+            
+            content_index=t.load_template('pastafari/add_servers_group.phtml', group=arr_group)
 
-@route('/'+pastafari_folder+'/configure/<group_id:int>')
-def execute_task(group_id):
+            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups_config', 'Server\'s Group servers'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+            
+        else:
+            redirect(config.admin_folder)
+    
+    else:
+    
+        redirect(config.admin_folder)
+
+@post('/'+pastafari_folder+'/editservers/<parent_id:int>')
+def add_servers(parent_id):
+    pass
+
+@route('/'+pastafari_folder+'/configure/<parent_id:int>')
+def execute_task(parent_id):
     
     # Get python file with the code
     
@@ -81,8 +139,8 @@ def task_options(url, id, arr_row):
     
     arr_list=SimpleList.standard_options(url, id, arr_row)
     
-    arr_list.append('<a href="%s">Edit servers</a>' % (make_url(pastafari_folder+'/editservers/%i') % id))
+    arr_list.append('<a href="%s">Subgroups</a>' % (make_url(pastafari_folder+'/groups', {'parent_id': str(id)})) )
     
-    arr_list.append('<a href="%s">Configure group</a>' % (make_url(pastafari_folder+'/configure/%i') % id))
+    arr_list.append('<a href="%s">Edit servers</a>' % (make_url(pastafari_folder+'/editservers/%i') % id))
     
     return arr_list
