@@ -14,6 +14,7 @@ from paramecio.citoplasma.i18n import I18n
 from paramecio.cromosoma import formsutils, webmodel
 from paramecio.cromosoma.coreforms import SelectForm
 from paramecio.cromosoma.coreforms import PasswordForm
+from paramecio.cromosoma.coreforms import SelectModelForm
 from paramecio.modules.admin.index import make_admin_url
 from settings import config
 from bottle import request, redirect
@@ -44,6 +45,8 @@ def admin(**args):
     
     logtask=tasks.LogTask(conn)
     
+    group_server=servers.ServerGroup(conn)
+    
     getpostfiles=GetPostFiles()
     
     getpostfiles.obtain_get()
@@ -58,11 +61,8 @@ def admin(**args):
     
     arr_os={}
     
-    cur=os_model.select()
-    
-    arr_os = { v['codename'] : v['name'] for v in cur }
-    
-    cur.close()
+    with os_model.select() as cur:
+        arr_os = { v['codename'] : v['name'] for v in cur }
     
     server.forms['os_codename'].arr_select=arr_os
     
@@ -72,9 +72,15 @@ def admin(**args):
     
     server.forms['password'].label=I18n.lang('pastafari', 'password', 'Password')
     
-    server.forms['delete_root_password']=SelectForm('delete_root_password', '', {0: 'No', 1: 'Yes'})
+    server.forms['delete_root_password']=SelectForm('delete_root_password', '', {'0': 'No', '1': 'Yes'})
     
     server.forms['delete_root_password'].label=I18n.lang('pastafari', 'delete_root_password', 'Disable root password')
+    
+    server.forms['group_id']=SelectModelForm('group_id', 0, group_server, 'name', 'id', 'parent_id')
+    
+    server.forms['group_id'].required=True
+    
+    server.forms['group_id'].label=label=I18n.lang('pastafari', 'principal_group', 'Principal group')
 
     if getpostfiles.get['op']=='1':
         
@@ -92,12 +98,20 @@ def admin(**args):
             post={}
             
             post['password']=getpostfiles.post.get('password', '')
-            post['delete_root_password']=getpostfiles.post.get('delete_root_password', '')
+            post['delete_root_password']=getpostfiles.post.get('delete_root_password', '0')
             post['ip']=getpostfiles.post.get('ip', '')
+            
+            try:
+            
+                post['group_id']=getpostfiles.post.get('group_id', '0')
+                
+            except:
+                
+                post['group_id']='0'
             
             check_form=formsutils.CheckForm()
             
-            (post, pass_form)=check_form.check(post, {'password': server.forms['password'], 'delete_root_password': server.forms['delete_root_password'], 'ip': server.forms['ip']})
+            (post, pass_form)=check_form.check(post, {'password': server.forms['password'], 'delete_root_password': server.forms['delete_root_password'], 'ip': server.forms['ip'], 'group_id': server.forms['group_id']})
             
             server.set_conditions('WHERE ip=%s', [post['ip']])
             
@@ -123,7 +137,7 @@ def admin(**args):
                         task_ssh.ssh.close()
                 
                         if not server.insert(getpostfiles.post):
-                        
+                            
                             forms=formsutils.show_form(getpostfiles.post, server.forms, t, True)
                             
                             return t.load_template('pastafari/admin/add_servers.phtml', form_server=forms, url=url+'?op=1')
@@ -132,97 +146,109 @@ def admin(**args):
                             
                             server_id=server.insert_id()
                             
-                            task.create_forms()
+                            # Insert in server group
                             
-                            os_server=getpostfiles.post['os_codename'].replace('/', '').replace('.', '')
+                            if group_server.insert({'group_ud': post['group_id'], 'server_id': server_id}):
                             
-                            ip=server.fields['ip'].check(getpostfiles.post['ip'])
-                            
-                            files=[]
-                            
-                            files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', 0o750])
-                            files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', 0o750])
-                            files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', 0o750])
-                            files.append(['modules/pastafari/scripts/standard/'+os_server+'/upgrade.sh', 0o750])
-                            files.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', 0o750])
-                            #files.append(['monit/'+os_server+'/files/alive.sh', 0o750];
-                            files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_info.py', 0o750])
-                            files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_updates.py', 0o750])
-                            files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/crontab/alive', 0o640])
-                            files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/sudoers.d/spanel', 0o640])
-                            files.append([config_task.public_key, 0o600])
+                                task.create_forms()
+                                
+                                os_server=getpostfiles.post['os_codename'].replace('/', '').replace('.', '')
+                                
+                                ip=server.fields['ip'].check(getpostfiles.post['ip'])
+                                
+                                files=[]
+                                
+                                files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', 0o750])
+                                files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', 0o750])
+                                files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', 0o750])
+                                files.append(['modules/pastafari/scripts/standard/'+os_server+'/upgrade.sh', 0o750])
+                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', 0o750])
+                                #files.append(['monit/'+os_server+'/files/alive.sh', 0o750];
+                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_info.py', 0o750])
+                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_updates.py', 0o750])
+                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/crontab/alive', 0o640])
+                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/sudoers.d/spanel', 0o640])
+                                files.append([config_task.public_key, 0o600])
 
-                            commands_to_execute=[]
-                            
-                            commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', ''])
-                            commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', ''])
-                            commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', ''])
-                            commands_to_execute.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', '--url='+config_task.url_monit+'/'+ip+'/'+config_task.api_key+' --user='+config_task.remote_user+' --pub_key='+config_task.public_key])
-                            
-                            delete_files=[]
-                            
-                            delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_python.sh')
-                            delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh')
-                            delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh')
-                            delete_files.append(config_task.public_key)
-                            
-                            delete_directories=['modules/pastafari']
-                            
-                            if post['delete_root_password']=='1':
-                                #delete_root_passwd.sh
-                                files.append(['modules/pastafari/scripts/standard/'+os_server+'/delete_root_passwd.sh', 0o750])
-                                commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/delete_root_passwd.sh', ''])
+                                commands_to_execute=[]
                                 
-                            
-                            if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root'}):
-                                                
-                                task_id=task.insert_id()
-                                                
-                                try:
+                                commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', ''])
+                                commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', ''])
+                                commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', ''])
+                                commands_to_execute.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', '--url='+config_task.url_monit+'/'+ip+'/'+config_task.api_key+' --user='+config_task.remote_user+' --pub_key='+config_task.public_key])
                                 
-                                    r=requests.get(server_task+str(task_id))
+                                delete_files=[]
+                                
+                                delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_python.sh')
+                                delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh')
+                                delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh')
+                                delete_files.append(config_task.public_key)
+                                
+                                delete_directories=['modules/pastafari']
+                                
+                                if post['delete_root_password']=='1':
+                                    #delete_root_passwd.sh
+                                    files.append(['modules/pastafari/scripts/standard/'+os_server+'/delete_root_passwd.sh', 0o750])
+                                    commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/delete_root_passwd.sh', ''])
                                     
-                                    arr_data=r.json()
+                                
+                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root'}):
+                                                    
+                                    task_id=task.insert_id()
+                                                    
+                                    try:
                                     
-                                    arr_data['task_id']=task_id
-                                    
-                                    logtask.create_forms()
-                                    
-                                    if not logtask.insert(arr_data):
+                                        r=requests.get(server_task+str(task_id))
                                         
-                                        return "Error:Wrong format of json data..."
+                                        arr_data=r.json()
                                         
-                                        #return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...') #"Load template with ajax..."
-                                
-                                except:
+                                        arr_data['task_id']=task_id
+                                        
+                                        logtask.create_forms()
+                                        
+                                        if not logtask.insert(arr_data):
+                                            
+                                            return "Error:Wrong format of json data..."
+                                            
+                                            #return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...') #"Load template with ajax..."
                                     
-                                    logtask.conditions=['WHERE id=%s', [task_id]]
+                                    except:
+                                        
+                                        logtask.conditions=['WHERE id=%s', [task_id]]
+                                        
+                                        task.update({'status': 1, 'error': 1})
+                                        
+                                        server.conditions=['WHERE id=%s', [server_id]]
                                     
-                                    task.update({'status': 1, 'error': 1})
+                                        server.delete()
+                                        
+                                        return "Error:cannot connect to task server, check the url for it..."
+                                    
+                                    return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, server=ip, position=0)
+                                    #return "Server is building..."
+                                    #redirect('servers?op=2&task_id='+str(task_id))
+                    
+                                else:
                                     
                                     server.conditions=['WHERE id=%s', [server_id]]
-                                
+                                    
                                     server.delete()
                                     
-                                    return "Error:cannot connect to task server, check the url for it..."
-                                
-                                return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, server=ip, position=0)
-                                #return "Server is building..."
-                                #redirect('servers?op=2&task_id='+str(task_id))
-                
+                                    return "Error: cannot create the new task"
                             else:
                                 
                                 server.conditions=['WHERE id=%s', [server_id]]
-                                
+                                    
                                 server.delete()
                                 
-                                return "Error: cannot create the new task"
+                                return "Error: you need a initial group for your server"
                                 
                     else:
                         task_ssh.ssh.close()
                         return "Cannot connect to the new server "+task_ssh.txt_error
                     
                 else:
+                    
                     forms=formsutils.show_form(getpostfiles.post, server.forms, t, True)
                         
                     return t.load_template('pastafari/admin/add_servers.phtml', form_server=forms, url=url+'?op=1')
@@ -435,6 +461,18 @@ def admin(**args):
         getpost=GetPostFiles()
         
         getpost.obtain_get()
+        
+        try: 
+        
+            group_id=int(getpost.get.get('group_id', '0'))
+            
+        except:
+            
+            group_id=0
+        
+        select_form_group=SelectModelForm('group_id', group_id, servers.ServerGroup(conn), 'name', 'id', 'parent_id')
+        
+        select_form_group.name_field_id='change_group_id_form'
                 
         servers_list=SimpleList(server, url, t)
         
@@ -479,12 +517,15 @@ def admin(**args):
                 yes_form=1
                 
             type_op=getpost.get['type']
-                
+        
+        if group_id>0:
+            pass
+        
         servers_list.fields_showed=['hostname', 'ip', 'num_updates', 'date']
 
         show_servers=servers_list.show()
         
-        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token())
+        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token(), select_form_group=select_form_group)
     
     
     return ""
