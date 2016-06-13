@@ -47,6 +47,8 @@ def admin(**args):
     
     group_server=servers.ServerGroup(conn)
     
+    group_server_item=servers.ServerGroupItem(conn)
+    
     getpostfiles=GetPostFiles()
     
     getpostfiles.obtain_get()
@@ -148,7 +150,9 @@ def admin(**args):
                             
                             # Insert in server group
                             
-                            if group_server.insert({'group_ud': post['group_id'], 'server_id': server_id}):
+                            group_server_item.valid_fields=['group_id', 'server_id']
+                            
+                            if group_server_item.insert({'group_id': post['group_id'], 'server_id': server_id}):
                             
                                 task.create_forms()
                                 
@@ -219,6 +223,10 @@ def admin(**args):
                                         task.update({'status': 1, 'error': 1})
                                         
                                         server.conditions=['WHERE id=%s', [server_id]]
+                                        
+                                        group_server_item.conditions=['WHERE server_id=%s', [server_id]]
+                                    
+                                        group_server_item.delete()
                                     
                                         server.delete()
                                         
@@ -233,6 +241,10 @@ def admin(**args):
                                     server.conditions=['WHERE id=%s', [server_id]]
                                     
                                     server.delete()
+                                    
+                                    group_server_item.conditions=['WHERE server_id=%s', [server_id]]
+                                    
+                                    group_server_item.delete()
                                     
                                     return "Error: cannot create the new task"
                             else:
@@ -519,9 +531,12 @@ def admin(**args):
             type_op=getpost.get['type']
         
         if group_id>0:
-            pass
+            servers_list.model.conditions[0]+=' AND id IN (select server_id from servergroupitem where group_id=%s)'
+            servers_list.model.conditions[1].append(group_id)
         
         servers_list.fields_showed=['hostname', 'ip', 'num_updates', 'date']
+        
+        servers_list.limit_pages=100
 
         show_servers=servers_list.show()
         
