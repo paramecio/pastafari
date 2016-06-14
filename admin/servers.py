@@ -54,6 +54,8 @@ def admin(**args):
     getpostfiles.obtain_get()
     
     getpostfiles.get['op']=getpostfiles.get.get('op', '')
+    
+    getpostfiles.get['group_id']=getpostfiles.get.get('group_id', '0')
 
     request_type=formsutils.request_type()
     
@@ -78,7 +80,9 @@ def admin(**args):
     
     server.forms['delete_root_password'].label=I18n.lang('pastafari', 'delete_root_password', 'Disable root password')
     
-    server.forms['group_id']=SelectModelForm('group_id', 0, group_server, 'name', 'id', 'parent_id')
+    server.forms['group_id']=SelectModelForm('group_id', getpostfiles.get['group_id'], group_server, 'name', 'id', 'parent_id')
+    
+    server.forms['group_id'].field=group_server_item.fields['server_id']
     
     server.forms['group_id'].required=True
     
@@ -90,7 +94,7 @@ def admin(**args):
             
             forms=formsutils.show_form({}, server.forms, t, False)
             
-            return t.load_template('pastafari/admin/add_servers.phtml', form_server=forms, url=url+'?op=1')
+            return t.load_template('pastafari/admin/add_servers.phtml', group_id=getpostfiles.get['group_id'], form_server=forms, url=url+'?op=1&group_id='+getpostfiles.get['group_id'])
         else:
             
             #if insert then send task to servertask
@@ -142,7 +146,7 @@ def admin(**args):
                             
                             forms=formsutils.show_form(getpostfiles.post, server.forms, t, True)
                             
-                            return t.load_template('pastafari/admin/add_servers.phtml', form_server=forms, url=url+'?op=1')
+                            return t.load_template('pastafari/admin/add_servers.phtml', group_id=getpostfiles.get['group_id'], form_server=forms, url=url+'?op=1')
                 
                         else:
                             
@@ -263,7 +267,7 @@ def admin(**args):
                     
                     forms=formsutils.show_form(getpostfiles.post, server.forms, t, True)
                         
-                    return t.load_template('pastafari/admin/add_servers.phtml', form_server=forms, url=url+'?op=1')
+                    return t.load_template('pastafari/admin/add_servers.phtml', group_id=getpostfiles.get['group_id'], form_server=forms, url=url+'?op=1&group_id='+getpostfiles.get['group_id'])
                     
             else:
                 
@@ -271,7 +275,7 @@ def admin(**args):
                 
                 forms=formsutils.show_form(getpostfiles.post, server.forms, t, True)
                         
-                return t.load_template('pastafari/admin/add_servers.phtml', form_server=forms, url=url+'?op=1')
+                return t.load_template('pastafari/admin/add_servers.phtml', group_id=getpostfiles.get['group_id'], form_server=forms, url=url+'?op=1&group_id='+getpostfiles.get['group_id'])
                 
     #elif getpostfiles.get['op']=='2':
         
@@ -540,7 +544,7 @@ def admin(**args):
 
         show_servers=servers_list.show()
         
-        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token(), select_form_group=select_form_group)
+        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token(), select_form_group=select_form_group, group_id=group_id)
     
     
     return ""

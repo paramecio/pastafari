@@ -1,6 +1,6 @@
 <%def name="show_menu(type_op)">
     % if type_op!="":
-        <a href="${make_url('admin/pastafari/servers')}">
+        <a href="${make_url('admin/pastafari/servers?group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'all_servers', 'All servers')}
     % if type_op!="":
@@ -8,7 +8,7 @@
     % endif
     - 
     % if type_op!="down":
-        <a href="${make_url('admin/pastafari/servers?type=down')}">
+        <a href="${make_url('admin/pastafari/servers?type=down&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_down', 'Servers down')}
     % if type_op!="down":
@@ -16,7 +16,7 @@
     % endif
     - 
     % if type_op!="heavy":
-        <a href="${make_url('admin/pastafari/servers?type=heavy')}">
+        <a href="${make_url('admin/pastafari/servers?type=heavy&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_heavy_loaded', 'Servers heavily loaded')}
     % if type_op!="heavy":
@@ -24,7 +24,7 @@
     % endif
     - 
     % if type_op!="disks":
-        <a href="${make_url('admin/pastafari/servers?type=disks')}">
+        <a href="${make_url('admin/pastafari/servers?type=disks&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_bloated_disks', 'Servers with bloated disks')}
     % if type_op!="disks":
@@ -32,7 +32,7 @@
     % endif
     - 
     % if type_op!="update_servers":
-        <a href="${make_url('admin/pastafari/servers?type=update_servers')}">
+        <a href="${make_url('admin/pastafari/servers?type=update_servers&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_to_update', 'Servers to update')}
     % if type_op!="update_servers":
@@ -42,7 +42,7 @@
 <form method="get" action="${make_admin_url('pastafari/servers')}" id="change_group">
 <p>${select_form_group.form()|n}</p>
 </form>
-<p><a href="${make_url('admin/pastafari/servers?op=1')}">${lang('pastafari', 'add_existent_server', 'Add existing server')}</a></p>
+<p><a href="${make_url('admin/pastafari/servers?op=1&group_id='+str(group_id))}">${lang('pastafari', 'add_existent_server', 'Add existing server')}</a></p>
 <p>
 ${show_menu(type_op)}
 </p>
