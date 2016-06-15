@@ -5,6 +5,7 @@ from paramecio.citoplasma.lists import SimpleList
 from paramecio.citoplasma.httputils import GetPostFiles
 from paramecio.cromosoma.formsutils import csrf_token
 from paramecio.citoplasma.urls import make_url
+from paramecio.citoplasma.mtemplates import set_flash_message
 from paramecio.citoplasma import datetime
 from modules.pastafari.models import servers, tasks
 from modules.pastafari.libraries.configclass import config_task
@@ -456,6 +457,39 @@ def admin(**args):
             
             return json.dumps(arr_disk)
     
+    elif getpostfiles.get['op']=='5':
+        
+        getpostfiles.get['id']=getpostfiles.get.get('id', '0')
+        
+        getpostfiles.get['delete']=getpostfiles.get.get('delete', '0')
+        
+        try:
+            getpostfiles.get['id']=int(getpostfiles.get['id'])
+        except:
+            getpostfiles.get['id']=0
+            
+        if getpostfiles.get['delete']!='0':
+            
+            group_server_item.set_conditions('WHERE server_id=%s', [ getpostfiles.get['id']])
+            
+            group_server_item.delete()
+            
+            server.set_conditions('WHERE id=%s', [ getpostfiles.get['id']])
+            
+            server.delete()
+            
+            set_flash_message('Deleted the server sucessfully')
+            
+            redirect(make_admin_url('pastafari/servers'))
+            
+            pass
+        else:
+            
+            return "It deleted the server in database <strong>only</strong><p>You need delete the server with the tool of your election: <input type=\"button\" value=\"Do you are sure?\" onclick=\"javascript:location.href='"+make_admin_url('pastafari/servers', {'op': '5', 'id': str(getpostfiles.get['id']), 'delete': '1'})+"';\"></p>"
+        
+        
+        pass
+    
     else:
         
         """
@@ -532,6 +566,16 @@ def admin(**args):
                 
                 yes_form=1
                 
+            elif getpost.get['type']=='task_servers': 
+                
+                servers_list.arr_extra_fields=[I18n.lang('pastafari', 'choose_server', 'Choose server')]
+        
+                servers_list.arr_extra_options=[server_update_options]
+                
+                servers_list.yes_search=False
+                
+                yes_form=2
+                
             type_op=getpost.get['type']
         
         if group_id>0:
@@ -555,6 +599,7 @@ def server_options(url, id, arr_row):
     
     arr_options.append('<a href="%s">%s</a>' % (make_admin_url('pastafari/servers', {'op': str(2), 'id': str(id)}), 'Server graphs'))
     arr_options.append('<a href="%s">%s</a>' % (make_url('pastafari/serverslogs', {'id': str(id)}), 'Server logs'))
+    arr_options.append('<a href="%s">%s</a>' % (make_admin_url('pastafari/servers', {'op': '5', 'id': str(id)}), 'Delete server from db'))
     
     return arr_options
     
