@@ -49,6 +49,13 @@ def home():
     t=PTemplate(env)
     
     getpost=GetPostFiles()            
+    
+    getpost.obtain_get()
+    
+    try:
+        group_id=int(getpost.get.get('group_id', '0'))
+    except:
+        group_id=0
 
     if request_type()=='POST':
         getpost.obtain_post()
@@ -89,6 +96,9 @@ def home():
             
             if len(arr_servers)>0:
                 where_sql='WHERE id IN (%s)' % ",".join(arr_servers)
+            
+            if group_id>0:
+                where_sql+=' AND id IN (select server_id from servergroupitem where group_id='+str(group_id)+')'
             
             commands_to_execute=[['bin/upgrade.sh', '']]
             

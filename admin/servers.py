@@ -23,6 +23,7 @@ import requests
 import os
 import copy
 import json
+import configparser
 
 #t_admin=ptemplate('modules/pastafari')
 
@@ -534,6 +535,8 @@ def admin(**args):
         
         servers_list.arr_extra_options=[server_options]
         
+        select_task=None
+        
         if 'type' in getpost.get:
             
             if getpost.get['type']=='down':
@@ -576,6 +579,17 @@ def admin(**args):
                 
                 yes_form=2
                 
+                # Get tasks and put in select_task
+                
+                # Folders are tasks/ and modules/pastafari/tasks
+                
+                base_path='modules/pastafari/tasks'
+                
+                config_parser = configparser.ConfigParser()
+                
+                arr_dir=scandir(base_path, config_parser, [],  'tasks')
+                print(arr_dir)
+                
             type_op=getpost.get['type']
         
         if group_id>0:
@@ -611,3 +625,26 @@ def server_update_options(url, id, arr_row):
     arr_options.append('<input type="checkbox" name="server_'+str(id)+'" id="server_'+str(id)+'" class="server_checkbox" value="'+str(id)+'" />')
     
     return arr_options
+
+def scandir(mydir, config_parser, arr_dir=[], father=''):
+    
+    search_dir=os.listdir(mydir)
+    
+    for one_path in search_dir:
+       
+        if os.path.isfile(mydir+'/'+one_path):
+            if one_path=='info.cfg':
+                # Read the info file and put radio form in python files signed in file
+                config_parser.read(mydir+'/'+one_path)
+                
+                if 'info' in config_parser:                   
+                    if 'name' in config_parser['info']:
+                        arr_dir.append([config_parser['info']['name'], father])
+                
+                pass
+            
+        elif os.path.isdir(mydir+'/'+one_path):
+            
+            arr_dir=scandir(mydir+'/'+one_path, config_parser, arr_dir, os.path.basename(one_path))
+            
+    return arr_dir

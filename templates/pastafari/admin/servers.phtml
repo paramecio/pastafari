@@ -55,18 +55,22 @@
 <p>
 ${show_menu(type_op)}
 </p>
-% if yes_form==1 or yes_yorm==2:
-<form method="post" name="update_servers" id="update_servers" action="${make_url('pastafari/updateservers')}">
+% if yes_form==1:
+<form method="post" name="update_servers" id="update_servers" action="${make_url('pastafari/updateservers?group_id='+str(group_id))}">
+% endif
+% if yes_form==2:
+<form method="post" name="update_servers" id="update_servers" action="${make_url('pastafari/maketask?group_id='+str(group_id))}">
+<p>Choose task: </p>
 % endif
 ${show_servers|n}
 % if yes_form==1 or yes_yorm==2:
 ${csrf_token()|n}
 % endif
 % if yes_form==1:
-<input type="submit" value="${lang('pastafari', 'update_selected_servers', 'Update selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/updateservers')}';" value="${lang('pastafari', 'update_all_servers', 'Update all servers')}" />
+<input type="submit" value="${lang('pastafari', 'update_selected_servers', 'Update selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/updateservers?group_id='+str(group_id))}';" value="${lang('pastafari', 'update_all_servers', 'Update all servers')}" />
 </form>
 % elif yes_form==2:
-<input type="submit" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/maketask')}';" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers')}" />
+<input type="submit" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/maketask?group_id='+str(group_id))}';" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers')}" />
 </form>
 % endif
 % if yes_form==1 or yes_yorm==2:
