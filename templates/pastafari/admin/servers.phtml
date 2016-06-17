@@ -47,6 +47,33 @@
         </a>
     % endif
 </%def>
+<%def name="show_tasks(task_folder)">
+<ul>
+% for task,value in select_task[task_folder].items():
+
+    <li>
+        <a href="#">${value[0][0]}</a>
+        
+        % if len(value)>=2:
+            <ul>
+            % for script in enumerate(value, 1):
+                %if script[1][2]==1:
+                    <li>
+                    ${script[1][0].split(',')[0].strip()}<input type="radio" name="task" value="${script[1][1].decode('utf-8')}"/>
+                    </li>
+                % endif
+            % endfor
+            </ul>
+        % endif
+        
+        % if task in select_task:
+            ${show_tasks(task)}
+        %endif
+    </li>
+
+% endfor
+</ul>
+</%def>
 <form method="get" action="${make_admin_url('pastafari/servers')}" id="change_group">
 <p>${select_form_group.form()|n}</p>
 <input type="hidden" name="type" value="${type_op}" />
@@ -61,6 +88,7 @@ ${show_menu(type_op)}
 % if yes_form==2:
 <form method="post" name="update_servers" id="update_servers" action="${make_url('pastafari/maketask?group_id='+str(group_id))}">
 <p>Choose task: </p>
+${show_tasks('tasks')}
 % endif
 ${show_servers|n}
 % if yes_form==1 or yes_yorm==2:
@@ -70,7 +98,7 @@ ${csrf_token()|n}
 <input type="submit" value="${lang('pastafari', 'update_selected_servers', 'Update selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/updateservers?group_id='+str(group_id))}';" value="${lang('pastafari', 'update_all_servers', 'Update all servers')}" />
 </form>
 % elif yes_form==2:
-<input type="submit" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/maketask?group_id='+str(group_id))}';" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers')}" />
+<input type="submit" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="button" onclick="javascript:$('#update_servers').submit();" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers')}" />
 </form>
 % endif
 % if yes_form==1 or yes_yorm==2:

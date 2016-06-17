@@ -17,9 +17,12 @@ from paramecio.cromosoma.coreforms import SelectForm
 from paramecio.cromosoma.coreforms import PasswordForm
 from paramecio.cromosoma.coreforms import SelectModelForm
 from paramecio.modules.admin.index import make_admin_url
+from itsdangerous import JSONWebSignatureSerializer
 from settings import config
 from bottle import request, redirect
+from collections import OrderedDict
 import requests
+import re
 import os
 import copy
 import json
@@ -587,8 +590,10 @@ def admin(**args):
                 
                 config_parser = configparser.ConfigParser()
                 
-                arr_dir=scandir(base_path, config_parser, [],  'tasks')
-                print(arr_dir)
+                select_task=scandir(base_path, config_parser, OrderedDict(),  'tasks')
+                
+                #OrderedDict([('tasks', {'servers': [['Servers', 'tasks', 0]]}), ('servers', {'databases': [['Database servers', 'servers', 0]], 'mail': [['Mail', 'servers', 0], ['Standalone postfix server,  Install on your servers a simple and secure postfix mail server', 'mail', 'modules/pastafari/tasks/servers/mail/postfix/standalone_postfix.py', 1]]})])
+
                 
             type_op=getpost.get['type']
         
@@ -602,7 +607,7 @@ def admin(**args):
 
         show_servers=servers_list.show()
         
-        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token(), select_form_group=select_form_group, group_id=group_id)
+        return t.load_template('pastafari/admin/servers.phtml', show_servers=show_servers, type_op=type_op, yes_form=yes_form, csrf_token=csrf_token(), select_form_group=select_form_group, group_id=group_id, select_task=select_task)
     
     
     return ""
@@ -626,7 +631,7 @@ def server_update_options(url, id, arr_row):
     
     return arr_options
 
-def scandir(mydir, config_parser, arr_dir=[], father=''):
+def scandir(mydir, config_parser, arr_dir=OrderedDict(), father='', s=JSONWebSignatureSerializer(config.key_encrypt)):
     
     search_dir=os.listdir(mydir)
     
@@ -635,16 +640,26 @@ def scandir(mydir, config_parser, arr_dir=[], father=''):
         if os.path.isfile(mydir+'/'+one_path):
             if one_path=='info.cfg':
                 # Read the info file and put radio form in python files signed in file
+                config_parser.clear()
                 config_parser.read(mydir+'/'+one_path)
                 
                 if 'info' in config_parser:                   
                     if 'name' in config_parser['info']:
-                        arr_dir.append([config_parser['info']['name'], father])
+                        
+                        if not father in arr_dir:
+                            arr_dir[father]={}
+                        
+                        arr_dir[father][os.path.basename(mydir)]=[]
+                        
+                        arr_dir[father][os.path.basename(mydir)].append([config_parser['info']['name'], father, 0])
+                        
+                        if 'modules' in config_parser:
+                            for k, v in config_parser['modules'].items():
+                                arr_dir[father][os.path.basename(mydir)].append([config_parser['modules'][k], s.dumps({'file': mydir+'/'+k+'.py'}), 1])
                 
-                pass
-            
+        
         elif os.path.isdir(mydir+'/'+one_path):
             
-            arr_dir=scandir(mydir+'/'+one_path, config_parser, arr_dir, os.path.basename(one_path))
-            
+            arr_dir=scandir(mydir+'/'+one_path, config_parser, arr_dir, os.path.basename(mydir))
+    
     return arr_dir
