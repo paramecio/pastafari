@@ -8,6 +8,33 @@ from modules.pastafari.libraries.configclass import config_task
 from paramecio.citoplasma.i18n import I18n
 from paramecio.cromosoma.webmodel import WebModel
 
+class ArgsTask:
+    
+    def __init__(self):
+        
+        self.files=[]
+        
+        # Format first array element is command with the interpreter, the task is agnostic, the files in os directory. The commands are setted with 750 permission.
+        # First element is the file, next elements are the arguments
+        
+        self.commands_to_execute=[];
+        
+        #THe files to delete
+        
+        self.delete_files=[];
+        
+        self.delete_directories=[];
+
+    def form(self):
+        
+        return ""
+        
+    def insert_task(self, post):
+        
+        # Insert task
+        
+        pass
+
 class Task:
 
     def __init__(self, server, task_id=0):
