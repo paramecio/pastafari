@@ -10,7 +10,7 @@ from paramecio.cromosoma.webmodel import WebModel
 
 class ArgsTask:
     
-    def __init__(self):
+    def __init__(self, conn):
         
         self.files=[]
         
