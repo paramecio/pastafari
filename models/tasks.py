@@ -47,3 +47,4 @@ class LogTask(WebModel):
         self.register(corefields.BooleanField('error'))
         self.register(corefields.BooleanField('status'))
         self.register(DictField('data', corefields.CharField('data')))
+        self.register(corefields.CharField('version'))

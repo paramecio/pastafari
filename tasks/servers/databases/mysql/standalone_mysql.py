@@ -23,6 +23,8 @@ class MakeTask(ArgsTask):
         self.delete_directories=['modules/pastafari/scripts/servers/databases/mariadb']
         
         self.task=Task(conn)
+        
+        self.one_time=True
     
     def form(self, t):
         

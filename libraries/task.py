@@ -23,7 +23,11 @@ class ArgsTask:
         
         self.delete_files=[];
         
-        self.delete_directories=[];
+        self.delete_directories=[]
+        
+        self.one_time=False
+        
+        self.version='1.0'
 
     def form(self):
         
