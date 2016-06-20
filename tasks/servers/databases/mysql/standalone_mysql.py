@@ -37,20 +37,6 @@ class MakeTask(ArgsTask):
     def insert_task(self, post):
         
         self.task.create_forms()
-        """
-        self.register(corefields.CharField('name_task'), True)
-        self.register(corefields.CharField('description_task'), True)
-        self.register(ArrayField('files', ArrayField('', corefields.CharField(''))))
-        self.register(ArrayField('commands_to_execute', ArrayField('', corefields.CharField(''))))
-        self.register(ArrayField('delete_files', corefields.CharField('')))
-        self.register(ArrayField('delete_directories', corefields.CharField('')))
-        self.register(corefields.BooleanField('error'))
-        self.register(corefields.BooleanField('status'))
-        self.register(corefields.CharField('url_return'))
-        self.register(IpField('server'))
-        self.register(corefields.TextField('where_sql_server'))
-        self.register(corefields.IntegerField('num_servers'))
-        """
         
         if 'mysql_password' in post:
         
@@ -58,7 +44,7 @@ class MakeTask(ArgsTask):
             
             if self.task.insert({'name_task': 'Mariadb Install server', 'description_task': 'Install a mariadb/Mysql server in your selected hosts', 'codename_task': 'mariadb_simple_server', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version}):
                 
-                return self.task.insert_id()
+                return (self.task.insert_id(), 'Mariadb Install server', 'Install a mariadb/Mysql server in your selected hosts')
                 
         return False
             

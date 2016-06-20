@@ -140,7 +140,7 @@ def showprogress(task_id, server):
                 
                 #arr_task=
                 
-                content_index=t.load_template('pastafari/progress.phtml', description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
+                content_index=t.load_template('pastafari/progress.phtml', name_task=arr_task['name_task'], description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
         
         return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
             

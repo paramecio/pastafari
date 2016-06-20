@@ -12,6 +12,7 @@ from settings import config_admin
 from paramecio.citoplasma.httputils import GetPostFiles
 from paramecio.cromosoma.formsutils import request_type
 from paramecio.cromosoma.webmodel import WebModel
+from paramecio.citoplasma.i18n import I18n
 from bottle import redirect
 from modules.pastafari.models.tasks import Task, LogTask
 from modules.pastafari.models.servers import Server
@@ -89,7 +90,7 @@ def home():
             
             #Get form of task
             
-            return t.load_template('admin/content.html', title='Updating servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
             redirect(config.admin_folder)
@@ -145,7 +146,7 @@ def executetask():
                 
                 # Process the task
                 
-                task_id=task_first.insert_task(getpost.post)
+                (task_id, name_task, description_task)=task_first.insert_task(getpost.post)
                 
                 if task_id:
 
@@ -199,7 +200,7 @@ def executetask():
                                 
                                 num_servers=server.select_count()
                                 
-                                content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), num_servers=num_servers)
+                                content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=name_task, description_task=description_task, num_servers=num_servers)
                         
                         except:
                             
@@ -212,7 +213,7 @@ def executetask():
                     else:
                         content_index="Error: cannot insert the task: "+task.show_errors()
                     
-                    return t.load_template('admin/content.html', title='Updating servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+                    return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
                     
                 else:
                     redirect(config.admin_folder)
