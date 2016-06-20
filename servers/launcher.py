@@ -63,6 +63,15 @@ def start():
         
         task.delete_directories=task_model.fields['files'].loads(arr_task['delete_directories'])
         
+        task.one_time=False
+        
+        if arr_task['one_time']==1:
+            task.one_time=True
+            
+        task.version=arr_task['version']
+        
+        task.codename=arr_task['codename_task']
+        
         if task.delete_directories==False:
             task.delete_directories=[]
         
@@ -108,7 +117,7 @@ def start():
                     arr_task=[]
                     
                     for server in arr_servers:
-                        arr_task.append([task, server['ip']])
+                        arr_task.append([task, server['ip'], server['os_codename']])
                     
                     pool.map(execute_multitask, arr_task)
                     
@@ -131,8 +140,10 @@ def execute_multitask(arr_task=[]):
     
     task=arr_task[0]
     server=arr_task[1]
+    os_server=arr_task[2]
     
     task.server=server
+    task.os_server=os_server
     
     task.exec()
 

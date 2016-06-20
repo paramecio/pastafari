@@ -140,7 +140,7 @@ def showprogress(task_id, server):
                 
                 #arr_task=
                 
-                content_index=t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, server=server, position=0)
+                content_index=t.load_template('pastafari/progress.phtml', description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
         
         return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
             
@@ -209,21 +209,43 @@ def getprogress(task_id):
             
             logtask.set_order(['id'], ['DESC'])
             
-            logtask.set_conditions('WHERE task_id=%s and status=1 and server IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
+            logtask.set_conditions('WHERE task_id=%s and status=1 and error=1 and server=""', [task_id])
             
-            arr_log=logtask.select_to_array(['status', 'error', 'server'])
+            c_error=logtask.select_count()
             
-            logtask.set_order(['id'], ['DESC'])
+            if c_error==0:
             
-            logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
-            
-            arr_log2=logtask.select_to_array(['status', 'error', 'server'])
-            
-            arr_log=arr_log2+arr_log
-            
+                logtask.set_order(['id'], ['DESC'])
+                
+                logtask.set_conditions('WHERE task_id=%s and status=1 and server IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
+                
+                arr_log=logtask.select_to_array(['status', 'error', 'server'])
+                
+                logtask.set_order(['id'], ['DESC'])
+                
+                logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
+                
+                arr_log2=logtask.select_to_array(['status', 'error', 'server'])
+                
+                arr_log=arr_log2+arr_log
+                
+                #response.set_header('Content-type', 'text/plain')
+                
+                #return json.dumps(arr_log)
+                
+            else:
+                
+                arr_log=[]
+                
+                for server in servers:
+                    
+                    arr_log.append({'status':1, 'error':1, 'server': server})
+                    
             response.set_header('Content-type', 'text/plain')
-            
+                
             return json.dumps(arr_log)
+                
+                
 
     else:
         return {}

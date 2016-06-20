@@ -89,75 +89,6 @@ def home():
             
             #Get form of task
             
-            
-            
-            # Send request to server
-            
-            
-            """
-            arr_servers=[]
-            
-            where_sql='WHERE num_updates>0'
-            
-            for server_id in getpost.post.values():
-                
-                try:
-                    server_id=int(server_id)
-                    
-                    if server_id>0:
-                        arr_servers.append(str(server_id))
-                except:
-                    pass
-            
-            if len(arr_servers)>0:
-                where_sql='WHERE id IN (%s)' % ",".join(arr_servers)
-            
-            if group_id>0:
-                where_sql+=' AND id IN (select server_id from servergroupitem where group_id='+str(group_id)+')'
-            
-            commands_to_execute=[['bin/upgrade.sh', '']]
-            
-            task.create_forms()
-            
-            if task.insert({'name_task': 'update_server','description_task': I18n.lang('pastafari', 'update_servers', 'Updating servers...'), 'url_return': '', 'commands_to_execute': commands_to_execute, 'server': '', 'where_sql_server': where_sql}):
-                                                
-                task_id=task.insert_id()
-                                
-                try:
-                
-                    r=requests.get(server_task+str(task_id))
-                    
-                    arr_data=r.json()
-                    
-                    arr_data['task_id']=task_id
-                    
-                    logtask.create_forms()
-                    
-                    if not logtask.insert(arr_data):
-                        
-                        content_index="Error:Wrong format of json data..."
-                        
-                        #return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...') #"Load template with ajax..."
-                    else:
-                        
-                        server.set_conditions(where_sql, [])
-                        
-                        num_servers=server.select_count()
-                        
-                        content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), num_servers=num_servers)
-                
-                except:
-                    
-                    #logtask.conditions=['WHERE id=%s', [task_id]]
-                    
-                    task.update({'status': 1, 'error': 1})
-                    
-                    content_index="Error:cannot connect to task server, check the url for it..."+traceback.format_exc()
-                    
-            else:
-                content_index="Error: cannot insert the task: "+task.show_errors()
-            """
-            
             return t.load_template('admin/content.html', title='Updating servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
@@ -261,8 +192,7 @@ def executetask():
                             if not logtask.insert(arr_data):
                                 
                                 content_index="Error:Wrong format of json data..."
-                                
-                                #return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...') #"Load template with ajax..."
+
                             else:
                                 
                                 server.set_conditions(where_sql, [])
@@ -272,8 +202,6 @@ def executetask():
                                 content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), num_servers=num_servers)
                         
                         except:
-                            
-                            #logtask.conditions=['WHERE id=%s', [task_id]]
                             
                             task.update({'status': 1, 'error': 1})
                             

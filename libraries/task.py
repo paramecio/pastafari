@@ -49,6 +49,8 @@ class Task:
         
         self.name=''
         
+        self.codename=''
+        
         self.description=''
 
         self.txt_error=''
@@ -85,7 +87,9 @@ class Task:
         self.logtask.reset_require()
         self.task.reset_require()
         
-        self.just_one=False
+        self.one_time=False
+        
+        self.version='1.0'
         
         pass
 
@@ -179,7 +183,7 @@ class Task:
                 try:
                     
                     if not os.path.isfile(source_file):
-                        self.txt_error="Sorry, you don't have source file to upload"
+                        self.txt_error="Sorry, you don't have source file to upload "+source_file
                         return False
                     
                     dir_file=os.path.dirname(source_file)
@@ -359,6 +363,32 @@ class Task:
             
             return False
         
+        #Check if script was executed
+        
+        if self.codename!='':
+        
+            if self.one_time==True:
+            
+                with self.ssh.open_sftp() as sftp:
+                    
+                    try:
+                    
+                        with sftp.file(self.config.remote_path+'/tasks/'+self.codename) as f:
+                            version=f.read()
+                            version=version.decode('utf-8').strip()
+                            
+                            if version==self.version:
+                                #self.task.conditions=['WHERE id=%s', [self.id]]
+                                #self.task.update({'error': 0, 'status': 1})
+                                
+                                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': 'This script was executed correctly in this server', 'error': 0, 'status': 1, 'server': self.server})
+                                
+                                return True
+                                
+                    except IOError:
+                        # It was not executed
+                        pass
+        
         if not self.upload_files():
             self.task.conditions=['WHERE id=%s', [self.id]]
             self.task.update({'error': 1, 'status': 1})
@@ -467,6 +497,27 @@ class Task:
 
         # FInish task
         
+        #Put this version how executed
+        
+        if self.codename!='':
+        
+            if self.one_time==True:
+                
+                with self.ssh.open_sftp() as sftp:
+                
+                    try:
+                        path_check=self.config.remote_path+'/tasks/'
+                                            
+                        f_stat=sftp.stat(path_check)
+                    
+                    except IOError:
+                    
+                        sftp.mkdir(path_check)
+                
+                    with sftp.file(path_check+self.codename, 'w') as f:
+                        f.write(self.version)
+                    
+            
         self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
         
         self.task.conditions=['WHERE id=%s', [self.id]]

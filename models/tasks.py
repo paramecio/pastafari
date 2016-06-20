@@ -15,8 +15,9 @@ class Task(WebModel):
         
         super().__init__(connection)
     
-        self.register(corefields.CharField('name_task'), True)
+        self.register(corefields.CharField('name_task'), True)        
         self.register(corefields.CharField('description_task'), True)
+        self.register(corefields.CharField('codename_task'))
         self.register(ArrayField('files', ArrayField('', corefields.CharField(''))))
         self.register(ArrayField('commands_to_execute', ArrayField('', corefields.CharField(''))))
         self.register(ArrayField('delete_files', corefields.CharField('')))
@@ -30,6 +31,8 @@ class Task(WebModel):
         self.register(corefields.CharField('user'))
         self.register(corefields.CharField('password'))
         self.register(corefields.CharField('path'))
+        self.register(corefields.BooleanField('one_time'))
+        self.register(corefields.CharField('version'))
     
 
 class LogTask(WebModel):
@@ -47,4 +50,3 @@ class LogTask(WebModel):
         self.register(corefields.BooleanField('error'))
         self.register(corefields.BooleanField('status'))
         self.register(DictField('data', corefields.CharField('data')))
-        self.register(corefields.CharField('version'))

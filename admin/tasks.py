@@ -66,7 +66,6 @@ def admin(**args):
         if getpostfiles.get['server']!='':
             tasklog.conditions=['WHERE task_id=%s and logtask.server=%s', [task_id, getpostfiles.get['server']]]
             
-        
         #tasklog.set_limit([position, 1])
         
         #arr_row=tasklog.select_a_row_where([], 1, position)
@@ -84,16 +83,36 @@ def admin(**args):
             for arr_row in cursor:
                 arr_rows.append(arr_row)
             
+            if len(arr_rows)==0:
+                tasklog.set_limit([1])
+            
+                tasklog.set_order(['id'], ['ASC'])
+                
+                tasklog.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
+                
+                if tasklog.select_count('id', True)==0:
+                    
+                    if arr_task['status']=='0' or arr_task['status']==0:
+                        return {'wait': 1}
+                    else:
+                        return {}
+                else:
+                    
+                    tasklog.set_limit([1])
+                
+                    tasklog.set_order(['id'], ['ASC'])
+                    
+                    tasklog.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
+                    
+                    arr_rows=tasklog.select_to_array([], True)
+            
             response.set_header('Content-type', 'text/plain')
             
             return json.dumps(arr_rows)
             
-        else:
-            
-            if arr_task['status']=='0' or arr_task['status']==0:
-                return {'wait': 1}
-            else:
-                return {}
+        
+                
+                
     else:
         return {}
         """
