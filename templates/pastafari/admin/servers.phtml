@@ -48,14 +48,14 @@
     % endif
 </%def>
 <%def name="show_tasks(task_folder)">
-<ul>
+<ul class="superul">
 % for task,value in select_task[task_folder].items():
 
     <li>
-        <a href="#">${value[0][0]}</a>
+        <a href="#" class="category_server">${value[0][0]}</a>
         
         % if len(value)>=2:
-            <ul>
+            <ul style="display:none;" class="sonul">
             % for script in enumerate(value, 1):
                 %if script[1][2]==1:
                     <li>
@@ -101,7 +101,7 @@ ${csrf_token()|n}
 <input type="submit" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="button" onclick="javascript:$('#update_servers').submit();" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers')}" />
 </form>
 % endif
-% if yes_form==1 or yes_yorm==2:
+% if yes_form==1 or yes_form==2:
 <script>
 
 $('#update_servers').submit( function () {
@@ -116,6 +116,26 @@ $('#update_servers').submit( function () {
     }
 
 });
+
+$('.category_server').click(function () {
+   
+    if($(this).parent().children('.sonul').css('display')=='none')
+    {
+   
+        $(this).parent().children('.sonul').show();
+        
+    }
+    else
+    {
+        
+        $(this).parent().children('.sonul').hide();
+        
+    }
+    
+    return false;
+    
+});
+
 </script>
 % endif
 <script>

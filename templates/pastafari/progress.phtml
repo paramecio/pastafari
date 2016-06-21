@@ -95,50 +95,7 @@
                     if(data[k].no_progress==0)
                     {
                         
-                        
                         update_progress_messages_queue(data[k].message, data[k].progress);
-                        
-                        /*data[k].progress=parseInt(data[k].progress);
-                        
-                        progressbar.progressbar( "value", data[k].progress );
-                        
-                        $('#no_progress').append(data[k].message+'<br />');
-                        
-                        objDiv.scrollTop = objDiv.scrollHeight;*/
-                        
-                        /*if(data[k].progress<100)
-                        {
-                        
-                            perc=data[k].progress/100;
-                        
-                            $('#no_progress').append(data[k].message+'<br />');
-                            
-                            objDiv.scrollTop = objDiv.scrollHeight;
-                            
-                            data[k].progress=parseInt(data[k].progress)
-                            
-                            progressbar.progressbar( "value", data[k].progress );
-                            
-                        }
-                        else
-                        {
-                            
-                            //line.animate(1);
-                            //$('#text_progress').html('100% - '+data[k].msg);
-                            
-                            data[k].progress=parseInt(data[k].progress);
-                            
-                            progressbar.progressbar( "value", data[k].progress );
-                            
-                            $('#no_progress').append(data[k].message+'<br />');
-                            
-                            objDiv.scrollTop = objDiv.scrollHeight;
-                            //$('#loading').hide();
-                            
-                            //Refresh dashboard
-                            
-                            
-                        }*/
                         
                     }
                     
@@ -155,9 +112,6 @@
                         
                         if(data[k].error==1)
                         {
-                            
-                            /*progressbar.progressbar( "value", data[k].progress );
-                            progressLabel.text( "ERROR, please see the log" );*/
                             
                             finish_progress_error(data[k].progress);
                             
