@@ -138,3 +138,28 @@ class StatusDisk(WebModel):
         self.register(corefields.DoubleField('free'))
         self.register(corefields.DoubleField('percent'))
         self.register(DateField('date'))
+
+class StatusMemory(WebModel):
+    
+    def __init__(self, connection):
+        
+        super().__init__(connection)
+        
+        self.register(IpField('ip'), True)
+        self.fields['ip'].indexed=True
+        
+        #svmem(total=518418432, available=413130752, percent=20.3, used=208052224, free=310366208, active=137457664, inactive=40919040, buffers=20692992, cached=82071552, shared=4820992)
+        
+        self.register(corefields.BigIntegerField('total'), True)
+        self.register(corefields.BigIntegerField('available'), True)
+        self.register(corefields.DoubleField('percent'), True)
+        self.register(corefields.BigIntegerField('used'), True)
+        self.register(corefields.BigIntegerField('free'), True)
+        self.register(corefields.BigIntegerField('active'), True)
+        self.register(corefields.BigIntegerField('inactive'), True)
+        self.register(corefields.BigIntegerField('buffers'), True)
+        self.register(corefields.BigIntegerField('cached'), True)
+        self.register(corefields.BigIntegerField('shared'), True)
+        
+        self.register(corefields.BooleanField('last_updated'))
+        self.register(DateField('date'))

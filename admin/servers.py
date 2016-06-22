@@ -97,7 +97,7 @@ def admin(**args):
         
         if request_type!="POST":
             
-            forms=formsutils.show_form({}, server.forms, t, False)
+            forms=formsutils.show_form({}, server.forms, t, False, False)
             
             return t.load_template('pastafari/admin/add_servers.phtml', group_id=getpostfiles.get['group_id'], form_server=forms, url=url+'?op=1&group_id='+getpostfiles.get['group_id'])
         else:
@@ -241,7 +241,7 @@ def admin(**args):
                                         
                                         return "Error:cannot connect to task server, check the url for it..."
                                     
-                                    return t.load_template('pastafari/progress.phtml', description_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), task_id=task_id, server=ip, position=0)
+                                    return t.load_template('pastafari/progress.phtml', name_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), description_task=I18n.lang('pastafari', 'add_monit_explain', 'Installing the basic scripts for send info from server to monit module'), task_id=task_id, server=ip, position=0)
                                     #return "Server is building..."
                                     #redirect('servers?op=2&task_id='+str(task_id))
                     
@@ -339,11 +339,26 @@ def admin(**args):
             
             arr_cpu=[]
             
+            cur.fetchone()
+            
             for cpu_info in cur:
                 
                 arr_cpu.append(cpu_info['idle'])
                 
             cur.close()
+            
+            status_mem=servers.StatusMemory(conn)
+            
+            status_mem.set_conditions('where ip=%s and date>=%s and date<=%s', [ip, date_hours12, date_now]) 
+            
+            status_mem.set_order(['id', 'ASC'])
+            
+            arr_mem=status_mem.select_to_array(['used', 'free', 'date'])
+            
+            arr_mem.pop(0)
+            
+            #arr_cpu=status_cpu.select_to_array(['idle', 'date'])
+            cur=status_cpu.select(['idle', 'date'])
             
             arr_net={}
             
@@ -389,8 +404,11 @@ def admin(**args):
                     bytes_sent=round((data_net['bytes_sent']-first_sent)/1024)
                     bytes_recv=round((data_net['bytes_recv']-first_recv)/1024)
                     cpu=arr_cpu[x]
+                    
+                    memory_used=arr_mem[x]['used']
+                    memory_free=arr_mem[x]['free']
 
-                    arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu})
+                    arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu, 'memory_used': memory_used, 'memory_free': memory_free})
                     
                     first_sent=data_net['bytes_sent']
                     first_recv=data_net['bytes_recv']

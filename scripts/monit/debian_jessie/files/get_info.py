@@ -27,6 +27,8 @@ for disk in disk_info:
 
 dev_info={}
 
+mem_info=psutil.virtual_memory()
+
 #for device, info in network_info.items():
     
     #{'eth0': netio(bytes_sent=485291293, bytes_recv=6004858642, packets_sent=3251564, packets_recv=4787798, errin=0, errout=0, dropin=0, dropout=0),
@@ -37,7 +39,7 @@ dev_info={}
 #for device, info in network_devices.items():
     
     #print(info)
-json_info=json.dumps({'net_info': network_info, 'cpu_idle': cpu_idle, 'disks_info': partitions})
+json_info=json.dumps({'net_info': network_info, 'cpu_idle': cpu_idle, 'disks_info': partitions, 'mem_info': mem_info})
 
 data = urllib.parse.urlencode({'data_json': json_info})
 

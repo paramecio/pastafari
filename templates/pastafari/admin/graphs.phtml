@@ -7,13 +7,16 @@ ${add_js_home_local('Chart.min.js', 'pastafari')}
     ${lang('pastafari', 'graphs', 'Graphs')}
 </div>
 <div class="cont">
-    <div>
+    <div style="width:48%;float:right;">
         <canvas id="canvas"></canvas>
     </div>
-    <div>
+    <div style="width:48%;float:left;">
         <canvas id="canvas_cpu"></canvas>
     </div>
-    <div>
+    <div style="width:48%;float:left;">
+        <canvas id="canvas_mem"></canvas>
+    </div>
+    <div style="width:48%;float:left;">
         <canvas id="canvas_disk"></canvas>
     </div>
 </div>
@@ -132,7 +135,7 @@ var config_net = {
                         labelString: 'Time'
                     },
                     ticks: {
-                        maxTicksLimit: 20,
+                        maxTicksLimit: 8,
                         
                         // Return an empty string to draw the tick line but hide the tick label
                         // Return `null` or `undefined` to hide the tick line entirely
@@ -161,11 +164,91 @@ var config_net = {
         }
     };
     
+    var config_mem = {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Used",
+                data: [],
+                fill: true,
+                borderColor: background_in,
+                backgroundColor: background_in,
+                pointBorderColor: background_in,
+                pointBackgroundColor: background_in,
+                pointRadius: 0,
+                lineTension: 0,
+                //borderDash: [5, 5],
+            }
+            ,{
+                label: "Free",
+                data: [],
+                fill: true,
+                lineTension: 0,
+                //borderDash: [5, 5],
+                borderColor: background_out,
+                backgroundColor: background_out,
+                pointBorderColor: background_out,
+                pointBackgroundColor: background_out,
+                pointBorderWidth: 1,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            showXLabels: 10,
+            animation : false,
+            responsive: true,
+            legend: {
+                position: 'bottom',
+            },
+            hover: {
+                mode: 'label'
+            },
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Time'
+                    },
+                    ticks: {
+                        maxTicksLimit: 8,
+                        
+                        // Return an empty string to draw the tick line but hide the tick label
+                        // Return `null` or `undefined` to hide the tick line entirely
+                           userCallback: function(value, index, values) {
+                            return value;
+                        }
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'GigaBytes'
+                    },
+                    ticks: {
+                        //suggestedMax: 500,
+                        min: 0
+                        
+                    }
+                }]
+            },
+            title: {
+                display: true,
+                text: 'Use of memory in this server'
+            }
+        }
+    };
+
+    
     var ctx = document.getElementById("canvas").getContext("2d");
     window.myLine = new Chart(ctx, config_net);
     
     var ctx_cpu = document.getElementById("canvas_cpu").getContext("2d");
     window.myLineCpu = new Chart(ctx_cpu, config_cpu);
+    
+    var ctx_mem = document.getElementById("canvas_mem").getContext("2d");
+    window.myLineMem = new Chart(ctx_mem, config_mem);
     
     //Now the disk donut
     
@@ -204,7 +287,7 @@ var config_net = {
                 },
                 title: {
                     display: true,
-                    text: 'Disk use'
+                    text: 'Disk use in GigaBytes'
                 },
                 animation: {
                     animateScale: true,
@@ -268,10 +351,15 @@ var config_net = {
                 config_cpu.data.labels.push(data[id].date);
                 config_cpu.data.datasets[0].data.push(data[id].cpu);
                 
+                config_mem.data.labels.push(data[id].date);
+                config_mem.data.datasets[0].data.push(data[id].memory_free);
+                config_mem.data.datasets[1].data.push(data[id].memory_used);
+                
             }
             
             window.myLine.update();
             window.myLineCpu.update();
+            window.myLineMem.update();
             
         }).fail(function (data) {
             

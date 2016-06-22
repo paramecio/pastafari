@@ -110,36 +110,9 @@ def admin(**args):
             
             return json.dumps(arr_rows)
             
-        
+        else:
+            return {'wait': 1}
                 
                 
     else:
         return {}
-        """
-        if getpostfiles.get['op']=='1':
-            
-            url_progress=make_url(config.admin_folder+'/pastafari/tasks', {'op': '2', 'task_id': getpostfiles.get['task_id'] })
-            
-            return t_admin.load_template('pastafari/ajax_progress.phtml', title='Adding monitoritation to the server...', url_progress=url_progress, url_return=arr_task['url_return'] )
-            #"Load template with ajax..."
-            
-        elif getpostfiles.get['op']=='2':
-            
-            ptemplate.show_basic_template=False
-            
-            r=requests.get(server_task+str(task_id))
-                            
-            #With it you check if valid JSON
-                           
-            arr_data=r.json()
-            
-            return json.dumps(arr_data)
-            
-        else:
-            
-            return "Progress list"
-        
-    else:
-        
-        return "Task doesn't exists"
-    """
