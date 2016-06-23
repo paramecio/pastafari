@@ -171,11 +171,11 @@ var config_net = {
             datasets: [{
                 label: "Used",
                 data: [],
-                fill: true,
-                borderColor: background_in,
-                backgroundColor: background_in,
-                pointBorderColor: background_in,
-                pointBackgroundColor: background_in,
+                fill: false,
+                borderColor: '#dd0000',
+                backgroundColor: '#dd0000',
+                pointBorderColor: '#dd0000',
+                pointBackgroundColor: '#dd0000',
                 pointRadius: 0,
                 lineTension: 0,
                 //borderDash: [5, 5],
@@ -183,13 +183,26 @@ var config_net = {
             ,{
                 label: "Free",
                 data: [],
-                fill: true,
+                fill: false,
                 lineTension: 0,
                 //borderDash: [5, 5],
                 borderColor: background_out,
                 backgroundColor: background_out,
                 pointBorderColor: background_out,
                 pointBackgroundColor: background_out,
+                pointBorderWidth: 1,
+                pointRadius: 0
+            },
+            {
+                label: "Cached",
+                data: [],
+                fill: false,
+                lineTension: 0,
+                //borderDash: [5, 5],
+                borderColor: background_in,
+                backgroundColor: background_in,
+                pointBorderColor: background_in,
+                pointBackgroundColor: background_in,
                 pointBorderWidth: 1,
                 pointRadius: 0
             }]
@@ -338,6 +351,10 @@ var config_net = {
             config_net.data.datasets[0].data=[];
             config_net.data.datasets[1].data=[];
             
+            config_mem.data.labels=[];
+            config_mem.data.datasets[0].data=[];
+            config_mem.data.datasets[1].data=[];
+            
             config_cpu.data.labels=[];
             config_cpu.data.datasets[0].data=[];
             
@@ -354,6 +371,7 @@ var config_net = {
                 config_mem.data.labels.push(data[id].date);
                 config_mem.data.datasets[0].data.push(data[id].memory_free);
                 config_mem.data.datasets[1].data.push(data[id].memory_used);
+                config_mem.data.datasets[2].data.push(data[id].memory_cached);
                 
             }
             

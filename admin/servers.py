@@ -322,7 +322,7 @@ def admin(**args):
             
             now=datetime.obtain_timestamp(datetime.now())
             
-            hours12=now-43200
+            hours12=now-21600
             
             date_now=datetime.timestamp_to_datetime(now)
             
@@ -351,11 +351,21 @@ def admin(**args):
             
             status_mem.set_conditions('where ip=%s and date>=%s and date<=%s', [ip, date_hours12, date_now]) 
             
-            status_mem.set_order(['id', 'ASC'])
+            #status_mem.set_order(['id', 'ASC'])
             
-            arr_mem=status_mem.select_to_array(['used', 'free', 'date'])
+            #arr_mem=status_mem.select_to_array(['used', 'free', 'date'])
+            arr_mem=[]
+            with status_mem.select(['used', 'free', 'cached', 'date'])  as cur:
+                #cur.fetchone()
+                
+                for mem_info in cur:
+                    mem_info['used']=((mem_info['used']/1024)/1024)/1024
+                    mem_info['free']=((mem_info['free']/1024)/1024)/1024
+                    mem_info['cached']=((mem_info['cached']/1024)/1024)/1024
+                    arr_mem.append(mem_info)
             
-            arr_mem.pop(0)
+            if len(arr_mem)>2:
+                arr_mem.pop(0)
             
             #arr_cpu=status_cpu.select_to_array(['idle', 'date'])
             cur=status_cpu.select(['idle', 'date'])
@@ -407,8 +417,9 @@ def admin(**args):
                     
                     memory_used=arr_mem[x]['used']
                     memory_free=arr_mem[x]['free']
+                    memory_cached=arr_mem[x]['cached']
 
-                    arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu, 'memory_used': memory_used, 'memory_free': memory_free})
+                    arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu, 'memory_used': memory_used, 'memory_free': memory_free, 'memory_cached': memory_cached})
                     
                     first_sent=data_net['bytes_sent']
                     first_recv=data_net['bytes_recv']
