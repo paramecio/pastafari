@@ -97,8 +97,6 @@ print('Writed config...')
 
 #cron_dir=input('The directory where cron notification script is installed (by default /etc/cron.d): ').strip()
 
-user=os.getlogin()
-
 with open('modules/pastafari/install/files/crontab') as f:
     cron_file=f.read()
     
@@ -112,5 +110,74 @@ if call("crontab modules/pastafari/install/files/crontab", shell=True) > 0:
     exit(1)
 else:
     print('Added cron file')
+    
+#Configure mail
+
+"""
+SendMail.port=587
+    
+SendMail.host='web-t-sys.com'
+    
+SendMail.username='absurdo'
+    
+SendMail.password='irpfxion'
+
+SendMail.ssl=False
+
+email_address='webmaster@web-t-sys.com'
+
+email_notification='webmaster@web-t-sys.com'
+"""
+
+host_email=input('Server host: ').strip()
+
+if host_email=='':
+    print('Error, you need a mail server')
+    exit(1)
+
+port_email=input('SMTP port (default port 25): ').strip()
+
+user_email=input('Email username: ').strip()
+
+if user_email=='':
+    print('Error, you need a mail username')
+    exit(1)
+    
+pass_email=input('Email password: ').strip()
+
+if pass_email=='':
+    print('Error, you need a mail password')
+    exit(1)
+    
+ssl_email=input('Email use ssl? (default: yes): ').strip().lower()
+
+if ssl_email=='' or ssl_email=='yes':
+    ssl_email=True
+elif ssl_email=='no':
+    ssl_email=False
+else:
+    ssl_email=True
+    
+if port_email=='':
+    port_email=25
+else:
+    try:
+        port_email=int(port_email)
+    except:
+        port_email=25
+
+email_address=input('The email address that define the email from: ').strip().lower()
+        
+if email_address=='':
+    print('Error, you need a mail name')
+    exit(1)
+    
+email_notification=input('The email address where notification are sended: ').strip().lower()
+        
+if email_notification=='':
+    print('Error, you need a mail name for send notification')
+    exit(1)
+
+
 
 print('Finished pastafari install')
