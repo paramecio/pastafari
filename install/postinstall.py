@@ -71,7 +71,7 @@ add_config.append("# Pastafari configuration")
 
 add_config.append("config_task.public_key='%s'" %  pub_key_file)
 	
-add_config.append("config_task.private_key='%s" % private_key_file)
+add_config.append("config_task.private_key='%s'" % private_key_file)
 
 add_config.append("config_task.password_key='%s'" % password)
 
@@ -87,3 +87,5 @@ with open('settings/config.py', 'a') as f:
     f.write("\n\n".join(add_config))
 
 print('Writed config...')
+
+print('Finished pastafari install')
