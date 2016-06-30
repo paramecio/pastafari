@@ -67,6 +67,8 @@ api_key=create_key(50)
 
 add_config=[]
 
+add_config.append("# Pastafari configuration")
+
 add_config.append("config_task.public_key='%s'" %  pub_key_file)
 	
 add_config.append("config_task.private_key='%s" % private_key_file)
