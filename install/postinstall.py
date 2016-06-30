@@ -113,23 +113,7 @@ else:
     
 #Configure mail
 
-"""
-SendMail.port=587
-    
-SendMail.host='web-t-sys.com'
-    
-SendMail.username='absurdo'
-    
-SendMail.password='irpfxion'
-
-SendMail.ssl=False
-
-email_address='webmaster@web-t-sys.com'
-
-email_notification='webmaster@web-t-sys.com'
-"""
-
-host_email=input('Server host: ').strip()
+host_email=input('SMTP host: ').strip()
 
 if host_email=='':
     print('Error, you need a mail server')
@@ -137,26 +121,26 @@ if host_email=='':
 
 port_email=input('SMTP port (default port 25): ').strip()
 
-user_email=input('Email username: ').strip()
+user_email=input('SMTP username: ').strip()
 
 if user_email=='':
     print('Error, you need a mail username')
     exit(1)
     
-pass_email=input('Email password: ').strip()
+pass_email=input('SMTP password: ').strip()
 
 if pass_email=='':
     print('Error, you need a mail password')
     exit(1)
     
-ssl_email=input('Email use ssl? (default: yes): ').strip().lower()
+ssl_email=input('SMTP use ssl/tls? (default: yes): ').strip().lower()
 
 if ssl_email=='' or ssl_email=='yes':
-    ssl_email=True
+    ssl_email='True'
 elif ssl_email=='no':
-    ssl_email=False
+    ssl_email='False'
 else:
-    ssl_email=True
+    ssl_email='True'
     
 if port_email=='':
     port_email=25
@@ -177,7 +161,28 @@ email_notification=input('The email address where notification are sended: ').st
 if email_notification=='':
     print('Error, you need a mail name for send notification')
     exit(1)
+    
+arr_mail=[]
 
+arr_mail.append("\n\n# Mail configuration")
 
+arr_mail.append("SendMail.port="+port_email)
+    
+arr_mail.append("SendMail.host='"+host_email+"'")
+    
+arr_mail.append("SendMail.username='"+user_email+"'")
+    
+arr_mail.append("SendMail.password='"+pass_email+"'")
+
+arr_mail.append("SendMail.ssl="+ssl_email+"")
+
+arr_mail.append("email_address='"+email_address+"'")
+
+arr_mail.append("email_notification='"+email_notification+"'")
+
+with open('settings/config.py', 'a') as f:
+    f.write("\n\n".join(add_config))
+
+print('Finishing config...')
 
 print('Finished pastafari install')
