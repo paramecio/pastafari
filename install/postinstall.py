@@ -2,6 +2,10 @@
 
 import shutil
 import os
+import sys
+
+sys.path.insert(0, os.getcwd())
+
 import argparse
 from paramecio.citoplasma.keyutils import create_key
 from subprocess import call
