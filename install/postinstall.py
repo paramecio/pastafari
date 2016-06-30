@@ -81,7 +81,7 @@ add_config.append("config_task.url_monit='%s/monit/getinfo'" % config.domain_url
 
 # Add this elements in config.py
 
-with open('settings/config.py', 'w+') as f:
+with open('settings/config.py', 'a') as f:
     f.write("\n\n".join(add_config))
 
 print('Writed config...')
