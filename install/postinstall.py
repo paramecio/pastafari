@@ -104,7 +104,7 @@ cron_file=cron_file.replace('/path/to/pastafari', working_directory)
 with open('modules/pastafari/install/files/crontab', 'w') as f:
     f.write(cron_file)
 
-if call("crontab -u "+user+' modules/pastafari/install/files/crontab', shell=True) > 0:
+if call("crontab modules/pastafari/install/files/crontab", shell=True) > 0:
     print('Error, cannot  install Paramiko')
     exit(1)
 else:
