@@ -4,7 +4,9 @@ import shutil
 import os
 import sys
 
-sys.path.insert(0, os.getcwd())
+working_directory=os.getcwd()
+
+sys.path.insert(0, working_directory)
 
 import argparse
 from paramecio.citoplasma.keyutils import create_key
@@ -87,5 +89,25 @@ with open('settings/config.py', 'a') as f:
     f.write("\n\n".join(add_config))
 
 print('Writed config...')
+
+#Install cron
+
+#cron_dir=input('The directory where cron notification script is installed (by default /etc/cron.d): ').strip()
+
+user=os.getlogin()
+
+with open('modules/pastafari/install/files/crontab') as f:
+    cron_file=f.read()
+    
+cron_file=cron_file.replace('/path/to/pastafari', working_directory)
+
+with open('modules/pastafari/install/files/crontab', 'w') as f:
+    f.write(cron_file)
+
+if call("crontab -u "+user+' modules/pastafari/install/files/crontab', shell=True) > 0:
+    print('Error, cannot  install Paramiko')
+    exit(1)
+else:
+    print('Added paramiko')
 
 print('Finished pastafari install')

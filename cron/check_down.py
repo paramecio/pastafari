@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.realpath(os.getcwd()))
+sys.path.insert(0, os.path.realpath(os.path.dirname(__file__))+'/../../../')
 
 from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models import servers
