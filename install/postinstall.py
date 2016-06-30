@@ -101,6 +101,7 @@ with open('modules/pastafari/install/files/crontab') as f:
     cron_file=f.read()
     
 cron_file=cron_file.replace('/path/to/pastafari', working_directory)
+cron_file=cron_file.replace('pzoo', os.getlogin())
 
 with open('modules/pastafari/install/files/crontab', 'w') as f:
     f.write(cron_file)
