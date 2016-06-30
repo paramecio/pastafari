@@ -86,6 +86,20 @@ add_config.append("config_task.api_key='%s'" % api_key)
 
 add_config.append("config_task.url_monit='%s/monit/getinfo'" % config.domain_url)
 
+remote_user=input('Remote username? (Need to be a valid unix username,  default: pzoo): ').strip().lower()
+
+if remote_user=='':
+    remote_user='pzoo'
+    
+add_config.append("config_task.remote_user='%s'" %  remote_user)
+
+remote_path=input('Remote path folder? (default: /home/pzoo): ').strip().lower()
+
+if remote_path=='':
+    remote_user='/home/'+remote_user
+    
+add_config.append("config_task.remote_path='%s'" %  remote_path)
+
 # Add this elements in config.py
 
 with open('settings/config.py', 'a') as f:
