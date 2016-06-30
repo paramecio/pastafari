@@ -181,7 +181,7 @@ arr_mail.append("email_address='"+email_address+"'")
 arr_mail.append("email_notification='"+email_notification+"'")
 
 with open('settings/config.py', 'a') as f:
-    f.write("\n\n".join(add_config))
+    f.write("\n\n".join(arr_mail))
 
 print('Finishing config...')
 
