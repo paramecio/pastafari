@@ -1,1 +1,1 @@
-*/5 * * * * pzoo /path/to/pastafari/modules/pastafari/cron/check_down.py
+*/5 * * * * pzoo python3 /path/to/pastafari/modules/pastafari/cron/check_down.py
