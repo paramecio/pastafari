@@ -95,7 +95,7 @@ if remote_user=='':
     
 add_config.append("config_task.remote_user='%s'" %  remote_user)
 
-remote_path=input('Remote path folder? (default: /home/pzoo): ').strip().lower()
+remote_path=input('Remote path folder? (default: /home/'+remote_user+'): ').strip().lower()
 
 if remote_path=='':
     remote_path='/home/'+remote_user
