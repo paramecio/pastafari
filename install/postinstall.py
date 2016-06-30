@@ -69,7 +69,10 @@ api_key=create_key(50)
 
 add_config=[]
 
-add_config.append("\n\n# Pastafari configuration")
+add_config.append("\n\nfrom modules.pastafari.libraries.configclass import config_task")
+add_config.append("from paramecio.citoplasma.sendmail import SendMail")
+
+add_config.append("# Pastafari configuration")
 
 add_config.append("config_task.public_key='%s'" %  pub_key_file)
 	
@@ -105,9 +108,9 @@ with open('modules/pastafari/install/files/crontab', 'w') as f:
     f.write(cron_file)
 
 if call("crontab modules/pastafari/install/files/crontab", shell=True) > 0:
-    print('Error, cannot  install Paramiko')
+    print('Error, cannot  install the cron file')
     exit(1)
 else:
-    print('Added paramiko')
+    print('Added cron file')
 
 print('Finished pastafari install')
