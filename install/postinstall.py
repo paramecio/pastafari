@@ -26,7 +26,7 @@ if not shutil.copy(src_scheduler, dst_scheduler):
 
 #Install paramiko
 
-if call("pip3 install paramiko"), shell=True) > 0:
+if call("pip3 install paramiko", shell=True) > 0:
     print('Error, cannot  install Paramiko')
     exit(1)
 else:
