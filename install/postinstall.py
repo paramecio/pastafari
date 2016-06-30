@@ -166,7 +166,7 @@ arr_mail=[]
 
 arr_mail.append("\n\n# Mail configuration")
 
-arr_mail.append("SendMail.port="+port_email)
+arr_mail.append("SendMail.port="+str(port_email))
     
 arr_mail.append("SendMail.host='"+host_email+"'")
     
