@@ -10,6 +10,8 @@ sys.path.insert(0, working_directory)
 
 import argparse
 from paramecio.citoplasma.keyutils import create_key
+from paramecio.cromosoma.webmodel import WebModel
+from modules.pastafari.models import servers
 from settings import config
 from subprocess import call
 
@@ -199,5 +201,14 @@ with open('settings/config.py', 'a') as f:
     f.write("\n\n".join(arr_mail))
 
 print('Finishing config...')
+
+conn=WebModel.connection()
+
+os_server=servers.OsServer(conn)
+
+os_server.create_forms()
+
+os_server.insert({'name': 'Debian Jessie', 'codename': 'debian_jessie'})
+os_server.insert({'name': 'Ubuntu Xenial', 'codename': 'ubuntu_xenial'})
 
 print('Finished pastafari install')
