@@ -53,7 +53,7 @@ except:
 private_key_file='ssh/id_rsa'
 pub_key_file='ssh/id_rsa.pub'
 
-rsa_key.write_private_key_file(filename, password)
+rsa_key.write_private_key_file(private_key_file, password)
 
 with open(pub_key_file, 'w') as f:
     f.write(rsa_key.get_base64())
