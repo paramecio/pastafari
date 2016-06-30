@@ -8,6 +8,7 @@ sys.path.insert(0, os.getcwd())
 
 import argparse
 from paramecio.citoplasma.keyutils import create_key
+from settings import config
 from subprocess import call
 
 src='modules/pastafari/install/files/config_admin.py'
@@ -64,16 +65,23 @@ print('Generated rsa key...')
 
 api_key=create_key(50)
 
-"""
-config_task.public_key='ssh/id_rsa.pub'
+add_config=[]
+
+add_config.append("config_task.public_key='%s'" %  pub_key_file)
 	
-config_task.private_key='/home/absurdo/.ssh/id_rsa'
+add_config.append("config_task.private_key='%s" % private_key_file)
 
-config_task.password_key='747mxcom'
+add_config.append("config_task.password_key='%s'" % password)
 
-config_task.deny_missing_host_key=False
+add_config.append("config_task.deny_missing_host_key=False")
 
-config_task.api_key="key"
+add_config.append("config_task.api_key='%s'" % api_key)
 
-config_task.url_monit='http://192.168.1.79:8080/monit/getinfo'
-"""
+add_config.append("config_task.url_monit='%s/monit/getinfo'" % config.domain_url)
+
+# Add this elements in config.py
+
+with open('settings/config.py', 'w+') as f:
+    f.write("\n\n".join(add_config)
+
+print('Writed config...')
