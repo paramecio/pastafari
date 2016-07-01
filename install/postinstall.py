@@ -216,7 +216,7 @@ os_server.insert({'name': 'Ubuntu Xenial', 'codename': 'ubuntu_xenial'})
 
 #  Deploy in nginx 
 
-deploy=input('Do you want deploy pastafari for production? you need Debian/Ubuntu Linux with systemd and nginx (yes/no) by default no: ').strip().lower()
+#  deploy=input('Do you want deploy pastafari for production? you need Debian/Ubuntu Linux with systemd and nginx (yes/no) by default no: ').strip().lower()
 
 
 
