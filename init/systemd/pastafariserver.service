@@ -1,3 +1,5 @@
+# Save it in /etc/systemd/system/pastafariserver.service
+
 [Unit]
 Description=Pastafari task server
 After=syslog.target
