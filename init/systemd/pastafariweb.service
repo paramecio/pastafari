@@ -1,0 +1,17 @@
+[Unit]
+Description=Pastafari  website
+After=syslog.target
+After=network.target
+After=mysqld.service
+
+[Service]
+Type=simple
+User=pzoo
+Group=pzoo
+WorkingDirectory=/home/pzoo/pastafari
+ExecStart=bottle.py -b 127.0.0.1:8081 --server cherrypy index:app
+Restart=always
+Environment=USER=pzoo HOME=/home/pzoo
+
+[Install]
+WantedBy=multi-user.target

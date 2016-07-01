@@ -14,6 +14,7 @@ from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models import servers
 from settings import config
 from subprocess import call
+import getpass
 
 src='modules/pastafari/install/files/config_admin.py'
 dst='settings/config_admin.py'
@@ -34,12 +35,13 @@ if not shutil.copy(src_scheduler, dst_scheduler):
     print('Error: cannot copy the scheduler')
 
 #Install paramiko
-
+"""
 if call("pip3 install paramiko", shell=True) > 0:
     print('Error, cannot  install Paramiko')
     exit(1)
 else:
     print('Added paramiko')
+"""
 
 # Generating rsa key
 
@@ -144,7 +146,8 @@ if user_email=='':
     print('Error, you need a mail username')
     exit(1)
     
-pass_email=input('SMTP password: ').strip()
+#pass_email=input('SMTP password: ').strip()
+pass_db=getpass.getpass('SMTP password: ').strip()
 
 if pass_email=='':
     print('Error, you need a mail password')
@@ -210,5 +213,14 @@ os_server.create_forms()
 
 os_server.insert({'name': 'Debian Jessie', 'codename': 'debian_jessie'})
 os_server.insert({'name': 'Ubuntu Xenial', 'codename': 'ubuntu_xenial'})
+
+#  Deploy in nginx 
+
+deploy=input('Do you want deploy pastafari for production? you need Debian/Ubuntu Linux with systemd and nginx (yes/no) by default no: ').strip().lower()
+
+
+
+if deploy=='yes':
+    pass
 
 print('Finished pastafari install')
