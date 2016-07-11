@@ -71,6 +71,8 @@ class ConfigClass:
         self.url_monit=''
         
         self.api_key=''
+        
+        self.ssh_directory=os.path.expanduser('~')+'/.ssh'
 
 # Class for global configuration
 

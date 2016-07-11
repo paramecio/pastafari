@@ -1,7 +1,7 @@
-${show_flash_message()}
+${show_flash_message()|n}
 <%def name="show_menu(type_op)">
     % if type_op!="":
-        <a href="${make_url('admin/pastafari/servers?group_id='+str(group_id))}">
+        <a href="${make_url('pastafari/servers?group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'all_servers', 'All servers')}
     % if type_op!="":
@@ -9,7 +9,7 @@ ${show_flash_message()}
     % endif
     - 
     % if type_op!="down":
-        <a href="${make_url('admin/pastafari/servers?type=down&group_id='+str(group_id))}">
+        <a href="${make_url('pastafari/servers?type=down&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_down', 'Servers down')}
     % if type_op!="down":
@@ -17,7 +17,7 @@ ${show_flash_message()}
     % endif
     - 
     % if type_op!="heavy":
-        <a href="${make_url('admin/pastafari/servers?type=heavy&group_id='+str(group_id))}">
+        <a href="${make_url('pastafari/servers?type=heavy&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_heavy_loaded', 'Servers heavily loaded')}
     % if type_op!="heavy":
@@ -25,7 +25,7 @@ ${show_flash_message()}
     % endif
     - 
     % if type_op!="disks":
-        <a href="${make_url('admin/pastafari/servers?type=disks&group_id='+str(group_id))}">
+        <a href="${make_url('pastafari/servers?type=disks&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_bloated_disks', 'Servers with bloated disks')}
     % if type_op!="disks":
@@ -33,7 +33,7 @@ ${show_flash_message()}
     % endif
     - 
     % if type_op!="update_servers":
-        <a href="${make_url('admin/pastafari/servers?type=update_servers&group_id='+str(group_id))}">
+        <a href="${make_url('pastafari/servers?type=update_servers&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'servers_to_update', 'Servers to update')}
     % if type_op!="update_servers":
@@ -41,7 +41,7 @@ ${show_flash_message()}
     % endif
     -
     % if type_op!="task_servers":
-        <a href="${make_url('admin/pastafari/servers?type=task_servers&group_id='+str(group_id))}">
+        <a href="${make_url('pastafari/servers?type=task_servers&group_id='+str(group_id))}">
     % endif
         ${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}
     % if type_op!="task_servers":
@@ -79,7 +79,7 @@ ${show_flash_message()}
 <p>Select group: ${select_form_group.form()|n}</p>
 <input type="hidden" name="type" value="${type_op}" />
 </form>
-<p><a href="${make_url('admin/pastafari/servers?op=1&group_id='+str(group_id))}">${lang('pastafari', 'add_existent_server', 'Add existing server')}</a></p>
+<p><a href="${make_url('pastafari/servers?op=1&group_id='+str(group_id))}">${lang('pastafari', 'add_existent_server', 'Add existing server')}</a></p>
 <p>
 ${show_menu(type_op)}
 </p>

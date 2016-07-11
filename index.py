@@ -4,7 +4,7 @@ import traceback, sys
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.i18n import load_lang, I18n
 from paramecio.citoplasma.urls import make_url, add_get_parameters
-from paramecio.citoplasma.adminutils import get_menu, get_language
+from paramecio.citoplasma.adminutils import get_menu, get_language, check_login
 from paramecio.citoplasma.sessions import get_session
 from bottle import route, get,post,response,request
 from settings import config
@@ -35,26 +35,25 @@ def home():
     t=PTemplate(env)
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
+    """
+    
+    if check_login():
                 
-            #Load menu
-            
-            menu=get_menu(config_admin.modules_admin)
+        #Load menu
         
-            lang_selected=get_language(s)
-            
-            content_index=t.load_template('pastafari/dashboard.phtml')
+        menu=get_menu(config_admin.modules_admin)
+    
+        lang_selected=get_language(s)
+        
+        content_index=t.load_template('pastafari/dashboard.phtml')
 
-            return t.load_template('admin/content.html', title='Dashboard', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-            
-        else:
-            redirect(config.admin_folder)
-    
+        return t.load_template('admin/content.html', title='Dashboard', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        
     else:
-    
         redirect(config.admin_folder)
 
 @route('/'+pastafari_folder+'/getinfo')

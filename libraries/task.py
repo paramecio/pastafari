@@ -99,10 +99,33 @@ class Task:
         
         #Check if the unknown host keys are rejected or not
         
-        if self.config.deny_missing_host_key == False:
+        #if self.config.deny_missing_host_key == False:
+            
+            #self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # Check if in known_hosts
+        check_ssh_host= paramiko.hostkeys.HostKeys()
+        
+        check_ssh_host.load(self.config.ssh_directory+'/known_hosts')
+        
+        host_key=self.ssh.get_host_keys()
+        
+        add_host=False
+        
+        if check_ssh_host.lookup(self.server)==None:
+            
+            # Be tolerant for the first connect with hostkey policy
             
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             
+            add_host=True
+            
+            #self.ssh.save_host_keys(config_task.ssh_directory)
+            
+            #Add host to known_hosts file
+            
+            #hashed_host=check_ssh_host.hash_host(self.server)
+            
+            #print(hashed_host)
         #Prepare ssh keys
         
         #rsa=prepare_ssh_keys(self.config.password_key)
@@ -124,7 +147,10 @@ class Task:
         
         try:
             
-            self.ssh.connect(self.server, port=self.config.port, username=self.config.remote_user, password=self.config.remote_password, pkey=rsa, key_filename=self.config.private_key, timeout=None, allow_agent=True, look_for_keys=True, compress=False, sock=None, gss_auth=False, gss_kex=False, gss_deleg_creds=True, gss_host=None, banner_timeout=None)
+            self.ssh.connect(self.server, port=self.config.port, username=self.config.remote_user, password=self.config.remote_password, pkey=rsa, key_filename=self.config.private_key, timeout=None, allow_agent=True, look_for_keys=True, compress=False, sock=None, gss_auth=False, gss_kex=False, gss_deleg_creds=True, gss_host=None, banner_timeout=None)           
+            
+            if add_host:
+                host_key.save(self.config.ssh_directory+'/known_hosts')
             
         except paramiko.SSHException as e:
             self.txt_error="Error: cannot connect to the server SSHException\n"+str(e)
