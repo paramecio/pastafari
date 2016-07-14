@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -u
+#!/usr/bin/python3.5 -u
 
 # A script for install alive script 
 

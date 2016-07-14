@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.5
 
 import subprocess
 import re
@@ -7,11 +7,13 @@ import urllib.parse
 
 pattern=re.compile('^Inst (.*?)$')
 
-if subprocess.call('sudo apt-get -y update',  shell=True) > 0:
-    print('Error, cannot update apt-get')
+"""
+if subprocess.call('sudo yum -y update',  shell=True) > 0:
+    print('Error, cannot update yum')
     exit(1)
 else:
     print('Your apt-get database is updated, checking if you have updates...')
+"""
 
 with subprocess.Popen(["apt-get upgrade -s | grep -P '^\d+ upgraded'|cut -d\" \" -f1"], shell=True, stdout=subprocess.PIPE) as proc:
     
