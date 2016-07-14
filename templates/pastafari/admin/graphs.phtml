@@ -2,7 +2,7 @@ ${add_js_home_local('jquery.min.js', 'admin')}
 ${add_js_home_local('Chart.min.js', 'pastafari')}
 
 <h2>${server['hostname']}</h2>
-<p><a href="${make_admin_url('pastafari/servers')}">${lang('pastafari', 'servers', 'Servers')}</a> &gt;&gt; ${server['hostname']}</p>
+<p><a href="${make_url('pastafari/servers')}">${lang('pastafari', 'servers', 'Servers')}</a> &gt;&gt; ${server['hostname']}</p>
 <div class="title">
     ${lang('pastafari', 'graphs', 'Graphs')}
 </div>
@@ -340,7 +340,7 @@ var config_net = {
     function update_graph_net() {
         
         $.ajax({
-        url: "${make_admin_url('pastafari/servers', {'id': str(server['id']), 'op': '3'})}",
+        url: "${make_url('pastafari/servers', {'id': str(server['id']), 'op': '3'})}",
         method: "GET",
         dataType: "json",
         data: {}
@@ -390,7 +390,7 @@ var config_net = {
     function update_graph_disk() {
         
         $.ajax({
-        url: "${make_admin_url('pastafari/servers', {'id': str(server['id']), 'op': '4'})}",
+        url: "${make_url('pastafari/servers', {'id': str(server['id']), 'op': '4'})}",
         method: "GET",
         dataType: "json",
         data: {}

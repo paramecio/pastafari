@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 print('Installing MariaDB...')
 
-if subprocess.call("sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install mariadb-server",  shell=True) > 0:
+if subprocess.call("sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install mariadb-server",  shell=True) > 0:
 	print('Error')
 	sys.exit(1)
 

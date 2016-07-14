@@ -213,6 +213,8 @@ os_server.create_forms()
 
 os_server.insert({'name': 'Debian Jessie', 'codename': 'debian_jessie'})
 os_server.insert({'name': 'Ubuntu Xenial', 'codename': 'ubuntu_xenial'})
+os_server.insert({'name': 'CentOS6', 'codename': 'centos6'})
+os_server.insert({'name': 'CentOS7', 'codename': 'centos7'})
 
 #  Deploy in nginx 
 

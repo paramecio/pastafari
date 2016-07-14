@@ -75,7 +75,7 @@ ${show_flash_message()|n}
 % endfor
 </ul>
 </%def>
-<form method="get" action="${make_admin_url('pastafari/servers')}" id="change_group">
+<form method="get" action="${make_url('pastafari/servers')}" id="change_group">
 <p>Select group: ${select_form_group.form()|n}</p>
 <input type="hidden" name="type" value="${type_op}" />
 </form>

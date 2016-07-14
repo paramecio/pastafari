@@ -202,8 +202,8 @@ def admin(**args):
 
                                 commands_to_execute=[]
                                 
-                                commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', ''])
                                 commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', ''])
+                                commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_python.sh', ''])
                                 commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', ''])
                                 commands_to_execute.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', '--url='+config_task.url_monit+'/'+ip+'/'+config_task.api_key+' --user='+config_task.remote_user+' --pub_key='+config_task.public_key])
                                 
@@ -676,8 +676,13 @@ def home():
         conn=WebModel.connection()
         
         content_index=admin(t=t, connection=conn)
+        
+        if t.show_basic_template==True:
 
-        return t.load_template('admin/content.html', title='Servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+            return t.load_template('admin/content.html', title='Servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        else:
+            
+            return content_index
         
     else:
         redirect(config.admin_folder)
@@ -687,7 +692,7 @@ def server_options(url, id, arr_row):
     arr_options=[]
     
     arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/servers', {'op': str(2), 'id': str(id)}), 'Server graphs'))
-    arr_options.append('<a href="%s">%s</a>' % (make_url('pastafari/serverslogs', {'id': str(id)}), 'Server logs'))
+    arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/serverslogs', {'id': str(id)}), 'Server logs'))
     arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/servers', {'op': '5', 'id': str(id)}), 'Delete server from db'))
     
     return arr_options

@@ -94,7 +94,7 @@ def home():
                 logtask_list.arr_extra_fields=[]
                 logtask_list.arr_extra_options=[]
                 
-                return_url=make_url('%s/%s' % (config.admin_folder, 'pastafari/servers'))
+                return_url=make_url('pastafari/servers')
                 
                 content_index=t.load_template('pastafari/admin/logs_list.phtml', logtask_list=logtask_list, server=arr_server, return_url=return_url)
                 #logtask_list.show()
