@@ -129,7 +129,8 @@ def home():
                         
                         num_servers=server.select_count()
                         
-                        content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), num_servers=num_servers)
+                        #content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), num_servers=num_servers)
+                        content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=I18n.lang('pastafari', 'servers_updating', 'Servers updating'), description_task=I18n.lang('pastafari', 'servers_updating_txt', 'All servers selected will be updated...'), num_servers=num_servers)
                 
                 except:
                     

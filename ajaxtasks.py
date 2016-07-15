@@ -85,10 +85,9 @@ def admin(**args):
             
             arr_rows=[]
             
-            cursor=tasklog.select()
-            
-            for arr_row in cursor:
-                arr_rows.append(arr_row)
+            with tasklog.select() as cursor:            
+                for arr_row in cursor:
+                    arr_rows.append(arr_row)
             
             if len(arr_rows)==0:
                 tasklog.set_limit([1])

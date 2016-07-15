@@ -51,16 +51,16 @@ if check_url.match(args.url):
     
     # Edit alive cron 
     
-    with open('modules/pastafari/scripts/monit/debian_jessie/files/crontab/alive') as f:
+    with open('modules/pastafari/scripts/monit/centos7/files/crontab/alive') as f:
         alive_cron=f.read()
     
-    with open('modules/pastafari/scripts/monit/debian_jessie/files/crontab/alive', 'w') as f:
-        alive_cron=alive_cron.replace('/home/spanel/modules/pastafari/scripts/monit/debian_jessie/files/get_info.py', '/usr/local/bin/get_info.py')
+    with open('modules/pastafari/scripts/monit/centos7/files/crontab/alive', 'w') as f:
+        alive_cron=alive_cron.replace('/home/spanel/modules/pastafari/scripts/monit/centos7/files/get_info.py', '/usr/local/bin/get_info.py')
         f.write(alive_cron)
     
     # Edit get_info.py
     
-    with open('modules/pastafari/scripts/monit/debian_jessie/files/get_info.py') as f:
+    with open('modules/pastafari/scripts/monit/centos7/files/get_info.py') as f:
         get_info=f.read()
 
     with open('/usr/local/bin/get_info.py', 'w') as f:
@@ -72,7 +72,7 @@ if check_url.match(args.url):
     
     # Edit get_updates.py
     
-    with open('modules/pastafari/scripts/monit/debian_jessie/files/get_updates.py') as f:
+    with open('modules/pastafari/scripts/monit/centos7/files/get_updates.py') as f:
         get_updates=f.read()
 
     with open('/etc/cron.daily/get_updates.py', 'w') as f:
@@ -84,7 +84,7 @@ if check_url.match(args.url):
     
     # Edit sudo file
 
-    with open('modules/pastafari/scripts/monit/debian_jessie/files/sudoers.d/spanel') as f:
+    with open('modules/pastafari/scripts/monit/centos7/files/sudoers.d/spanel') as f:
         sudoers=f.read()
 
     with open('/etc/sudoers.d/spanel', 'w') as f:
@@ -93,7 +93,7 @@ if check_url.match(args.url):
     
     # Copy cron alive to /etc/cron.d/
     
-    if call("sudo cp modules/pastafari/scripts/monit/debian_jessie/files/crontab/alive /etc/cron.d/alive", shell=True) > 0:
+    if call("sudo cp modules/pastafari/scripts/monit/centos7/files/crontab/alive /etc/cron.d/alive", shell=True) > 0:
         print('Error, cannot install crontab alive file in cron.d')
         exit(1)
     else:
@@ -103,7 +103,7 @@ if check_url.match(args.url):
     
     # Copy script for upgrades in /usr/local/bin
     
-    if call("mkdir /home/"+args.user+"/bin/ && cp modules/pastafari/scripts/standard/debian_jessie/upgrade.sh /home/"+args.user+"/bin/ && chown -R "+args.user+":"+args.user+" /home/"+args.user+"/bin/", shell=True) > 0:
+    if call("mkdir /home/"+args.user+"/bin/ && cp modules/pastafari/scripts/standard/centos7/upgrade.sh /home/"+args.user+"/bin/ && chown -R "+args.user+":"+args.user+" /home/"+args.user+"/bin/", shell=True) > 0:
         print('Error, cannot install upgrade.py in /home/'+args.user+'/bin/')
         exit(1)
     else:

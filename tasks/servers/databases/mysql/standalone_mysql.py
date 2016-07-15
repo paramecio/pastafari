@@ -32,7 +32,7 @@ class MakeTask(ArgsTask):
         
         #Here load the form for it task
         
-        return "The MySQL password used by all servers: <input type=\"text\" name=\"mysql_password\"/>"
+        return "The MySQL password used by all servers: <input type=\"password\" name=\"mysql_password\"/>"
     
     def insert_task(self, post):
         

@@ -106,11 +106,22 @@ ${csrf_token()|n}
 <script>
 
 $('#update_servers').submit( function () {
+    
+    group_id=${group_id};
 
-    if(!$("input:checkbox:checked").length > 0)
+    if(!$("input:checkbox:checked").length > 0 && group_id==0)
     {
         
         alert('No servers selected');
+        
+        return false;
+        
+    }
+    
+    if($('input[name=task]:checked').val()==undefined)
+    {
+        
+        alert('No chosed any task');
         
         return false;
         

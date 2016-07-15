@@ -76,3 +76,21 @@ sudo yum -y python35u
 
 echo "Installed python3 sucessfully if not error..."
 
+# Install pip
+
+sudo yum -y install python35u-pip
+
+echo "Installed pip3 if not error..."
+
+# Install gcc for build 
+
+sudo yum -y install gcc
+
+echo "Installed gcc if not error..."
+
+# Install gcc for build 
+
+sudo yum -y install python35u-devel
+
+echo "Installed Python devel package..."
+

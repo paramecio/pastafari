@@ -26,7 +26,7 @@ import json
 import configparser
 from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models import servers, tasks
-from bottle import request, redirect, route
+from bottle import request, redirect, route, post
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.adminutils import check_login, get_menu, get_language
 from settings import config
@@ -40,7 +40,7 @@ server_task=config_task.server_task
 
 server_task=server_task+'/exec/'+config_task.api_key+'/'
 
-url=make_url(config.admin_folder+'/pastafari/servers')
+url=make_url('pastafari/servers')
 
 pastafari_folder='pastafari'
 
@@ -659,6 +659,7 @@ def admin(**args):
     return ""
 
 @route('/'+pastafari_folder+'/servers')
+@post('/'+pastafari_folder+'/servers')
 def home():
     
     if check_login():

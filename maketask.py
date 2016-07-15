@@ -87,6 +87,8 @@ def home():
             
             if task_first is not None:
                 content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t), post=getpost.post, group_id=group_id)
+            else:
+                content_index="Doesn't exists the task file"
             
             #Get form of task
             
