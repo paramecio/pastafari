@@ -198,6 +198,8 @@ def executetask():
 
                             else:
                                 
+                                # Redirect to show multiples tasks.
+                                
                                 server.set_conditions(where_sql, [])
                                 
                                 num_servers=server.select_count()
