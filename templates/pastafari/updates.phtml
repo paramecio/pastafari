@@ -3,7 +3,7 @@
 <hr />
 <p>${lang('pastafari', 'num_servers', 'Number of servers')}: <span id="num_servers">${num_servers}</span></p>
 <p>${lang('pastafari', 'completed_tasks', 'Completed tasks')}: <span id="num_completed">0</span></p>
-<p id="detecting_servers">Detecting servers in progress... <i class="fa fa-cog fa-spin fa-fw"></i></p>
+<p id="detecting_servers" style="display:none;">Detecting servers in progress... <i class="fa fa-cog fa-spin fa-fw"></i></p>
 <table class="table_servers">
     <tr class="row_server" id="father_server" style="display:none;">
         <td class="hostname">Hostname</td>
@@ -30,44 +30,58 @@
     }
     
     function get_servers() {
-    /**pepe**/
+        
+    $('#detecting_servers').fadeIn(1);
+    
      $.ajax({
-        url: "${make_url('pastafari/getservers')}/${task_id}",
+        url: "${make_url('pastafari/getservers')}/${task_id}/"+total_servers_done,
         method: "GET",
         dataType: "json",
         data: {}
         }).done(function(data) {
             
-            c=data.length;
-            
-            if(c==total_servers)
+            if(data.error==0)
             {
             
-                for(x=0;x<c;x++) {
+                c=data.servers.length;
+                
+                //if(c==total_servers)
+                if(c>0)
+                {
+                
+                    for(x=0;x<c;x++) {
+                        
+                        row=$('#father_server').clone().appendTo('.table_servers');
+                        
+                        row.attr('id', data.servers[x].ip)
+                        
+                        row.css('display', 'block');
+                        
+                        row.children('.hostname').html(data.servers[x].hostname);
+                        
+                        row.children('.progress').children('a').attr('href', '${make_url("pastafari/showprogress")}/${task_id}/'+data.servers[x].ip);
+                        
+                        
+                        arr_servers.push(data.servers[x].ip);
+                        
+                    }
                     
-                    row=$('#father_server').clone().appendTo('.table_servers');
+                    $('#detecting_servers').fadeOut(1);
                     
-                    row.attr('id', data[x].ip)
+                    get_progress_servers();
+                }
+                else
+                {
                     
-                    row.css('display', 'block');
-                    
-                    row.children('.hostname').html(data[x].hostname);
-                    
-                    row.children('.progress').children('a').attr('href', '${make_url("pastafari/showprogress")}/${task_id}/'+data[x].ip);
-                    
-                    
-                    arr_servers.push(data[x].ip);
+                    setTimeout(get_servers, 1000);
                     
                 }
                 
-                $('#detecting_servers').fadeOut(1);
-                
-                get_progress_servers();
             }
             else
             {
-                
-                get_servers();
+             
+                $('#detecting_servers').html('<span class="error">'+data.message+'</span>');
                 
             }
         
@@ -141,7 +155,7 @@
            
             if(total_servers_done<total_servers) {
            
-                setTimeout(get_progress_servers, 1000);
+                setTimeout(get_servers, 1000);
         
             }
             else {

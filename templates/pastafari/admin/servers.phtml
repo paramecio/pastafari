@@ -99,17 +99,16 @@ ${csrf_token()|n}
 <input type="submit" value="${lang('pastafari', 'update_selected_servers', 'Update selected servers')}" /> <input type="button" onclick="location.href='${make_url('pastafari/updateservers?group_id='+str(group_id))}';" value="${lang('pastafari', 'update_all_servers', 'Update all servers')}" />
 </form>
 % elif yes_form==2:
-<input type="submit" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="button" onclick="javascript:$('#update_servers').submit();" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers')}" />
+<input type="button" id="update_selected_servers" value="${lang('pastafari', 'make_task_selected_servers', 'Make task in selected servers')}" /> <input type="submit" value="${lang('pastafari', 'make_task_in_all', 'Make task in all servers in the group')}" />
 </form>
 % endif
 % if yes_form==1 or yes_form==2:
 <script>
 
-$('#update_servers').submit( function () {
-    
-    group_id=${group_id};
+$('#update_selected_servers').click( function () {
 
-    if(!$("input:checkbox:checked").length > 0 && group_id==0)
+    
+    if(!$("input:checkbox:checked").length)
     {
         
         alert('No servers selected');
@@ -118,6 +117,13 @@ $('#update_servers').submit( function () {
         
     }
     
+    $('#update_servers').submit();
+
+});
+
+$('#update_servers').submit( function () {
+
+
     if($('input[name=task]:checked').val()==undefined)
     {
         

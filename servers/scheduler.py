@@ -69,24 +69,36 @@ def index(api_key, task_id):
         task=tasks.Task(connection)
         logtask=tasks.LogTask(connection)
         logtask.create_forms()
-        arr_task=task.select_a_row(task_id)
         
-        if arr_task:
+        task.set_conditions('where status=%s and id!=%s', [0, task_id])
         
-        # Add to queue
+        c=task.select_count()
+        
+        if c==0:
+        
+            arr_task=task.select_a_row(task_id)
+            
+            if arr_task:
+            
+            # Add to queue
 
-            greenlet = gevent.spawn( execute_script, task_id)
-            """p = Process(target=execute_script, args=(task_id,))
-            p.start()"""
-            # Close the connection
+                greenlet = gevent.spawn( execute_script, task_id)
+                """p = Process(target=execute_script, args=(task_id,))
+                p.start()"""
+                # Close the connection
 
-            response={'error': 0, 'code_error': 0, 'message': 'Begin task with id '+str(task_id), 'progress' : 0}
+                response={'error': 0, 'code_error': 0, 'message': 'Begin task with id '+str(task_id), 'progress' : 0}
 
-            return response
+                return response
+            else:
+                
+                response={'error': 1, 'code_error': 1, 'message': 'Doesnt exists task with id '+str(task_id), 'progress' : 100, 'status': 1}
+            
+                return response
         else:
             
-            response={'error': 1, 'code_error': 1, 'message': 'Doesnt exists task with id '+str(task_id), 'progress' : 100, 'status': 1}
-        
+            response={'error': 1, 'code_error': 1, 'message': 'Sorry, other task are in process', 'progress' : 100, 'status': 1}
+            
             return response
     
     else:
@@ -95,7 +107,7 @@ def index(api_key, task_id):
         
         return response
         #logtask.insert({})
-    
+"""
 @route('/progress/<api_key>/<task_id:int>')
 def progress(api_key, task_id):
     
@@ -111,7 +123,7 @@ def progress(api_key, task_id):
 
     return response
 
-
+"""
 #def control_process():
     
     

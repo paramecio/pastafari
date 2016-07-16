@@ -19,6 +19,11 @@ from modules.pastafari.libraries.configclass import config_task
 import requests
 import json
 
+num_tasks=10
+
+if hasattr(config, 'num_tasks'):
+    num_tasks=config.num_tasks
+
 server_task=config_task.server_task
 
 server_task=server_task+'/exec/'+config_task.api_key+'/'
@@ -117,6 +122,8 @@ def home():
 @get('/'+pastafari_folder+'/showprogress/<task_id:int>/<server>')
 def showprogress(task_id, server):
     
+    # Need check the server
+    
     t=PTemplate(env)
     
     conn=WebModel.connection()
@@ -148,8 +155,8 @@ def showprogress(task_id, server):
     return ""
 
 
-@get('/'+pastafari_folder+'/getservers/<task_id:int>')
-def getservers(task_id):
+@get('/'+pastafari_folder+'/getservers/<task_id:int>/<position:int>')
+def getservers(task_id, position):
     
     conn=WebModel.connection()
     
@@ -167,11 +174,40 @@ def getservers(task_id):
             
             server.set_conditions('WHERE ip IN (select DISTINCT server from logtask where task_id=%s)', [task_id])
             
+            server.set_limit([position, num_tasks])
+            
             arr_server=server.select_to_array(['hostname', 'ip'])
             
             response.set_header('Content-type', 'text/plain')
             
-            return json.dumps(arr_server)
+            if arr_server:
+                
+                return json.dumps({'servers': arr_server, 'error': 0})
+                
+            else:
+                
+                logtask.set_conditions('where task_id=%s and server=""', [task_id])
+                
+                logtask.set_order(['id'], ['DESC'])
+                
+                arr_tasklog=logtask.select_a_row_where([], True)
+                
+                if arr_tasklog:
+                    
+                    if arr_tasklog['error']==1:
+                        
+                        return arr_tasklog
+                    else:
+                        
+                        return {'error': 0, 'servers': []}
+                        
+                else:
+                    
+                    return {'error': 0, 'servers': []}
+                    
+                
+                pass
+        
 
     else:
         return {}

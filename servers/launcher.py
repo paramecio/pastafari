@@ -132,6 +132,16 @@ def start():
         if not task.commands_to_execute:
             print('Error: no task files')
             exit(1)
+            
+        # Task done
+        
+        task_model.set_conditions('WHERE id=%s', [task_id])
+            
+        task_model.reset_require()
+        
+        task_model.valid_fields=['status']
+        
+        task_model.update({'num_servers': 1})
 
     exit(0)
 
