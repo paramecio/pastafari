@@ -7,16 +7,16 @@ ${add_js_home_local('Chart.min.js', 'pastafari')}
     ${lang('pastafari', 'graphs', 'Graphs')}
 </div>
 <div class="cont">
-    <div style="width:48%;float:right;">
+    <div class="first_canvas">
         <canvas id="canvas"></canvas>
     </div>
-    <div style="width:48%;float:left;">
+    <div class="other_canvas">
         <canvas id="canvas_cpu"></canvas>
     </div>
-    <div style="width:48%;float:left;">
+    <div class="other_canvas">
         <canvas id="canvas_mem"></canvas>
     </div>
-    <div style="width:48%;float:left;">
+    <div class="other_canvas">
         <canvas id="canvas_disk"></canvas>
     </div>
 </div>
@@ -56,6 +56,7 @@ var config_net = {
             }]
         },
         options: {
+            
             showXLabels: 10,
             animation : false,
             responsive: true,

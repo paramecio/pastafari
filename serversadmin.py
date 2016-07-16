@@ -584,6 +584,8 @@ def admin(**args):
         
         servers_list.arr_extra_options=[server_options]
         
+        servers_list.yes_search=False
+        
         select_task=None
         
         if 'type' in getpost.get:
