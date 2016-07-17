@@ -67,6 +67,8 @@ def getinfo():
     
     status_net=servers.StatusNet(connection)
     
+    status_cpu=servers.StatusCpu(connection)
+    
     c=server.select_count()
     
     now=datetime.now(True)
@@ -127,12 +129,14 @@ def getinfo():
         
     arr_cpu={'0-30': 0, '30-70': 0, '70-100': 0}
     
-    with server.select(['actual_idle']) as cur:
+    status_cpu.set_conditions('WHERE date>%s and last_updated=1 group by ip', [twelve_hours_date])
+    
+    with status_cpu.select(['idle']) as cur:
         
         for cpu in cur:
-            if cpu['actual_idle']>70:
+            if cpu['idle']>70:
                 arr_cpu['70-100']+=1
-            elif cpu['actual_idle']>30:
+            elif cpu['idle']>30:
                 arr_cpu['30-70']+=1
             else:
                 arr_cpu['0-30']+=1
