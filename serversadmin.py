@@ -403,12 +403,17 @@ def admin(**args):
             
             c_elements=0
             
-            if cur.rowcount>0:
+            c_count=cur.rowcount
+            
+            if c_count>0:
             
                 data_net=cur.fetchone()
                 
                 first_recv=data_net['bytes_recv']
                 first_sent=data_net['bytes_sent']
+                
+                if len(arr_cpu)<(c_count-1):
+                    arr_cpu.append(arr_cpu[1:])
                 
                 for data_net in cur:
                     
