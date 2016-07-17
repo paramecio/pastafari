@@ -376,6 +376,10 @@ var config_net = {
                 
             }
             
+            window.myLine.destroy();
+            window.myLineCpu.destroy();
+            window.myLineMem.destroy();
+            
             window.myLine.update();
             window.myLineCpu.update();
             window.myLineMem.update();
@@ -451,6 +455,7 @@ var config_net = {
                 z++;
             }
             
+            window.bar_disk.destroy();
             window.bar_disk.update();
             
         }).fail(function (data) {
