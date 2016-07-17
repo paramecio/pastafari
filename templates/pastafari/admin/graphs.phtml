@@ -348,6 +348,10 @@ var config_net = {
         }).done(function(data) {
             //{"1":{"bytes_sent":"4545988","bytes_recv":"116474015","date":"20160509220644","IdStatus_net":"1"},"2":{"bytes_sent":"4547076","bytes_recv":"116474967","date":"20160509220705","IdStatus_net":"2"}
             
+            window.myLine.destroy();
+            window.myLineCpu.destroy();
+            window.myLineMem.destroy();
+            
             config_net.data.labels=[];
             config_net.data.datasets[0].data=[];
             config_net.data.datasets[1].data=[];
@@ -375,10 +379,6 @@ var config_net = {
                 config_mem.data.datasets[2].data.push(data[id].memory_cached);
                 
             }
-            
-            window.myLine.destroy();
-            window.myLineCpu.destroy();
-            window.myLineMem.destroy();
             
             window.myLine.update();
             window.myLineCpu.update();
