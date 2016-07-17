@@ -208,7 +208,7 @@ def executetask():
                         
                         except:
                             
-                            task.update({'status': 1, 'error': 1})
+                            task_first.task.update({'status': 1, 'error': 1})
                             
                             content_index="Error:cannot connect to task server, check the url for it..."+traceback.format_exc()
                         

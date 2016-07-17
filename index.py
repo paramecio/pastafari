@@ -15,6 +15,8 @@ from bottle import redirect
 from modules.pastafari.models import servers
 from paramecio.citoplasma import datetime
 
+#Dashboard of pastafari
+
 pastafari_folder='pastafari'
 
 if hasattr(config, 'pastafari_folder'):

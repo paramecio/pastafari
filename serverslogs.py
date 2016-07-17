@@ -4,7 +4,7 @@ import traceback, sys, time
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.i18n import load_lang, I18n
 from paramecio.citoplasma.urls import make_url, add_get_parameters
-from paramecio.citoplasma.adminutils import get_menu, get_language
+from paramecio.citoplasma.adminutils import get_menu, get_language, check_login
 from paramecio.citoplasma.sessions import get_session
 from paramecio.citoplasma.lists import SimpleList
 from bottle import route, get,post,response,request
@@ -18,6 +18,8 @@ from modules.pastafari.models.servers import Server
 from modules.pastafari.libraries.configclass import config_task
 import requests
 import json
+
+# Show the progress of a task in a server
 
 num_tasks=10
 
@@ -43,6 +45,8 @@ load_lang(['paramecio', 'admin'], ['paramecio', 'common'])
 env=env_theme(__file__)
 
 env.directories.insert(1, 'paramecio/modules/admin/templates')
+
+# A list of messages in tasks for a server
 
 @get('/'+pastafari_folder+'/serverslogs')
 def home():
@@ -118,7 +122,9 @@ def home():
     else:
     
         redirect(config.admin_folder)
-        
+
+# Show progress of a task in a server
+
 @get('/'+pastafari_folder+'/showprogress/<task_id:int>/<server>')
 def showprogress(task_id, server):
     
@@ -154,6 +160,7 @@ def showprogress(task_id, server):
     
     return ""
 
+# Get json data of the servers executing same task
 
 @get('/'+pastafari_folder+'/getservers/<task_id:int>/<position:int>')
 def getservers(task_id, position):
@@ -211,6 +218,8 @@ def getservers(task_id, position):
 
     else:
         return {}
+
+# Get json format log of a server group executing a task
 
 @post('/'+pastafari_folder+'/getprogress/<task_id:int>')
 def getprogress(task_id):
@@ -285,3 +294,116 @@ def getprogress(task_id):
 
     else:
         return {}
+
+# Get json data for a see progress in task in a server
+
+@route('/'+pastafari_folder+'/tasks')
+@post('/'+pastafari_folder+'/tasks')
+def gettasks():
+    
+    if check_login():
+        
+        s=get_session()
+        
+        #Load menu
+        
+        menu=get_menu(config_admin.modules_admin)
+
+        lang_selected=get_language(s)
+        
+        t=PTemplate(env)
+    
+        conn=WebModel.connection()
+
+        getpostfiles=GetPostFiles()
+
+        getpostfiles.obtain_get()
+        
+        getpostfiles.get['op']=getpostfiles.get.get('op', '')
+        getpostfiles.get['task_id']=getpostfiles.get.get('task_id', '0')
+        getpostfiles.get['position']=getpostfiles.get.get('position', '0')
+        getpostfiles.get['server']=getpostfiles.get.get('server', '')
+        
+        try:
+        
+            task_id=int(getpostfiles.get['task_id'])
+        except:
+            task_id=0
+            
+        try:
+            position=int(getpostfiles.get['position'])
+        except:
+            position=0
+        
+        task=Task(conn)
+        tasklog=LogTask(conn)
+        
+        arr_task=task.select_a_row(task_id)
+        
+        t.show_basic_template=False
+        
+        if arr_task:
+            
+            tasklog.set_limit([position, 20])
+                
+            tasklog.set_order(['id'], ['ASC'])
+            
+            tasklog.conditions=['WHERE task_id=%s', [task_id]]
+            
+            if getpostfiles.get['server']!='':
+                tasklog.conditions=['WHERE task_id=%s and logtask.server=%s', [task_id, getpostfiles.get['server']]]
+                
+            #tasklog.set_limit([position, 1])
+            
+            #arr_row=tasklog.select_a_row_where([], 1, position)
+            
+            tasklog.yes_reset_conditions=False
+            
+            c=tasklog.select_count()
+            
+            if c>0:
+                
+                arr_rows=[]
+                
+                with tasklog.select() as cursor:            
+                    for arr_row in cursor:
+                        arr_rows.append(arr_row)
+                
+                if len(arr_rows)==0:
+                    tasklog.set_limit([1])
+                
+                    tasklog.set_order(['id'], ['ASC'])
+                    
+                    tasklog.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
+                    
+                    if tasklog.select_count('id', True)==0:
+                        
+                        if arr_task['status']=='0' or arr_task['status']==0:
+                            return {'wait': 1}
+                        else:
+                            return {}
+                    else:
+                        
+                        tasklog.set_limit([1])
+                    
+                        tasklog.set_order(['id'], ['ASC'])
+                        
+                        tasklog.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
+                        
+                        arr_rows=tasklog.select_to_array([], True)
+                
+                response.set_header('Content-type', 'text/plain')
+                
+                return json.dumps(arr_rows)
+                
+            else:
+                return {'wait': 1}
+                    
+                    
+        else:
+            return {}
+
+        
+        
+    else:
+        redirect(config.admin_folder)
