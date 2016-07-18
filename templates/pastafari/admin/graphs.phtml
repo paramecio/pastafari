@@ -341,7 +341,7 @@ var config_net = {
     function update_graph_net() {
         
         $.ajax({
-        url: "${make_url('pastafari/servers', {'id': str(server['id']), 'op': '3'})}",
+        url: "${make_url('pastafari/getdatagraphs/'+str(server['id']))}",
         method: "GET",
         dataType: "json",
         data: {}
@@ -396,7 +396,7 @@ var config_net = {
     function update_graph_disk() {
         
         $.ajax({
-        url: "${make_url('pastafari/servers', {'id': str(server['id']), 'op': '4'})}",
+        url: "${make_url('pastafari/getdiskgraphs/'+str(server['id']))}",
         method: "GET",
         dataType: "json",
         data: {}
