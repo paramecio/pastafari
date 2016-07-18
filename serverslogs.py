@@ -140,24 +140,33 @@ def showprogress(task_id, server):
         
         if s['privileges']==2:
             
+            content_index=''
+            
             conn=WebModel.connection()
             task=Task(conn)
+            
+            menu=get_menu(config_admin.modules_admin)
+            
+            lang_selected=get_language(s)           
             
             arr_task=task.select_a_row(task_id)
             
             if arr_task:
-            
-                menu=get_menu(config_admin.modules_admin)
-            
-                lang_selected=get_language(s)           
                 
-                #arr_task=
+                server_model=Server(conn)
                 
-                content_index=t.load_template('pastafari/progress.phtml', name_task=arr_task['name_task'], description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
+                server_model.set_conditions('where ip=%s', [server])
+                
+                arr_server=server_model.select_a_row_where()
+                
+                if arr_server:
+                
+                    #arr_task=
+                    
+                    content_index=t.load_template('pastafari/progress.phtml', name_task=arr_task['name_task']+' - '+arr_server['hostname'], description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
         
-        return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
+            return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
             
-    
     return ""
 
 # Get json data of the servers executing same task
@@ -252,42 +261,50 @@ def getprogress(task_id):
             
             #for ip in servers:
             
-            logtask.set_order(['id'], ['DESC'])
-            
-            logtask.set_conditions('WHERE task_id=%s and status=1 and error=1 and server=""', [task_id])
-            
-            c_error=logtask.select_count()
-            
-            if c_error==0:
+            if len(servers)>0:
             
                 logtask.set_order(['id'], ['DESC'])
                 
-                logtask.set_conditions('WHERE task_id=%s and status=1 and server IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
+                logtask.set_conditions('WHERE task_id=%s and status=1 and error=1 and server=""', [task_id])
                 
-                arr_log=logtask.select_to_array(['status', 'error', 'server'])
+                c_error=logtask.select_count()
                 
-                logtask.set_order(['id'], ['DESC'])
+                if c_error==0:
                 
-                logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN (\''+'\',\''.join(servers)+'\') and server!=""', [task_id])
-                
-                arr_log2=logtask.select_to_array(['status', 'error', 'server'])
-                
-                arr_log=arr_log2+arr_log
-                
-                #response.set_header('Content-type', 'text/plain')
-                
-                #return json.dumps(arr_log)
-                
-            else:
-                
-                arr_log=[]
-                
-                for server in servers:
+                    logtask.set_order(['id'], ['DESC'])
                     
-                    arr_log.append({'status':1, 'error':1, 'server': server})
+                    logtask.set_conditions('WHERE task_id=%s and status=1 and server IN %s and server!=""', [task_id, servers])
                     
-            response.set_header('Content-type', 'text/plain')
+                    arr_log=logtask.select_to_array(['status', 'error', 'server'])
+                    
+                    logtask.set_order(['id'], ['DESC'])
+                    
+                    logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN %s and server!=""', [task_id, servers])
+                    
+                    arr_log2=logtask.select_to_array(['status', 'error', 'server'])
+                    
+                    arr_log=arr_log2+arr_log
+                    
+                    #response.set_header('Content-type', 'text/plain')
+                    
+                    #return json.dumps(arr_log)
+                    
+                else:
+                    
+                    arr_log=[]
+                    
+                    for server in servers:
+                        
+                        arr_log.append({'status':1, 'error':1, 'server': server})
+                        
+                response.set_header('Content-type', 'text/plain')
                 
+                return json.dumps(arr_log)
+                
+            response.set_header('Content-type', 'text/plain')    
+            
+            arr_log=[]
+            
             return json.dumps(arr_log)
                 
                 

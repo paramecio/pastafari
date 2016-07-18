@@ -37,11 +37,6 @@ def home():
     t=PTemplate(env)
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
     
     if check_login():
                 
@@ -57,6 +52,8 @@ def home():
         
     else:
         redirect(config.admin_folder)
+
+#THe info for the dashboard
 
 @route('/'+pastafari_folder+'/getinfo')
 def getinfo():

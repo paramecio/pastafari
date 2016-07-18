@@ -23,6 +23,8 @@ import requests
 import json
 import re
 
+#Script  for make and show the  progress of the tasks.
+
 server_task=config_task.server_task
 
 server_task=server_task+'/exec/'+config_task.api_key+'/'
@@ -215,7 +217,7 @@ def executetask():
                         pass
                         
                     else:
-                        content_index="Error: cannot insert the task: "+task.show_errors()
+                        content_index="Error: cannot insert the task: "+task_first.task.show_errors()
                     
                     return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
                     
