@@ -117,11 +117,11 @@ def home():
             return t.load_template('admin/content.html', title='Servers log'+ server_hostname, content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
-            redirect(config.admin_folder)
+            redirect(make_url(config.admin_folder))
     
     else:
     
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
 
 # Show progress of a task in a server
 
@@ -423,4 +423,4 @@ def gettasks():
         
         
     else:
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))

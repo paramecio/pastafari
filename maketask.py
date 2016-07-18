@@ -97,11 +97,11 @@ def home():
             return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
-            redirect(config.admin_folder)
+            redirect(make_url(config.admin_folder))
     
     else:
     
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
 
 
 @post('/'+pastafari_folder+'/executetask')
@@ -222,11 +222,11 @@ def executetask():
                     return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
                     
                 else:
-                    redirect(config.admin_folder)
+                    redirect(make_url(config.admin_folder))
             
             else:
             
-                redirect(config.admin_folder)
+                redirect(make_url(config.admin_folder))
                 
                 
                 

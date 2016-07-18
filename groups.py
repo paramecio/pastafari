@@ -82,11 +82,11 @@ def home():
             return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups', 'Server\'s Group'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
-            redirect(config.admin_folder)
+            redirect(make_url(config.admin_folder))
     
     else:
     
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
 
 @route('/'+pastafari_folder+'/editservers/<parent_id:int>')
 def edit_servers(parent_id):
@@ -117,11 +117,11 @@ def edit_servers(parent_id):
             return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups_config', 'Server\'s Group servers'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
         else:
-            redirect(config.admin_folder)
+            redirect(make_url(config.admin_folder))
     
     else:
     
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
 
 @post('/'+pastafari_folder+'/editservers/<parent_id:int>')
 def add_servers(parent_id):

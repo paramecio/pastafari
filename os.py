@@ -55,6 +55,6 @@ def home():
         return t.load_template('admin/content.html', title='Os Servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
         
     else:
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
     
 

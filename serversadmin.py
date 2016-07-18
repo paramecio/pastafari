@@ -487,7 +487,7 @@ def home():
             return content_index
         
     else:
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
         
 # Method for show the graphs
 @route('/'+pastafari_folder+'/servergraphs/<server_id:int>')
@@ -528,7 +528,7 @@ def graphs(server_id):
             return content_index
         
     else:
-        redirect(config.admin_folder)
+        redirect(make_url(config.admin_folder))
 
 # Method for get data for graphs
 @route('/'+pastafari_folder+'/getdatagraphs/<server_id:int>')
