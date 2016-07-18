@@ -253,16 +253,6 @@ var config_net = {
             }
         }
     };
-
-    
-    var ctx = document.getElementById("canvas").getContext("2d");
-    window.myLine = new Chart(ctx, config_net);
-    
-    var ctx_cpu = document.getElementById("canvas_cpu").getContext("2d");
-    window.myLineCpu = new Chart(ctx_cpu, config_cpu);
-    
-    var ctx_mem = document.getElementById("canvas_mem").getContext("2d");
-    window.myLineMem = new Chart(ctx_mem, config_mem);
     
     //Now the disk donut
     
@@ -326,6 +316,15 @@ var config_net = {
     var ctx_disk = document.getElementById("canvas_disk").getContext("2d");
     window.bar_disk = new Chart(ctx_disk, config_disk);
     
+    var ctx = document.getElementById("canvas").getContext("2d");
+    window.myLine = new Chart(ctx, config_net);
+    
+    var ctx_cpu = document.getElementById("canvas_cpu").getContext("2d");
+    window.myLineCpu = new Chart(ctx_cpu, config_cpu);
+    
+    var ctx_mem = document.getElementById("canvas_mem").getContext("2d");
+    window.myLineMem = new Chart(ctx_mem, config_mem);
+    
     window.onload=function () {
         
         update_graph_net();
@@ -381,9 +380,17 @@ var config_net = {
                 
             }
             
-            window.myLine.update();
+            /*window.myLine.update();
             window.myLineCpu.update();
             window.myLineMem.update();
+            
+            window.myLine.resize();
+            window.myLineCpu.resize();
+            window.myLineMem.resize();*/
+            
+            window.myLine = new Chart(ctx, config_net);
+            window.myLineCpu = new Chart(ctx_cpu, config_cpu);
+            window.myLineMem = new Chart(ctx_mem, config_mem);
             
         }).fail(function (data) {
             
@@ -457,7 +464,8 @@ var config_net = {
             }
             
             window.bar_disk.destroy();
-            window.bar_disk.update();
+            
+            window.bar_disk = new Chart(ctx_disk, config_disk);
             
         }).fail(function (data) {
             
