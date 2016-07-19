@@ -2,11 +2,11 @@
 
 from paramecio.citoplasma.generate_admin_class import GenerateAdminClass
 from paramecio.citoplasma.lists import SimpleList
-from paramecio.citoplasma.urls import make_url
+from paramecio.citoplasma.urls import make_url, redirect
 from paramecio.citoplasma.i18n import load_lang, I18n
 from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models import servers, tasks
-from bottle import request, redirect, route, post
+from bottle import request, route, post
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.adminutils import check_login, get_menu, get_language
 from settings import config

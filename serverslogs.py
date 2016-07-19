@@ -3,7 +3,7 @@
 import traceback, sys, time
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.i18n import load_lang, I18n
-from paramecio.citoplasma.urls import make_url, add_get_parameters
+from paramecio.citoplasma.urls import make_url, add_get_parameters, redirect
 from paramecio.citoplasma.adminutils import get_menu, get_language, check_login
 from paramecio.citoplasma.sessions import get_session
 from paramecio.citoplasma.lists import SimpleList
@@ -12,7 +12,6 @@ from settings import config
 from settings import config_admin
 from paramecio.citoplasma.httputils import GetPostFiles
 from paramecio.cromosoma.webmodel import WebModel
-from bottle import redirect
 from modules.pastafari.models.tasks import Task, LogTask
 from modules.pastafari.models.servers import Server
 from modules.pastafari.libraries.configclass import config_task
