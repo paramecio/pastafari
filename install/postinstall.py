@@ -222,7 +222,7 @@ os_server.insert({'name': 'CentOS7', 'codename': 'centos7'})
 
 
 
-if deploy=='yes':
-    pass
+#if deploy=='yes':
+#    pass
 
 print('Finished pastafari install')
