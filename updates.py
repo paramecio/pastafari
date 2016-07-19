@@ -37,7 +37,7 @@ load_lang(['paramecio', 'admin'], ['paramecio', 'common'])
 
 env=env_theme(__file__)
 
-env.directories.insert(1, 'paramecio/modules/admin/templates')
+env.directories.insert(1, config.paramecio_root+'/modules/admin/templates')
 
 @post('/'+pastafari_folder+'/updateservers')
 @get('/'+pastafari_folder+'/updateservers')
