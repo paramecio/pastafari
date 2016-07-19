@@ -147,7 +147,7 @@ if user_email=='':
     exit(1)
     
 #pass_email=input('SMTP password: ').strip()
-pass_db=getpass.getpass('SMTP password: ').strip()
+pass_email=getpass.getpass('SMTP password: ').strip()
 
 if pass_email=='':
     print('Error, you need a mail password')
