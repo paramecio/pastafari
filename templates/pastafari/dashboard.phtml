@@ -103,12 +103,6 @@
         }
     };
     
-    var cpu_pie = new Chart(ctx_cpu,{
-        type: 'pie',
-        data: data_cpu,
-        options: options_cpu
-    });
-    
     //Disks
     
     var ctx_disk = document.getElementById("canvas_disk").getContext("2d");
@@ -138,12 +132,6 @@
                 position: 'bottom',
         }
     };
-    
-    var disk_pie = new Chart(ctx_disk,{
-        type: 'pie',
-        data: data_disk,
-        options: options
-    });
     
     //Charts for networking
     
@@ -175,11 +163,9 @@
         }
     };
     
-    var net_pie = new Chart(ctx_net,{
-        type: 'pie',
-        data: data_net,
-        options: options_net
-    });
+    var cpu_pie = new Chart(ctx_cpu,{ type: 'pie', data: data_cpu, options: options_cpu });
+    var disk_pie = new Chart(ctx_disk,{ type: 'pie', data: data_disk, options: options });
+    var net_pie = new Chart(ctx_net,{ type: 'pie', data: data_net, options: options_net });
     
     function get_servers() {
     
