@@ -140,6 +140,6 @@ def task_options(url, id, arr_row):
     
     arr_list.append('<a href="%s">Subgroups</a>' % (make_url(pastafari_folder+'/groups', {'parent_id': str(id)})) )
     
-    arr_list.append('<a href="%s">Edit servers</a>' % (make_url(config.admin_folder+'/'+pastafari_folder+'/servers', {'group_id': str(id)})))
+    arr_list.append('<a href="%s">Edit servers</a>' % (make_url(pastafari_folder+'/servers', {'group_id': str(id)})))
     
     return arr_list
