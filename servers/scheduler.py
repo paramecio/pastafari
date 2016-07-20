@@ -17,7 +17,7 @@ from modules.pastafari.libraries.configclass import config_task
 # For deploy with uwsgi;  uwsgi --gevent 100 --http-socket :9090 --wsgi-file scheduler.py 
 
 pastafari_scripts='./scripts'
-pastafari_host='localhost'
+pastafari_host='127.0.0.1'
 pastafari_port=1337
 
 #parser.add_argument('--port', help='The port where the task server is executed', required=True)
