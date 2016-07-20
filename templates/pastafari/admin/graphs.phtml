@@ -374,8 +374,8 @@ var config_net = {
                 config_cpu.data.datasets[0].data.push(data[id].cpu);
                 
                 config_mem.data.labels.push(data[id].date);
-                config_mem.data.datasets[0].data.push(data[id].memory_free);
-                config_mem.data.datasets[1].data.push(data[id].memory_used);
+                config_mem.data.datasets[0].data.push(data[id].memory_used);
+                config_mem.data.datasets[1].data.push(data[id].memory_free);
                 config_mem.data.datasets[2].data.push(data[id].memory_cached);
                 
             }
