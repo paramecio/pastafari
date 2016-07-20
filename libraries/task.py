@@ -150,7 +150,7 @@ class Task:
         
         try:
             
-            self.ssh.connect(self.server, port=self.config.port, username=self.config.remote_user, password=self.config.remote_password, pkey=rsa, key_filename=self.config.private_key, timeout=None, allow_agent=True, look_for_keys=True, compress=False, sock=None, gss_auth=False, gss_kex=False, gss_deleg_creds=True, gss_host=None, banner_timeout=None)           
+            self.ssh.connect(self.server, port=self.config.port, username=self.config.remote_user, password=self.config.remote_password, pkey=rsa, key_filename=None, timeout=None, allow_agent=True, look_for_keys=True, compress=False, sock=None, gss_auth=False, gss_kex=False, gss_deleg_creds=True, gss_host=None, banner_timeout=None)           
             
             if add_host:
                 host_key.save(self.config.ssh_directory+'/known_hosts')
