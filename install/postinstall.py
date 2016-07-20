@@ -198,7 +198,7 @@ arr_mail.append("SendMail.ssl="+ssl_email+"")
 
 arr_mail.append("email_address='"+email_address+"'")
 
-arr_mail.append("email_notification='"+email_notification+"'")
+arr_mail.append("email_notification=['"+email_notification+"']")
 
 with open('settings/config.py', 'a') as f:
     f.write("\n\n".join(arr_mail))
