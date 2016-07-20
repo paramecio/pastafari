@@ -90,6 +90,8 @@ def admin(**args):
     with os_model.select() as cur:
         arr_os = { v['codename'] : v['name'] for v in cur }
     
+    server.fields['date'].label=I18n.lang('pastafari', 'server_status', 'Server status')
+    
     server.forms['os_codename'].arr_select=arr_os
     
     server.forms['password']=PasswordForm('password', '')
