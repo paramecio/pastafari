@@ -4,6 +4,7 @@ import psutil
 import json
 import urllib.request
 import urllib.parse
+import ssl
 
 #url="http://url/to/info"
 
@@ -45,7 +46,22 @@ data = urllib.parse.urlencode({'data_json': json_info})
 
 data = data.encode('ascii')
 
-content=urllib.request.urlopen(url, data)
+#content=urllib.request.urlopen(url, data)
+
+if url[:5]=='https':
+    
+    # For nexts versions 3.5
+    
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    content=urllib.request.urlopen(url, data, context=ctx)
+    
+else:
+
+    content=urllib.request.urlopen(url, data)
+
 
 
 

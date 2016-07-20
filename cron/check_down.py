@@ -49,6 +49,6 @@ if len(arr_server)>0:
     
     content_mail='Please, click in this link for view the servers down; '+config.domain_url+make_url('pastafari/servers', {'type': 'down'})
     
-    if not send_mail.send(email_address, [config.email_notification], I18n.lang('pastafari', 'servers_down', 'WARNING:  SERVERS ARE DOWN!'), content_mail):
+    if not send_mail.send(email_address, config.email_notification, I18n.lang('pastafari', 'servers_down', 'WARNING:  SERVERS ARE DOWN!'), content_mail):
         print('Sended email with notification')
 
