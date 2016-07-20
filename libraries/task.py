@@ -129,7 +129,7 @@ class Task:
         #Prepare ssh keys
         
         #rsa=prepare_ssh_keys(self.config.password_key)
-        
+        """
         rsa=None
         
         if self.config.remote_password is None:
@@ -144,6 +144,9 @@ class Task:
             
             if rsa==None:
                 return False
+        """
+        
+        rsa=paramiko.RSAKey.from_private_key_file(self.config.private_key, self.config.password_key)
         
         try:
             
