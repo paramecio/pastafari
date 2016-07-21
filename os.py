@@ -50,6 +50,11 @@ def home():
         
         admin=GenerateAdminClass(os, url, t)
         
+        admin.list.fields_showed=['name', 'codename']
+        
+        admin.list.s['order']='0'
+        admin.list.s['order_field']='name'
+        
         content_index=admin.show()
 
         return t.load_template('admin/content.html', title='Os Servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
