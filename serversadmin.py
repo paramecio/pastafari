@@ -359,9 +359,6 @@ def admin(**args):
     
     else:
         
-        if 'order_field' not in args['s']:
-             args['s']['order_field']='hostname'
-        
         getpost=GetPostFiles()
         
         getpost.obtain_get()
@@ -456,6 +453,9 @@ def admin(**args):
         servers_list.fields_showed=['hostname', 'ip', 'num_updates', 'date']
         
         servers_list.limit_pages=100
+        
+        servers_list.s['order']='0'
+        servers_list.s['order_field']='hostname'
 
         show_servers=servers_list.show()
         
@@ -482,7 +482,7 @@ def home():
     
         conn=WebModel.connection()
         
-        content_index=admin(t=t, connection=conn, s=s)
+        content_index=admin(t=t, connection=conn)
         
         if t.show_basic_template==True:
 

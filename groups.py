@@ -46,7 +46,7 @@ def home():
             getpostfiles=GetPostFiles()
             
             getpostfiles.obtain_get()
-            
+
             parent_id=getpostfiles.get.get('parent_id', '0')
             
             parent_id=int(parent_id)
@@ -74,6 +74,9 @@ def home():
             group_list.list.fields_showed=['name']
             
             group_list.list.arr_extra_options=[task_options]
+            
+            group_list.list.s['order']='0'
+            group_list.list.s['order_field']='name'
             
             content_index=t.load_template('pastafari/groups.phtml', group_list=group_list, hierarchy_links=hierarchy, son_id=parent_id)
             #group_list.show()
