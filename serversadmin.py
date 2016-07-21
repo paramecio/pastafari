@@ -359,6 +359,9 @@ def admin(**args):
     
     else:
         
+        if 'order_field' not in args['s']:
+             args['s']['order_field']='hostname'
+        
         getpost=GetPostFiles()
         
         getpost.obtain_get()
@@ -479,7 +482,7 @@ def home():
     
         conn=WebModel.connection()
         
-        content_index=admin(t=t, connection=conn)
+        content_index=admin(t=t, connection=conn, s=s)
         
         if t.show_basic_template==True:
 
