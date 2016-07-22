@@ -87,7 +87,26 @@ def home():
             task_first=checktask(getpost.post, connection)
             
             if task_first is not None:
-                content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t), post=getpost.post, group_id=group_id)
+                
+                post_task={'task': getpost.post['task']}
+                
+                pattern=re.compile('^server_.*$')
+                    
+                for k, server_id in getpost.post.items():
+                    
+                    if pattern.match(k):
+                        
+                        try:
+                            server_id=int(server_id)
+                            
+                            if server_id>0:
+                                
+                                post_task[k]=str(server_id)
+                        except:
+                            pass
+                        
+                
+                content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t), post=post_task, group_id=group_id)
             else:
                 content_index="Doesn't exists the task file"
             
@@ -120,8 +139,8 @@ def executetask():
     except:
         group_id=0
 
-    if request_type()=='POST':
-        getpost.obtain_post()
+    #if request_type()=='POST':
+    getpost.obtain_post()
     
     s=get_session()
     
@@ -149,6 +168,23 @@ def executetask():
                 
                 # Process the task
                 
+                post_task={'task': getpost.post['task']}
+                    
+                pattern=re.compile('^server_.*$')
+                
+                for k, server_id in getpost.post.items():
+                    
+                    if pattern.match(k):
+                        
+                        try:
+                            server_id=int(server_id)
+                            
+                            if server_id>0:
+                                arr_servers.append(str(server_id))
+                                post_task[k]=str(server_id)
+                        except:
+                            pass
+                
                 (task_id, name_task, description_task)=task_first.insert_task(getpost.post)
                 
                 if task_id:
@@ -156,20 +192,6 @@ def executetask():
                     arr_servers=[]
                     
                     where_sql='WHERE 1=1'
-                    
-                    pattern=re.compile('^server_.*$')
-                    
-                    for k, server_id in getpost.post.items():
-                        
-                        if pattern.match(k):
-                            
-                            try:
-                                server_id=int(server_id)
-                                
-                                if server_id>0:
-                                    arr_servers.append(str(server_id))
-                            except:
-                                pass
                     
                     if group_id>0:
                         where_sql+=' AND id IN (select server_id from servergroupitem where group_id='+str(group_id)+')'
@@ -218,10 +240,11 @@ def executetask():
                     else:
                         content_index="Error: cannot insert the task: "+task_first.task.show_errors()
                     
-                    return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-                    
                 else:
-                    redirect(make_url(config.admin_folder))
+                    
+                    content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t, yes_error=True, pass_values=True, **getpost.post), post=post_task, group_id=group_id)
+                    
+                return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
             
             else:
             

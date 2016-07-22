@@ -2,6 +2,9 @@
 
 from modules.pastafari.libraries.task import ArgsTask
 from modules.pastafari.models.tasks import Task
+from paramecio.cromosoma import coreforms
+from paramecio.cromosoma.formsutils import show_form
+from collections import OrderedDict
 
 class MakeTask(ArgsTask):
     
@@ -27,26 +30,55 @@ class MakeTask(ArgsTask):
         self.one_time=True
         
         self.version='1.0'
+        
+        self.arr_form=OrderedDict()
+        
+        self.arr_form['mysql_password']=coreforms.PasswordForm('mysql_password', '')
+        
+        self.arr_form['mysql_password'].required=True
+        
+        self.arr_form['mysql_password'].label='The MySQL password used by all servers'
+        
+        self.arr_form['repeat_mysql_password']=coreforms.PasswordForm('repeat_mysql_password', '')
+        
+        self.arr_form['repeat_mysql_password'].required=True
+        
+        self.arr_form['repeat_mysql_password'].label='Repeat MySQL password'
     
-    def form(self, t):
+    def form(self, t, yes_error=False, pass_values=False, **args):
         
         #Here load the form for it task
         
-        return "The MySQL password used by all servers: <input type=\"password\" name=\"mysql_password\"/>"
+        
+        
+        #return "The MySQL password used by all servers: <input type=\"password\" name=\"mysql_password\"/>"
+        
+        #return t.load_template('forms/modelform.phtml', forms=self.arr_form)
+        # def show_form(post, arr_form, t, yes_error=True, pass_values=True, modelform_tpl='forms/modelform.phtml'):
+        
+        return show_form(args, self.arr_form, t, yes_error, pass_values)
+        
+    def check_form(self, **args):
+        
+        return True
     
     def insert_task(self, post):
         
         self.task.create_forms()
         
-        if 'mysql_password' in post:
-        
-            self.commands_to_execute=[['modules/pastafari/scripts/servers/databases/mariadb/${os_server}/install_mariadb.py', '--password=%s' % post['mysql_password']]]
+        if 'mysql_password' in post and 'repeat_mysql_password' in post:
             
-            if self.task.insert({'name_task': 'Mariadb Install server', 'description_task': 'Install a mariadb/Mysql server in your selected hosts', 'codename_task': 'mariadb_simple_server', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version}):
+            if post['mysql_password'].strip()!='' and post['mysql_password']==post['repeat_mysql_password']:
                 
-                return (self.task.insert_id(), 'Mariadb Install server', 'Install a mariadb/Mysql server in your selected hosts')
+                self.commands_to_execute=[['modules/pastafari/scripts/servers/databases/mariadb/${os_server}/install_mariadb.py', '--password=%s' % post['mysql_password']]]
                 
-        return False
+                if self.task.insert({'name_task': 'Mariadb Install server', 'description_task': 'Install a mariadb/Mysql server in your selected hosts', 'codename_task': 'mariadb_simple_server', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version}):
+                    
+                    return (self.task.insert_id(), 'Mariadb Install server', 'Install a mariadb/Mysql server in your selected hosts')
+            else:
+                self.arr_form['mysql_password'].txt_error='Passwords doesn\'t match'
+                
+        return (False, 'Mariadb Install server', 'Install a mariadb/Mysql server in your selected hosts')
             
         
         
