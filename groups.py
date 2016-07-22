@@ -78,6 +78,8 @@ def home():
             group_list.list.s['order']='0'
             group_list.list.s['order_field']='name'
             
+            group_list.list.yes_search=False
+            
             content_index=t.load_template('pastafari/groups.phtml', group_list=group_list, hierarchy_links=hierarchy, son_id=parent_id)
             #group_list.show()
 

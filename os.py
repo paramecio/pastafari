@@ -55,6 +55,8 @@ def home():
         admin.list.s['order']='0'
         admin.list.s['order_field']='name'
         
+        admin.list.yes_search=False
+        
         content_index=admin.show()
 
         return t.load_template('admin/content.html', title='Os Servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
