@@ -69,7 +69,7 @@ print('Generated rsa key...')
 
 # Open the config and write this data
 
-api_key=create_key(50)
+api_key=create_key(50).replace('/', '#')
 
 add_config=[]
 
