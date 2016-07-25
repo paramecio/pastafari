@@ -4,4 +4,6 @@
 Future
 --------------
 
+* When add a server, give the election for create a user with ssh privileges and access via ssh key provided.
+
 

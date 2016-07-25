@@ -10,7 +10,7 @@ from paramecio.citoplasma.lists import SimpleList
 from bottle import route, get,post,response,request
 from settings import config
 from settings import config_admin
-from paramecio.citoplasma.httputils import GetPostFiles
+from paramecio.citoplasma.httputils import GetPostFiles, filter_ajax
 from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models.tasks import Task, LogTask
 from modules.pastafari.models.servers import Server
@@ -197,7 +197,7 @@ def getservers(task_id, position):
             
             if arr_server:
                 
-                return json.dumps({'servers': arr_server, 'error': 0})
+                return filter_ajax({'servers': arr_server, 'error': 0})
                 
             else:
                 
@@ -214,18 +214,18 @@ def getservers(task_id, position):
                         return arr_tasklog
                     else:
                         
-                        return {'error': 0, 'servers': []}
+                        return filter_ajax({'error': 0, 'servers': []})
                         
                 else:
                     
-                    return {'error': 0, 'servers': []}
+                    return filter_ajax({'error': 0, 'servers': []})
                     
                 
                 pass
         
 
     else:
-        return {}
+        return filter_ajax({})
 
 # Get json format log of a server group executing a task
 
@@ -298,18 +298,18 @@ def getprogress(task_id):
                         
                 response.set_header('Content-type', 'text/plain')
                 
-                return json.dumps(arr_log)
+                return filter_ajax(arr_log)
                 
             response.set_header('Content-type', 'text/plain')    
             
             arr_log=[]
             
-            return json.dumps(arr_log)
+            return filter_ajax(arr_log)
                 
                 
 
     else:
-        return {}
+        return filter_ajax({})
 
 # Get json data for a see progress in task in a server
 
@@ -395,9 +395,9 @@ def gettasks():
                     if tasklog.select_count('id', True)==0:
                         
                         if arr_task['status']=='0' or arr_task['status']==0:
-                            return {'wait': 1}
+                            return filter_ajax({'wait': 1})
                         else:
-                            return {}
+                            return filter_ajax({})
                     else:
                         
                         tasklog.set_limit([1])
@@ -408,16 +408,16 @@ def gettasks():
                         
                         arr_rows=tasklog.select_to_array([], True)
                 
-                response.set_header('Content-type', 'text/plain')
+                #response.set_header('Content-type', 'text/plain')
                 
-                return json.dumps(arr_rows)
+                return filter_ajax(arr_rows)
                 
             else:
-                return {'wait': 1}
+                return filter_ajax({'wait': 1})
                     
                     
         else:
-            return {}
+            return filter_ajax({})
 
         
         

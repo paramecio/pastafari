@@ -2,7 +2,7 @@
 
 from paramecio.citoplasma.generate_admin_class import GenerateAdminClass
 from paramecio.citoplasma.lists import SimpleList
-from paramecio.citoplasma.httputils import GetPostFiles
+from paramecio.citoplasma.httputils import GetPostFiles, filter_ajax
 from paramecio.cromosoma.formsutils import csrf_token
 from paramecio.citoplasma.urls import make_url, redirect
 from paramecio.citoplasma.mtemplates import set_flash_message
@@ -697,14 +697,14 @@ def net_cpu_status(server_id):
                     
                     if c_elements>2:
                         
-                        return json.dumps(arr_net)
+                        return filter_ajax(arr_net)
                     else:
                         
-                        return {}
+                        return filter_ajax({})
                         
-                    return {}
+                    return filter_ajax({})
         
-    return  {}
+    return filter_ajax({})
 
 # Method for get data for graphs
 @route('/'+pastafari_folder+'/getdiskgraphs/<server_id:int>')
@@ -732,8 +732,8 @@ def disk_status(server_id):
                 
                 arr_disk=status_disk.select_to_array(['disk', 'used', 'free', 'date'])
                 
-                return json.dumps(arr_disk)
-    return {}
+                return filter_ajax(arr_disk)
+    return filter_ajax({})
 
 def server_options(url, id, arr_row):
     
