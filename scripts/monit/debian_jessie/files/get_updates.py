@@ -13,7 +13,7 @@ if subprocess.call('sudo apt-get -y update',  shell=True) > 0:
 else:
     print('Your apt-get database is updated, checking if you have updates...')
 
-with subprocess.Popen(["apt-get upgrade -s | grep -P '^\d+ upgraded'|cut -d\" \" -f1"], shell=True, stdout=subprocess.PIPE) as proc:
+with subprocess.Popen(["apt-get upgrade -s | grep \"^Inst \" | wc -l"], shell=True, stdout=subprocess.PIPE) as proc:
     
     num_updates=proc.stdout.read().decode("utf-8")
 
