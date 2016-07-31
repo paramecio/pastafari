@@ -27,6 +27,7 @@ class Task(WebModel):
         self.register(corefields.CharField('url_return'))
         self.register(IpField('server'))
         self.register(corefields.TextField('where_sql_server'))
+        self.fields['where_sql_server'].escape=True
         self.register(corefields.IntegerField('num_servers'))
         self.register(corefields.CharField('user'))
         self.register(corefields.CharField('password'))
