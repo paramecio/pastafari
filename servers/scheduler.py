@@ -56,6 +56,7 @@ def execute_script(task_id):
             logtask.insert({'task_id': task_id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_exec_launcher', 'Error executing launcher.py: ')+str(line)+"\n"+str(line_error), 'error': 1, 'status': 1})
             #Status die
             task.set_conditions('where id=%s', [task_id])
+            task.reset_require()
             task.update({'status': 1, 'error': 1})
     
 
