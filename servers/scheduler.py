@@ -43,11 +43,20 @@ def execute_script(task_id):
 
         if return_value>0:
             connection=WebModel.connection()
+            
             logtask=tasks.LogTask(connection)
+            task=tasks.Task(connection)
+            
             logtask.create_forms()
+            task.create_forms()
+            
+            
             line=proc.stdout.read().decode('utf-8')
             line_error=proc.stderr.read().decode('utf-8')
             logtask.insert({'task_id': task_id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_exec_launcher', 'Error executing launcher.py: ')+str(line)+"\n"+str(line_error), 'error': 1, 'status': 1})
+            #Status die
+            task.set_conditions('where id=%s', [task_id])
+            task.update({'status': 1, 'error': 1})
     
 
 @route('/')
