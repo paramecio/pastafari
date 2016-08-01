@@ -45,9 +45,9 @@ else:
 
 # Generating rsa key
 
-import paramiko
+#import paramiko
 
-rsa_key=paramiko.RSAKey.generate(2048)
+#rsa_key=paramiko.RSAKey.generate(2048)
 
 password=create_key(20)
 
@@ -60,12 +60,18 @@ except:
 private_key_file='ssh/id_rsa'
 pub_key_file='ssh/id_rsa.pub'
 
+if call("ssh-keygen -t rsa -P \""+password+"\" -f "+private_key_file, shell=True) > 0:
+    print('Error, cannot  install the new ssh key')
+    exit(1)
+else:
+    print('Generated rsa key...')
+
+"""
 rsa_key.write_private_key_file(private_key_file, password)
 
 with open(pub_key_file, 'w') as f:
     f.write(rsa_key.get_base64())
-    
-print('Generated rsa key...')
+"""    
 
 # Open the config and write this data
 
