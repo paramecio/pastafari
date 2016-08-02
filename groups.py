@@ -39,12 +39,6 @@ def home():
     
     s=get_session()
     
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
-    
     if check_login():
         
         getpostfiles=GetPostFiles()
@@ -92,56 +86,6 @@ def home():
     else:
         redirect(make_url(config.admin_folder))
     
-    """
-    else:
-    
-        redirect(make_url(config.admin_folder))
-    """
-
-@route('/'+pastafari_folder+'/editservers/<parent_id:int>')
-def edit_servers(parent_id):
-    
-    connection=WebModel.connection()
-    #Fix, make local variable
-    
-    t=PTemplate(env)
-    
-    s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
-    if check_login():
-                
-        #Load menu
-        
-        group=servers.ServerGroup(connection)
-        
-        arr_group=group.select_a_row(parent_id)
-        
-        menu=get_menu(config_admin.modules_admin)
-    
-        lang_selected=get_language(s)
-        
-        content_index=t.load_template('pastafari/add_servers_group.phtml', group=arr_group)
-
-        return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups_config', 'Server\'s Group servers'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-        
-    else:
-        redirect(make_url(config.admin_folder))
-    
-
-@post('/'+pastafari_folder+'/editservers/<parent_id:int>')
-def add_servers(parent_id):
-    pass
-
-@route('/'+pastafari_folder+'/configure/<parent_id:int>')
-def execute_task(parent_id):
-    
-    # Get python file with the code
-    
-    return ""
 
 
 def task_options(url, id, arr_row):
