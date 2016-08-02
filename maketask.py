@@ -4,7 +4,7 @@ import traceback, sys
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.i18n import load_lang, I18n
 from paramecio.citoplasma.urls import make_url, add_get_parameters, redirect
-from paramecio.citoplasma.adminutils import get_menu, get_language
+from paramecio.citoplasma.adminutils import get_menu, get_language, check_login
 from paramecio.citoplasma.sessions import get_session
 from bottle import route, get,post,response,request
 from settings import config
@@ -65,60 +65,57 @@ def home():
         getpost.obtain_post()
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
-            
-            #task=Task(connection)
-            logtask=LogTask(connection)
-            server=Server(connection)
-            
-            #Load menu
-            
-            menu=get_menu(config_admin.modules_admin)
+    """
+    if check_login():
+        #task=Task(connection)
+        logtask=LogTask(connection)
+        server=Server(connection)
         
-            lang_selected=get_language(s)
+        #Load menu
+        
+        menu=get_menu(config_admin.modules_admin)
+    
+        lang_selected=get_language(s)
+        
+        content_index=''
+        
+        #Load task
+        
+        task_first=checktask(getpost.post, connection)
+        
+        if task_first is not None:
             
-            content_index=''
+            post_task={'task': getpost.post['task']}
             
-            #Load task
-            
-            task_first=checktask(getpost.post, connection)
-            
-            if task_first is not None:
+            pattern=re.compile('^server_.*$')
                 
-                post_task={'task': getpost.post['task']}
+            for k, server_id in getpost.post.items():
                 
-                pattern=re.compile('^server_.*$')
+                if pattern.match(k):
                     
-                for k, server_id in getpost.post.items():
-                    
-                    if pattern.match(k):
+                    try:
+                        server_id=int(server_id)
                         
-                        try:
-                            server_id=int(server_id)
+                        if server_id>0:
                             
-                            if server_id>0:
-                                
-                                post_task[k]=str(server_id)
-                        except:
-                            pass
-                        
-                
-                content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t), post=post_task, group_id=group_id)
-            else:
-                content_index="Doesn't exists the task file"
+                            post_task[k]=str(server_id)
+                    except:
+                        pass
+                    
             
-            #Get form of task
-            
-            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-            
+            content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t), post=post_task, group_id=group_id)
         else:
-            redirect(make_url(config.admin_folder))
-    
+            content_index="Doesn't exists the task file"
+        
+        #Get form of task
+        
+        return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        
     else:
-    
         redirect(make_url(config.admin_folder))
 
 
@@ -143,112 +140,114 @@ def executetask():
     getpost.obtain_post()
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
+    """
+    if check_login():
             
-            task=Task(connection)
-            logtask=LogTask(connection)
-            server=Server(connection)
-            
-            #Load menu
-            
-            menu=get_menu(config_admin.modules_admin)
+        task=Task(connection)
+        logtask=LogTask(connection)
+        server=Server(connection)
         
-            lang_selected=get_language(s)
+        #Load menu
+        
+        menu=get_menu(config_admin.modules_admin)
+    
+        lang_selected=get_language(s)
+        
+        content_index=''
+        
+        #Load task
+        
+        task_first=checktask(getpost.post, connection)
+        
+        if task_first is not None:
             
-            content_index=''
+            # Process the task
             
-            #Load task
+            post_task={'task': getpost.post['task']}
+                
+            pattern=re.compile('^server_.*$')
             
-            task_first=checktask(getpost.post, connection)
-            
-            if task_first is not None:
+            for k, server_id in getpost.post.items():
                 
-                # Process the task
-                
-                post_task={'task': getpost.post['task']}
+                if pattern.match(k):
                     
-                pattern=re.compile('^server_.*$')
-                
-                for k, server_id in getpost.post.items():
-                    
-                    if pattern.match(k):
+                    try:
+                        server_id=int(server_id)
                         
-                        try:
-                            server_id=int(server_id)
-                            
-                            if server_id>0:
-                                arr_servers.append(str(server_id))
-                                post_task[k]=str(server_id)
-                        except:
-                            pass
-                
-                (task_id, name_task, description_task)=task_first.insert_task(getpost.post)
-                
-                if task_id:
-
-                    arr_servers=[]
-                    
-                    where_sql='WHERE 1=1'
-                    
-                    if group_id>0:
-                        where_sql+=' AND id IN (select server_id from servergroupitem where group_id='+str(group_id)+')'
-                    
-                    if len(arr_servers)>0:
-                        where_sql='WHERE id IN (%s)' % ",".join(arr_servers)
-                    
-                    task_first.task.reset_require()
-                    
-                    task_first.task.set_conditions('WHERE id=%s', [task_id])
-                    
-                    if task_first.task.update({'where_sql_server': where_sql}):
-                        
-                        try:
-                        
-                            r=requests.get(server_task+str(task_id))
-                            
-                            arr_data=r.json()
-                            
-                            arr_data['task_id']=task_id
-                            
-                            logtask.create_forms()
-                            
-                            if not logtask.insert(arr_data):
-                                
-                                content_index="Error:Wrong format of json data..."
-
-                            else:
-                                
-                                # Redirect to show multiples tasks.
-                                
-                                server.set_conditions(where_sql, [])
-                                
-                                num_servers=server.select_count()
-                                
-                                content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=name_task, description_task=description_task, num_servers=num_servers)
-                        
-                        except:
-                            
-                            task_first.task.update({'status': 1, 'error': 1})
-                            
-                            content_index="Error:cannot connect to task server, check the url for it..."+traceback.format_exc()
-                        
+                        if server_id>0:
+                            arr_servers.append(str(server_id))
+                            post_task[k]=str(server_id)
+                    except:
                         pass
+            
+            (task_id, name_task, description_task)=task_first.insert_task(getpost.post)
+            
+            if task_id:
+
+                arr_servers=[]
+                
+                where_sql='WHERE 1=1'
+                
+                if group_id>0:
+                    where_sql+=' AND id IN (select server_id from servergroupitem where group_id='+str(group_id)+')'
+                
+                if len(arr_servers)>0:
+                    where_sql='WHERE id IN (%s)' % ",".join(arr_servers)
+                
+                task_first.task.reset_require()
+                
+                task_first.task.set_conditions('WHERE id=%s', [task_id])
+                
+                if task_first.task.update({'where_sql_server': where_sql}):
+                    
+                    try:
+                    
+                        r=requests.get(server_task+str(task_id))
                         
-                    else:
-                        content_index="Error: cannot insert the task: "+task_first.task.show_errors()
+                        arr_data=r.json()
+                        
+                        arr_data['task_id']=task_id
+                        
+                        logtask.create_forms()
+                        
+                        if not logtask.insert(arr_data):
+                            
+                            content_index="Error:Wrong format of json data..."
+
+                        else:
+                            
+                            # Redirect to show multiples tasks.
+                            
+                            server.set_conditions(where_sql, [])
+                            
+                            num_servers=server.select_count()
+                            
+                            content_index=t.load_template('pastafari/updates.phtml', task_id=task_id, title_task=name_task, description_task=description_task, num_servers=num_servers)
+                    
+                    except:
+                        
+                        task_first.task.update({'status': 1, 'error': 1})
+                        
+                        content_index="Error:cannot connect to task server, check the url for it..."+traceback.format_exc()
+                    
+                    pass
                     
                 else:
-                    
-                    content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t, yes_error=True, pass_values=True, **getpost.post), post=post_task, group_id=group_id)
-                    
-                return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-            
+                    content_index="Error: cannot insert the task: "+task_first.task.show_errors()
+                
             else:
-            
-                redirect(make_url(config.admin_folder))
+                
+                content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t, yes_error=True, pass_values=True, **getpost.post), post=post_task, group_id=group_id)
+                
+            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        
+    else:
+    
+        redirect(make_url(config.admin_folder))
                 
                 
                 

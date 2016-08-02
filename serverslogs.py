@@ -56,70 +56,68 @@ def home():
     t=PTemplate(env)
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
-            
-            task=Task(connection)
-            logtask=LogTask(connection)
-            server=Server(connection)
-            
-            getpost=GetPostFiles() 
-            
-            getpost.obtain_get()
-            
-            #Load menu
+    """
+    if check_login():
                 
-            menu=get_menu(config_admin.modules_admin)
+        task=Task(connection)
+        logtask=LogTask(connection)
+        server=Server(connection)
         
-            lang_selected=get_language(s)           
+        getpost=GetPostFiles() 
+        
+        getpost.obtain_get()
+        
+        #Load menu
             
-            server_id=getpost.get.get('id', 0)
+        menu=get_menu(config_admin.modules_admin)
+    
+        lang_selected=get_language(s)           
+        
+        server_id=getpost.get.get('id', 0)
+        
+        server_hostname=''
+        
+        arr_server=server.select_a_row(server_id)
+        
+        if arr_server:
             
-            server_hostname=''
+            server_hostname=' - '+arr_server['hostname']
+        
+            ip=arr_server['ip']
             
-            arr_server=server.select_a_row(server_id)
+            logtask.set_conditions('WHERE server=%s', [ip])
             
-            if arr_server:
-                
-                server_hostname=' - '+arr_server['hostname']
+            logtask_list=SimpleList(logtask, '', t)
             
-                ip=arr_server['ip']
-                
-                logtask.set_conditions('WHERE server=%s', [ip])
-                
-                logtask_list=SimpleList(logtask, '', t)
-                
-                logtask_list.limit_pages=100
-                
-                logtask_list.yes_search=False
-                
-                logtask_list.s['order']=1
-                
-                logtask_list.fields_showed=['server', 'message', 'error', 'status']
-                
-                logtask_list.arr_extra_fields=[]
-                logtask_list.arr_extra_options=[]
-                
-                return_url=make_url('pastafari/servers')
-                
-                content_index=t.load_template('pastafari/admin/logs_list.phtml', logtask_list=logtask_list, server=arr_server, return_url=return_url)
-                #logtask_list.show()
-                
-                # Send request to server
-                               
-            else:
+            logtask_list.limit_pages=100
             
-                content_index='Log no exists'
-                
-            return t.load_template('admin/content.html', title='Servers log'+ server_hostname, content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+            logtask_list.yes_search=False
             
+            logtask_list.s['order']=1
+            
+            logtask_list.fields_showed=['server', 'message', 'error', 'status']
+            
+            logtask_list.arr_extra_fields=[]
+            logtask_list.arr_extra_options=[]
+            
+            return_url=make_url('pastafari/servers')
+            
+            content_index=t.load_template('pastafari/admin/logs_list.phtml', logtask_list=logtask_list, server=arr_server, return_url=return_url)
+            #logtask_list.show()
+            
+            # Send request to server
+                           
         else:
-            redirect(make_url(config.admin_folder))
-    
+        
+            content_index='Log no exists'
+            
+        return t.load_template('admin/content.html', title='Servers log'+ server_hostname, content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        
     else:
-    
         redirect(make_url(config.admin_folder))
 
 # Show progress of a task in a server
@@ -134,39 +132,43 @@ def showprogress(task_id, server):
     conn=WebModel.connection()
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
+    """
+    if check_login():
             
-            content_index=''
-            
-            conn=WebModel.connection()
-            task=Task(conn)
-            
-            menu=get_menu(config_admin.modules_admin)
-            
-            lang_selected=get_language(s)           
-            
-            arr_task=task.select_a_row(task_id)
-            
-            if arr_task:
-                
-                server_model=Server(conn)
-                
-                server_model.set_conditions('where ip=%s', [server])
-                
-                arr_server=server_model.select_a_row_where()
-                
-                if arr_server:
-                
-                    #arr_task=
-                    
-                    content_index=t.load_template('pastafari/progress.phtml', name_task=arr_task['name_task']+' - '+arr_server['hostname'], description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
+        content_index=''
         
-            return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
+        conn=WebModel.connection()
+        task=Task(conn)
+        
+        menu=get_menu(config_admin.modules_admin)
+        
+        lang_selected=get_language(s)           
+        
+        arr_task=task.select_a_row(task_id)
+        
+        if arr_task:
             
-    return ""
+            server_model=Server(conn)
+            
+            server_model.set_conditions('where ip=%s', [server])
+            
+            arr_server=server_model.select_a_row_where()
+            
+            if arr_server:
+            
+                #arr_task=
+                
+                content_index=t.load_template('pastafari/progress.phtml', name_task=arr_task['name_task']+' - '+arr_server['hostname'], description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
+    
+        return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
+            
+    else:
+        return ""
+
 
 # Get json data of the servers executing same task
 
@@ -176,52 +178,55 @@ def getservers(task_id, position):
     conn=WebModel.connection()
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
-    
-            task=Task(conn)
-            logtask=LogTask(conn)
-            server=Server(conn)
+    """
+
+    if check_login():
+
+        task=Task(conn)
+        logtask=LogTask(conn)
+        server=Server(conn)
+        
+        arr_task=task.select_a_row(task_id)
+        
+        server.set_conditions('WHERE ip IN (select DISTINCT server from logtask where task_id=%s)', [task_id])
+        
+        server.set_limit([position, num_tasks])
+        
+        arr_server=server.select_to_array(['hostname', 'ip'])
+        
+        response.set_header('Content-type', 'text/plain')
+        
+        if arr_server:
             
-            arr_task=task.select_a_row(task_id)
+            return filter_ajax({'servers': arr_server, 'error': 0})
             
-            server.set_conditions('WHERE ip IN (select DISTINCT server from logtask where task_id=%s)', [task_id])
+        else:
             
-            server.set_limit([position, num_tasks])
+            logtask.set_conditions('where task_id=%s and server=""', [task_id])
             
-            arr_server=server.select_to_array(['hostname', 'ip'])
+            logtask.set_order(['id'], ['DESC'])
             
-            response.set_header('Content-type', 'text/plain')
+            arr_tasklog=logtask.select_a_row_where([], True)
             
-            if arr_server:
+            if arr_tasklog:
                 
-                return filter_ajax({'servers': arr_server, 'error': 0})
-                
-            else:
-                
-                logtask.set_conditions('where task_id=%s and server=""', [task_id])
-                
-                logtask.set_order(['id'], ['DESC'])
-                
-                arr_tasklog=logtask.select_a_row_where([], True)
-                
-                if arr_tasklog:
+                if arr_tasklog['error']==1:
                     
-                    if arr_tasklog['error']==1:
-                        
-                        return arr_tasklog
-                    else:
-                        
-                        return filter_ajax({'error': 0, 'servers': []})
-                        
+                    return arr_tasklog
                 else:
                     
                     return filter_ajax({'error': 0, 'servers': []})
                     
+            else:
                 
-                pass
+                return filter_ajax({'error': 0, 'servers': []})
+                
+            
+            pass
         
 
     else:
@@ -235,76 +240,78 @@ def getprogress(task_id):
     conn=WebModel.connection()
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
+    """
+    if check_login():
+        
+        getpost=GetPostFiles() 
+        
+        getpost.obtain_post([], True)
+
+        task=Task(conn)
+        logtask=LogTask(conn)
+        server=Server(conn)
+        
+        arr_task=task.select_a_row(task_id)
+        
+        try:
             
-            getpost=GetPostFiles() 
+            servers=json.loads(getpost.post['servers'])
             
-            getpost.obtain_post([], True)
-    
-            task=Task(conn)
-            logtask=LogTask(conn)
-            server=Server(conn)
+        except:
             
-            arr_task=task.select_a_row(task_id)
+            servers={}
+        
+        #for ip in servers:
+        
+        if len(servers)>0:
+        
+            logtask.set_order(['id'], ['DESC'])
             
-            try:
-                
-                servers=json.loads(getpost.post['servers'])
-                
-            except:
-                
-                servers={}
+            logtask.set_conditions('WHERE task_id=%s and status=1 and error=1 and server=""', [task_id])
             
-            #for ip in servers:
+            c_error=logtask.select_count()
             
-            if len(servers)>0:
+            if c_error==0:
             
                 logtask.set_order(['id'], ['DESC'])
                 
-                logtask.set_conditions('WHERE task_id=%s and status=1 and error=1 and server=""', [task_id])
+                logtask.set_conditions('WHERE task_id=%s and status=1 and server IN %s and server!=""', [task_id, servers])
                 
-                c_error=logtask.select_count()
+                arr_log=logtask.select_to_array(['status', 'error', 'server'])
                 
-                if c_error==0:
+                logtask.set_order(['id'], ['DESC'])
                 
-                    logtask.set_order(['id'], ['DESC'])
-                    
-                    logtask.set_conditions('WHERE task_id=%s and status=1 and server IN %s and server!=""', [task_id, servers])
-                    
-                    arr_log=logtask.select_to_array(['status', 'error', 'server'])
-                    
-                    logtask.set_order(['id'], ['DESC'])
-                    
-                    logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN %s and server!=""', [task_id, servers])
-                    
-                    arr_log2=logtask.select_to_array(['status', 'error', 'server'])
-                    
-                    arr_log=arr_log2+arr_log
-                    
-                    #response.set_header('Content-type', 'text/plain')
-                    
-                    #return json.dumps(arr_log)
-                    
-                else:
-                    
-                    arr_log=[]
-                    
-                    for server in servers:
-                        
-                        arr_log.append({'status':1, 'error':1, 'server': server})
-                        
-                response.set_header('Content-type', 'text/plain')
+                logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN %s and server!=""', [task_id, servers])
                 
-                return filter_ajax(arr_log)
+                arr_log2=logtask.select_to_array(['status', 'error', 'server'])
                 
-            response.set_header('Content-type', 'text/plain')    
-            
-            arr_log=[]
+                arr_log=arr_log2+arr_log
+                
+                #response.set_header('Content-type', 'text/plain')
+                
+                #return json.dumps(arr_log)
+                
+            else:
+                
+                arr_log=[]
+                
+                for server in servers:
+                    
+                    arr_log.append({'status':1, 'error':1, 'server': server})
+                    
+            response.set_header('Content-type', 'text/plain')
             
             return filter_ajax(arr_log)
+            
+        response.set_header('Content-type', 'text/plain')    
+        
+        arr_log=[]
+        
+        return filter_ajax(arr_log)
                 
                 
 

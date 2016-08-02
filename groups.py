@@ -4,7 +4,7 @@ import traceback, sys
 from paramecio.citoplasma.mtemplates import env_theme, PTemplate
 from paramecio.citoplasma.i18n import load_lang, I18n
 from paramecio.citoplasma.urls import make_url, add_get_parameters, redirect
-from paramecio.citoplasma.adminutils import get_menu, get_language
+from paramecio.citoplasma.adminutils import get_menu, get_language, check_login
 from paramecio.citoplasma.sessions import get_session
 from paramecio.citoplasma.lists import SimpleList
 from paramecio.citoplasma.generate_admin_class import GenerateAdminClass
@@ -39,58 +39,64 @@ def home():
     
     s=get_session()
     
+    """
     if 'login' in s:
         
         if s['privileges']==2:
-            
-            getpostfiles=GetPostFiles()
-            
-            getpostfiles.obtain_get()
-
-            parent_id=getpostfiles.get.get('parent_id', '0')
-            
-            parent_id=int(parent_id)
-            
-            #Load menu
-            
-            menu=get_menu(config_admin.modules_admin)
-        
-            lang_selected=get_language(s)
-            
-            groups=servers.ServerGroup(connection)
-            
-            groups.create_forms()
-            
-            groups.forms['parent_id'].default_value=parent_id
-            
-            hierarchy=HierarchyModelLinks(groups, 'All groups', 'name', 'parent_id', make_url('pastafari/groups'))
-            
-            hierarchy.prepare()
-            
-            group_list=GenerateAdminClass(groups, make_url(pastafari_folder+'/groups', {'parent_id': str(parent_id)}), t)
-            
-            groups.set_conditions('WHERE parent_id=%s', [parent_id])
-            
-            group_list.list.fields_showed=['name']
-            
-            group_list.list.arr_extra_options=[task_options]
-            
-            group_list.list.s['order']='0'
-            group_list.list.s['order_field']='name'
-            
-            group_list.list.yes_search=False
-            
-            content_index=t.load_template('pastafari/groups.phtml', group_list=group_list, hierarchy_links=hierarchy, son_id=parent_id)
-            #group_list.show()
-
-            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups', 'Server\'s Group'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-            
-        else:
-            redirect(make_url(config.admin_folder))
+    """
     
+    if check_login():
+        
+        getpostfiles=GetPostFiles()
+        
+        getpostfiles.obtain_get()
+
+        parent_id=getpostfiles.get.get('parent_id', '0')
+        
+        parent_id=int(parent_id)
+        
+        #Load menu
+        
+        menu=get_menu(config_admin.modules_admin)
+    
+        lang_selected=get_language(s)
+        
+        groups=servers.ServerGroup(connection)
+        
+        groups.create_forms()
+        
+        groups.forms['parent_id'].default_value=parent_id
+        
+        hierarchy=HierarchyModelLinks(groups, 'All groups', 'name', 'parent_id', make_url('pastafari/groups'))
+        
+        hierarchy.prepare()
+        
+        group_list=GenerateAdminClass(groups, make_url(pastafari_folder+'/groups', {'parent_id': str(parent_id)}), t)
+        
+        groups.set_conditions('WHERE parent_id=%s', [parent_id])
+        
+        group_list.list.fields_showed=['name']
+        
+        group_list.list.arr_extra_options=[task_options]
+        
+        group_list.list.s['order']='0'
+        group_list.list.s['order_field']='name'
+        
+        group_list.list.yes_search=False
+        
+        content_index=t.load_template('pastafari/groups.phtml', group_list=group_list, hierarchy_links=hierarchy, son_id=parent_id)
+        #group_list.show()
+
+        return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups', 'Server\'s Group'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        
+    else:
+        redirect(make_url(config.admin_folder))
+    
+    """
     else:
     
         redirect(make_url(config.admin_folder))
+    """
 
 @route('/'+pastafari_folder+'/editservers/<parent_id:int>')
 def edit_servers(parent_id):
@@ -101,31 +107,30 @@ def edit_servers(parent_id):
     t=PTemplate(env)
     
     s=get_session()
-    
+    """
     if 'login' in s:
         
         if s['privileges']==2:
+    """
+    if check_login():
                 
-            #Load menu
-            
-            group=servers.ServerGroup(connection)
-            
-            arr_group=group.select_a_row(parent_id)
-            
-            menu=get_menu(config_admin.modules_admin)
+        #Load menu
         
-            lang_selected=get_language(s)
-            
-            content_index=t.load_template('pastafari/add_servers_group.phtml', group=arr_group)
+        group=servers.ServerGroup(connection)
+        
+        arr_group=group.select_a_row(parent_id)
+        
+        menu=get_menu(config_admin.modules_admin)
+    
+        lang_selected=get_language(s)
+        
+        content_index=t.load_template('pastafari/add_servers_group.phtml', group=arr_group)
 
-            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups_config', 'Server\'s Group servers'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-            
-        else:
-            redirect(make_url(config.admin_folder))
-    
+        return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups_config', 'Server\'s Group servers'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+        
     else:
-    
         redirect(make_url(config.admin_folder))
+    
 
 @post('/'+pastafari_folder+'/editservers/<parent_id:int>')
 def add_servers(parent_id):
