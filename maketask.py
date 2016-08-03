@@ -65,11 +65,7 @@ def home():
         getpost.obtain_post()
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
+
     if check_login():
         #task=Task(connection)
         logtask=LogTask(connection)
@@ -140,11 +136,7 @@ def executetask():
     getpost.obtain_post()
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
+    
     if check_login():
             
         task=Task(connection)

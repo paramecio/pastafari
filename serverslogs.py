@@ -56,11 +56,7 @@ def home():
     t=PTemplate(env)
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
+    
     if check_login():
                 
         task=Task(connection)
@@ -132,11 +128,7 @@ def showprogress(task_id, server):
     conn=WebModel.connection()
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
+    
     if check_login():
             
         content_index=''
@@ -178,11 +170,6 @@ def getservers(task_id, position):
     conn=WebModel.connection()
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
 
     if check_login():
 
@@ -240,11 +227,7 @@ def getprogress(task_id):
     conn=WebModel.connection()
     
     s=get_session()
-    """
-    if 'login' in s:
-        
-        if s['privileges']==2:
-    """
+
     if check_login():
         
         getpost=GetPostFiles() 
