@@ -555,7 +555,7 @@ def net_cpu_status(server_id):
             
                 ip=arr_server['ip']
                 
-                now=datetime.obtain_timestamp(datetime.now())
+                now=datetime.obtain_timestamp(datetime.now(True))
                 
                 hours12=now-21600
                 
