@@ -4,6 +4,7 @@ import paramiko, json
 import os, sys,traceback
 from stat import S_ISDIR
 from modules.pastafari.models import tasks
+from modules.pastafari.models.servers import ServerGroupTask
 from modules.pastafari.libraries.configclass import config_task
 from paramecio.citoplasma.i18n import I18n
 from paramecio.cromosoma.webmodel import WebModel
@@ -548,6 +549,10 @@ class Task:
                     
             
         self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+        
+        # Add 
+        
+        
         
         self.task.conditions=['WHERE id=%s', [self.id]]
         self.task.update({'error': 0, 'status': 1})

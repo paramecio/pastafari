@@ -97,6 +97,14 @@ class ServerGroupItem(WebModel):
         self.register(corefields.ForeignKeyField('group_id', ServerGroup(connection)), True)
         self.register(corefields.ForeignKeyField('server_id', Server(connection)), True)
 
+class ServerGroupTask(WebModel):
+    
+    def __init__(self, connection):
+        
+        super().__init__(connection)
+        self.register(corefields.CharField('name_task'), True)
+        self.register(LonelyIpField('ip'), True)
+
 class StatusNet(WebModel):
     
     def __init__(self, connection):
