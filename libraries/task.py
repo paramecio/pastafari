@@ -82,6 +82,7 @@ class Task:
         
         self.logtask=tasks.LogTask(connection)
         self.task=tasks.Task(connection)
+        self.taskdone=ServerGroupTask(connection)
         
         self.ssh=paramiko.SSHClient()
         
@@ -551,8 +552,9 @@ class Task:
         self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
         
         # Add 
+        self.taskdone.create_forms()
         
-        
+        self.taskdone.insert({'name_task': self.codename, 'ip': self.server})
         
         self.task.conditions=['WHERE id=%s', [self.id]]
         self.task.update({'error': 0, 'status': 1})
