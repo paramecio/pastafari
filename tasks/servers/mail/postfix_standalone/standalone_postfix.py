@@ -12,19 +12,20 @@ class MakeTask(ArgsTask):
         
         super().__init__(conn)
         
-        self.files=[['modules/pastafari/scripts/servers/mail/postfix/${os_server}/install_postfix.sh', 0o700]]
-        
-        self.files=[['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/main.cf', 0o644]]
-        
-        self.files=[['modules/pastafari/scripts/servers/mail/sqlgrey/${os_server}/install_sqlgrey.sh', 0o700]]
-        self.files=[['modules/pastafari/scripts/servers/mail/sqlgrey/${os_server}/files/sqlgrey.conf', 0o644]]
-        
         self.files.append(['modules/pastafari/scripts/servers/mail/dovecot/${os_server}/install_dovecot.sh', 0o700])
         
         self.files.append(['modules/pastafari/scripts/servers/mail/dovecot/${os_server}/files/10-auth.conf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/dovecot/${os_server}/files/10-mail.conf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/dovecot/${os_server}/files/10-master.conf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/dovecot/${os_server}/files/10-ssl.conf', 0o644])
+        
+        self.files=[['modules/pastafari/scripts/servers/mail/postfix/${os_server}/install_postfix.sh', 0o700]]
+        self.files=[['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/main.cf', 0o644]]
+        
+        self.files=[['modules/pastafari/scripts/servers/databases/sqlite/${os_server}/install_sqlite.sh', 0o700]]
+        
+        self.files=[['modules/pastafari/scripts/servers/mail/sqlgrey/${os_server}/install_sqlgrey.sh', 0o700]]
+        self.files=[['modules/pastafari/scripts/servers/mail/sqlgrey/${os_server}/files/sqlgrey.conf', 0o644]]
         
         self.files.append(['modules/pastafari/scripts/servers/mail/dkim/${os_server}/install_dkim.sh', 0o700])
         self.files.append(['modules/pastafari/scripts/servers/mail/opendkim/${os_server}/files/opendkim.conf', 0o644])
