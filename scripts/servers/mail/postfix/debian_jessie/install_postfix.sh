@@ -29,7 +29,15 @@ else
     exit;
 fi
 
-sudo HOSTNAME_SERVER=`hostname -f` sed -i -e 's/alfa.example.com/'$HOSTNAME_SERVER'/g' /etc/postfix/main.cf
+HOSTNAME_SERVER=`hostname -f`
+
+sudo sed -i -e 's/alfa\.example\.com/'$HOSTNAME_SERVER'/g' /etc/postfix/main.cf
+
+sudo touch /etc/postfix/virtual_mailbox
+sudo touch /etc/postfix/virtual_domains
+
+sudo postmap hash:/etc/postfix/virtual_mailbox
+sudo postmap hash:/etc/postfix/virtual_domains
 
 sudo postfix reload
 
