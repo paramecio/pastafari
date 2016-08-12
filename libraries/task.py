@@ -441,8 +441,13 @@ class Task:
                 
                 arguments=c[1]
                 
+                sudo_str=''
+                
+                if len(c)==3:
+                    sudo_str='sudo '
+                
                 #, get_pty=True
-                stdin, stdout, stderr = self.ssh.exec_command(self.config.remote_path+'/'+command+' '+arguments)
+                stdin, stdout, stderr = self.ssh.exec_command(sudo_str+self.config.remote_path+'/'+command+' '+arguments)
                 
                 for line in stdout:
                     
