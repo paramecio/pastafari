@@ -16,9 +16,9 @@ class MakeTask(ArgsTask):
         self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/main.cf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/master.cf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/add_domain.py', 0o700])
-        self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/add_account.py', 0o700])
-        self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/remove_domain.py', 0o700])
-        self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/remove_account.py', 0o700])
+        #self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/add_account.py', 0o700])
+        #self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/remove_domain.py', 0o700])
+        #self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/remove_account.py', 0o700])
         
         self.files.append(['modules/pastafari/scripts/servers/mail/dovecot/${os_server}/install_dovecot.sh', 0o700])
         
@@ -36,6 +36,8 @@ class MakeTask(ArgsTask):
         self.files.append(['modules/pastafari/scripts/servers/mail/opendkim/${os_server}/files/opendkim.conf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/opendkim/${os_server}/files/opendkim', 0o644])
         
+        self.files.append(['modules/pastafari/scripts/servers/system/quota/${os_server}/install_quota_home.py', 0o700])
+        
         # Format first array element is command with the interpreter, the task is agnostic, the files in os directory. The commands are setted with 750 permission.
         # First element is the file, next elements are the arguments
         
@@ -48,6 +50,8 @@ class MakeTask(ArgsTask):
         self.commands_to_execute.append(['modules/pastafari/scripts/servers/mail/sqlgrey/${os_server}/install_sqlgrey.sh', ''])
         
         self.commands_to_execute.append(['modules/pastafari/scripts/servers/mail/opendkim/${os_server}/install_opendkim.sh', ''])
+        
+        self.commands_to_execute.append(['modules/pastafari/scripts/servers/system/quota/${os_server}/install_quota_home.py', '', ''])
         
         #THe files to delete
         
