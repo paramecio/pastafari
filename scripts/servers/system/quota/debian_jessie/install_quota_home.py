@@ -60,5 +60,11 @@ if no_quota==1:
     if subprocess.call("sudo quotacheck -cugm %s" % disk,  shell=True) > 0:
         print('Error: cannot create the quota files!')
         sys.exit(1)
+        
+    print("Enabling quota...")
+
+    if subprocess.call("sudo quotaon %s" % disk,  shell=True) > 0:
+        print('Error: cannot enable quota!')
+        sys.exit(1)
 
 print("Finished quota configuration...")

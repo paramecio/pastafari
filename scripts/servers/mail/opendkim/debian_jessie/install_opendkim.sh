@@ -9,13 +9,13 @@ else
     exit 1;
 fi
 
-sudo mkdir -p /etc/postfix/dkim/
+sudo mkdir -p /etc/opendkim
 
-sudo touch /etc/postfix/dkim/keytable
-sudo touch /etc/postfix/dkim/signingtable 
+sudo touch /etc/opendkim/KeyTable
+sudo touch /etc/opendkim/SigningTable
 
-sudo chgrp opendkim /etc/postfix/dkim/ *
-sudo chmod g+r /etc/postfix/dkim/ * 
+sudo chgrp opendkim /etc/opendkim/ *
+sudo chmod g+r /etc/opendkim/ * 
 
 sudo cp modules/pastafari/scripts/servers/mail/opendkim/debian_jessie/files/opendkim.conf /etc/opendkim.conf
 sudo cp modules/pastafari/scripts/servers/mail/opendkim/debian_jessie/files/opendkim /etc/default/

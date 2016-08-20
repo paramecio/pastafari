@@ -11,12 +11,12 @@ else
     exit;
 fi
 
-sudo apt-get install -y procmail
+sudo apt-get install -y maildrop
 
 if [ $? -eq 0 ]; then
-    echo "Installed Procmail successfully"
+    echo "Installed Maildrop successfully"
 else
-    echo "Error installing procmail..."
+    echo "Error installing Maildrop..."
     exit;
 fi
 
@@ -32,6 +32,10 @@ fi
 HOSTNAME_SERVER=`hostname -f`
 
 sudo sed -i -e 's/alfa\.example\.com/'$HOSTNAME_SERVER'/g' /etc/postfix/main.cf
+
+sudo /etc/postfix/transport < "autoreply.$HOSTNAME_SERVER  autoreply:"
+
+sudo postmap hash:/etc/postfix/transport
 
 sudo touch /etc/postfix/virtual_mailbox
 sudo touch /etc/postfix/virtual_domains

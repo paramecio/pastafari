@@ -14,7 +14,7 @@ smtp      inet  n       -       -       -       -       smtpd
 #smtpd     pass  -       -       -       -       -       smtpd
 #dnsblog   unix  -       -       -       -       0       dnsblog
 #tlsproxy  unix  -       -       -       -       0       tlsproxy
-#submission inet n       -       -       -       -       smtpd
+submission inet n       -       -       -       -       smtpd
 #  -o syslog_name=postfix/submission
 #  -o smtpd_tls_security_level=encrypt
 #  -o smtpd_sasl_auth_enable=yes
@@ -121,4 +121,6 @@ scalemail-backend unix	-	n	n	-	2	pipe
 mailman   unix  -       n       n       -       -       pipe
   flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
   ${nexthop} ${user}
-
+# Autoresponse
+autoreply unix  -       n       n       -       -       pipe
+   flags= user=nobody argv=/home/pzoo/modules/mail/utilities/autoreply.py --sender $sender --mailbox $mailbox
