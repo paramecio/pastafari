@@ -16,6 +16,15 @@ class MakeTask(ArgsTask):
         self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/main.cf', 0o644])
         self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/master.cf', 0o644])
         self.files.append(['modules/mail/utilities/${os_server}/add_domain.py', 0o700])
+        self.files.append(['modules/mail/utilities/${os_server}/remove_domain.py', 0o750])
+        self.files.append(['modules/mail/utilities/${os_server}/add_user.py', 0o750])
+        self.files.append(['modules/mail/utilities/${os_server}/remove_user.py', 0o750])
+        self.files.append(['modules/mail/utilities/${os_server}/add_redirection.py', 0o750])
+        self.files.append(['modules/mail/utilities/${os_server}/remove_redirection.py', 0o750])
+        self.files.append(['modules/mail/utilities/${os_server}/add_alias.py', 0o750])
+        self.files.append(['modules/mail/utilities/${os_server}/remove_alias.py', 0o750])
+        #dd_alias.py        add_user.py      remove_domain.py add_domain.py       autoreply.py     remove_redirection.py add_redirection.py  remove_alias.py  remove_user.py
+
         self.files.append(['modules/mail/utilities/${os_server}/autoreply.py', 0o755])
         #self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/add_account.py', 0o700])
         #self.files.append(['modules/pastafari/scripts/servers/mail/postfix/${os_server}/files/utilities/remove_domain.py', 0o700])

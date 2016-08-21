@@ -123,4 +123,4 @@ mailman   unix  -       n       n       -       -       pipe
   ${nexthop} ${user}
 # Autoresponse
 autoreply unix  -       n       n       -       -       pipe
-   flags= user=nobody argv=/home/pzoo/modules/mail/utilities/autoreply.py --sender $sender --mailbox $mailbox
+   flags= user=nobody argv=/home/pzoo/modules/mail/utilities/debian_jessie/autoreply.py --sender $sender --mailbox $mailbox
