@@ -79,38 +79,40 @@ def index(api_key, task_id):
         task=tasks.Task(connection)
         logtask=tasks.LogTask(connection)
         logtask.create_forms()
-        
+        """
         task.set_conditions('where status=%s and id!=%s', [0, task_id])
         
         c=task.select_count()
         
         if c==0:
+        """
+        arr_task=task.select_a_row(task_id)
         
-            arr_task=task.select_a_row(task_id)
-            
-            if arr_task:
-            
-            # Add to queue
+        if arr_task:
+        
+        # Add to queue
 
-                greenlet = gevent.spawn( execute_script, task_id)
-                """p = Process(target=execute_script, args=(task_id,))
-                p.start()"""
-                # Close the connection
+            greenlet = gevent.spawn( execute_script, task_id)
+            """p = Process(target=execute_script, args=(task_id,))
+            p.start()"""
+            # Close the connection
 
-                response={'error': 0, 'code_error': 0, 'message': 'Begin task with id '+str(task_id), 'progress' : 0}
+            response={'error': 0, 'code_error': 0, 'message': 'Begin task with id '+str(task_id), 'progress' : 0}
 
-                return response
-            else:
-                
-                response={'error': 1, 'code_error': 1, 'message': 'Doesnt exists task with id '+str(task_id), 'progress' : 100, 'status': 1}
+            return response
+        else:
             
-                return response
+            response={'error': 1, 'code_error': 1, 'message': 'Doesnt exists task with id '+str(task_id), 'progress' : 100, 'status': 1}
+        
+            return response
+        """
         else:
             
             response={'error': 1, 'code_error': 1, 'message': 'Sorry, other task are in process', 'progress' : 100, 'status': 1}
             
             return response
-    
+        """
+        
     else:
         
         response={'error': 1, 'code_error': 1, 'message': 'No permission for make tasks', 'progress' : 100, 'status': 1}

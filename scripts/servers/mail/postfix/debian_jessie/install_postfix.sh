@@ -11,15 +11,6 @@ else
     exit;
 fi
 
-sudo apt-get install -y maildrop
-
-if [ $? -eq 0 ]; then
-    echo "Installed Maildrop successfully"
-else
-    echo "Error installing Maildrop..."
-    exit;
-fi
-
 sudo cp modules/pastafari/scripts/servers/mail/postfix/debian_jessie/files/main.cf /etc/postfix/
 
 if [ $? -eq 0 ]; then
