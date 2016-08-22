@@ -29,6 +29,8 @@ class ArgsTask:
         self.one_time=False
         
         self.version='1.0'
+        
+        self.simultaneous=False
 
     def form(self):
         
@@ -92,6 +94,8 @@ class Task:
         self.one_time=False
         
         self.version='1.0'
+        
+        self.simultaneous=False
         
         pass
 

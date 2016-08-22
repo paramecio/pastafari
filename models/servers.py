@@ -121,6 +121,7 @@ class StatusNet(WebModel):
         self.register(corefields.IntegerField('dropout'))
         self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
+        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
 
 class StatusCpu(WebModel):
     
@@ -132,6 +133,7 @@ class StatusCpu(WebModel):
         self.register(corefields.DoubleField('idle'))
         self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
+        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
         
 class StatusDisk(WebModel):
     
@@ -146,6 +148,7 @@ class StatusDisk(WebModel):
         self.register(corefields.DoubleField('free'))
         self.register(corefields.DoubleField('percent'))
         self.register(DateField('date'))
+        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
 
 class StatusMemory(WebModel):
     
@@ -171,3 +174,4 @@ class StatusMemory(WebModel):
         
         self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
+        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))

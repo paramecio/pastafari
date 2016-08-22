@@ -120,7 +120,7 @@ class MakeTask(ArgsTask):
                 
         return (False, 'Mariadb Install server', 'Install a mariadb/Mysql server in your selected hosts')
         """
-        if self.task.insert({'name_task': 'Postfix server', 'description_task': 'Install a mail server in your selected hosts with postfix, dovecot, sqlgrey based in unix accounts', 'codename_task': 'standalone_postfix', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version}):
+        if self.task.insert({'name_task': 'Postfix server', 'description_task': 'Install a mail server in your selected hosts with postfix, dovecot, sqlgrey based in unix accounts', 'codename_task': 'standalone_postfix', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version, 'simultaneous': self.simultaneous}):
                     
             return (self.task.insert_id(), 'Postfix Install server', 'Install a mail server with postfix/dovecot in your selected hosts, based in unix accounts')
         else:
