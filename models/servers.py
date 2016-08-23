@@ -130,6 +130,7 @@ class StatusCpu(WebModel):
         super().__init__(connection)
         self.register(IpField('ip'), True)
         self.fields['ip'].indexed=True
+        self.register(corefields.IntegerField('num_cpu'))
         self.register(corefields.DoubleField('idle'))
         self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
