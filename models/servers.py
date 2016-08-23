@@ -121,7 +121,7 @@ class StatusNet(WebModel):
         self.register(corefields.IntegerField('dropout'))
         self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
-        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
+        #self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
 
 class StatusCpu(WebModel):
     
@@ -148,7 +148,7 @@ class StatusDisk(WebModel):
         self.register(corefields.DoubleField('free'))
         self.register(corefields.DoubleField('percent'))
         self.register(DateField('date'))
-        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
+        #self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
 
 class StatusMemory(WebModel):
     
@@ -174,4 +174,31 @@ class StatusMemory(WebModel):
         
         self.register(corefields.BooleanField('last_updated'))
         self.register(DateField('date'))
-        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
+        #self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=False, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
+        
+class DataServer(WebModel):
+    def __init__(self, connection):
+        
+        super().__init__(connection)
+        
+        self.register(IpField('ip'), True)
+        self.fields['ip'].indexed=True
+        
+        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=True, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
+        self.register(corefields.ForeignKeyField('net_id', StatusNet(connection), size=11, required=False, identifier_field='id', named_field="bytes_sent", select_fields=['bytes_sent', 'bytes_recv']))
+        self.register(corefields.ForeignKeyField('memory_id', StatusMemory(connection), size=11, required=False, identifier_field='id', named_field="free", select_fields=['free', 'used', 'cached']))
+        self.register(corefields.ForeignKeyField('cpu_id', StatusCpu(connection), size=11, required=False, identifier_field='id', named_field="idle", select_fields=[]))
+        
+        self.register(corefields.ForeignKeyField('disk0_id', StatusDisk(connection), size=11, required=False, identifier_field='id', named_field="disk", select_fields=['free', 'used', 'size', 'percent']))
+        
+        self.register(corefields.ForeignKeyField('disk1_id', StatusDisk(connection), size=11, required=False, identifier_field='id', named_field="disk", select_fields=['free', 'used', 'size', 'percent']))
+        
+        self.register(corefields.ForeignKeyField('disk2_id', StatusDisk(connection), size=11, required=False, identifier_field='id', named_field="disk", select_fields=['free', 'used', 'size', 'percent']))
+        
+        self.register(corefields.ForeignKeyField('disk3_id', StatusDisk(connection), size=11, required=False, identifier_field='id', named_field="disk", select_fields=['free', 'used', 'size', 'percent']))
+    
+        self.register(corefields.ForeignKeyField('disk4_id', StatusDisk(connection), size=11, required=False, identifier_field='id', named_field="disk", select_fields=['free', 'used', 'size', 'percent']))
+        
+        self.register(corefields.ForeignKeyField('disk5_id', StatusDisk(connection), size=11, required=False, identifier_field='id', named_field="disk", select_fields=['free', 'used', 'size', 'percent']))
+    
+        self.register(DateField('date'))
