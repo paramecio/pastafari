@@ -185,7 +185,7 @@ class DataServer(WebModel):
         self.register(IpField('ip'), True)
         self.fields['ip'].indexed=True
         
-        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=True, identifier_field='id', named_field="hostname", select_fields=['actual_idle', 'date']))
+        self.register(corefields.ForeignKeyField('server_id', Server(connection), size=11, required=True, identifier_field='id', named_field="hostname", select_fields=['id','actual_idle', 'date']))
         self.register(corefields.ForeignKeyField('net_id', StatusNet(connection), size=11, required=False, identifier_field='id', named_field="bytes_sent", select_fields=['bytes_sent', 'bytes_recv']))
         self.register(corefields.ForeignKeyField('memory_id', StatusMemory(connection), size=11, required=False, identifier_field='id', named_field="free", select_fields=['free', 'used', 'cached']))
         self.register(corefields.ForeignKeyField('cpu_id', StatusCpu(connection), size=11, required=False, identifier_field='id', named_field="idle", select_fields=['num_cpu']))
