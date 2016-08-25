@@ -1,4 +1,4 @@
-#/usr/bin/python3
+#/usr/bin/env python3
 
 from paramecio.citoplasma.generate_admin_class import GenerateAdminClass
 from paramecio.citoplasma.lists import SimpleList

@@ -1,4 +1,4 @@
-#/usr/bin/python3
+#/usr/bin/env python3
 
 from modules.pastafari.libraries.task import ArgsTask
 from modules.pastafari.models.tasks import Task
