@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5 -u
+#!/usr/bin/python3.5 -u
 
 import psutil
 import json
