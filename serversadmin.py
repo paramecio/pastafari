@@ -216,7 +216,7 @@ def admin(**args):
                                 delete_files.append('modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh')
                                 delete_files.append(config_task.public_key)
                                 
-                                delete_directories=['modules/pastafari']
+                                #delete_directories=['modules/pastafari']
                                 
                                 if post['delete_root_password']=='1':
                                     #delete_root_passwd.sh
