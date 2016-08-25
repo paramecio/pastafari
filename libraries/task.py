@@ -475,6 +475,8 @@ class Task:
                         else:
                             
                             json_code['task_id']=self.id
+                            
+                            json_code['server']=self.server
                     
                             self.logtask.insert(json_code)
                                                 
