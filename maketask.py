@@ -159,6 +159,8 @@ def executetask():
             
             # Process the task
             
+            arr_servers=[]
+            
             post_task={'task': getpost.post['task']}
                 
             pattern=re.compile('^server_.*$')
@@ -180,7 +182,7 @@ def executetask():
             
             if task_id:
 
-                arr_servers=[]
+                #arr_servers=[]
                 
                 where_sql='WHERE 1=1'
                 

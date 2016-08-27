@@ -97,7 +97,11 @@ class Task:
         
         self.simultaneous=False
         
-        pass
+        self.pre_task=None
+        
+        self.error_task=None
+        
+        self.post_task=None
 
     def prepare_connection(self):
         

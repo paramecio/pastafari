@@ -17,7 +17,19 @@
         progressbar.progressbar({
           value: false,
           change: function() {
-            progressLabel.text( progressbar.progressbar( "value" ) + "%" );
+              
+            if(progressbar.progressbar( "value" )>0)
+            {
+              
+                progressLabel.text( progressbar.progressbar( "value" ) + "%" );
+                
+            }
+            else
+            {
+                progressbar.progressbar( "value", false);
+                progressLabel.text( "Processing task..." );
+                
+            }
           },
           complete: function() {
             progressLabel.text( "Complete!" );

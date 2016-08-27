@@ -12,6 +12,7 @@ else
 fi
 
 sudo cp modules/pastafari/scripts/servers/mail/postfix/debian_jessie/files/main.cf /etc/postfix/
+sudo cp modules/pastafari/scripts/servers/mail/postfix/debian_jessie/files/master.cf /etc/postfix/
 
 if [ $? -eq 0 ]; then
     echo "Installed sucessfully main.cf"
@@ -24,7 +25,7 @@ HOSTNAME_SERVER=`hostname -f`
 
 sudo sed -i -e 's/alfa\.example\.com/'$HOSTNAME_SERVER'/g' /etc/postfix/main.cf
 
-sudo /etc/postfix/transport < "autoreply.$HOSTNAME_SERVER  autoreply:"
+sudo echo "autoreply.$HOSTNAME_SERVER  autoreply:" > /etc/postfix/transport
 
 sudo postmap hash:/etc/postfix/transport
 
