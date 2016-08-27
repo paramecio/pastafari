@@ -440,6 +440,8 @@ class Task:
 
         # Execute commands
         
+        json_code=[]
+        
         for c in self.commands_to_execute:
         
             try:
@@ -562,8 +564,11 @@ class Task:
                 
                     with sftp.file(path_check+self.codename, 'w') as f:
                         f.write(self.version)
-                     
-        if json_code['progress']!=100:
+
+        if 'progress' in json_code:
+            if json_code['progress']!=100:
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+        else:
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
         
         # Add 

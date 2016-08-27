@@ -25,7 +25,9 @@ HOSTNAME_SERVER=`hostname -f`
 
 sudo sed -i -e 's/alfa\.example\.com/'$HOSTNAME_SERVER'/g' /etc/postfix/main.cf
 
-sudo echo "autoreply.$HOSTNAME_SERVER  autoreply:" > /etc/postfix/transport
+#sudo echo 'autoreply.'$HOSTNAME_SERVER'  autoreply:' > /etc/postfix/transport
+
+sudo sh -c "echo 'autoreply.'$HOSTNAME_SERVER'  autoreply:' > /etc/postfix/transport"
 
 sudo postmap hash:/etc/postfix/transport
 
