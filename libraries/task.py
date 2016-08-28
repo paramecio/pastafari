@@ -579,6 +579,9 @@ class Task:
         self.task.conditions=['WHERE id=%s', [self.id]]
         self.task.update({'error': 0, 'status': 1})
         
+        if self.post_task!=None:
+            self.post_task(self)
+        
         #connection.close()
         return True
         
