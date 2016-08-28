@@ -31,6 +31,10 @@ class ArgsTask:
         self.version='1.0'
         
         self.simultaneous=False
+        
+        # Field for save extra_data used for pre_,post_error _ tasks.
+        
+        self.extra_data={}
 
     def form(self):
         
@@ -402,6 +406,20 @@ class Task:
             
             return False
         
+        # Pre task
+        
+        if self.pre_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'pre_tasks', 'Pre tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
+            
+            if self.pre_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'pre_tasks_executed', 'Pre tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                return False
+        
         #Check if script was executed
         
         if self.codename!='':
@@ -485,6 +503,9 @@ class Task:
                             json_code['server']=self.server
                     
                             self.logtask.insert(json_code)
+                            
+                            if json_code['error']==1:
+                                return False
                                                 
                     
                     
@@ -564,6 +585,19 @@ class Task:
                 
                     with sftp.file(path_check+self.codename, 'w') as f:
                         f.write(self.version)
+                        
+        if self.post_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'post_tasks', 'Post tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
+            
+            if self.post_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'post_tasks_executed', 'Post tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                return False
+                
 
         if 'progress' in json_code:
             if json_code['progress']!=100:
@@ -578,9 +612,6 @@ class Task:
         
         self.task.conditions=['WHERE id=%s', [self.id]]
         self.task.update({'error': 0, 'status': 1})
-        
-        if self.post_task!=None:
-            self.post_task(self)
         
         #connection.close()
         return True

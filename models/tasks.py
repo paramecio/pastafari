@@ -34,6 +34,10 @@ class Task(WebModel):
         self.register(corefields.CharField('path'))
         self.register(corefields.BooleanField('one_time'))
         self.register(corefields.CharField('version'))
+        self.register(corefields.CharField('post_func'))
+        self.register(corefields.CharField('pre_func'))
+        self.register(corefields.CharField('error_func'))
+        self.register(DictField('extra_data', corefields.CharField('')))
     
 
 class LogTask(WebModel):
