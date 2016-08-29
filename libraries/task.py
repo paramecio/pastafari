@@ -106,6 +106,8 @@ class Task:
         self.error_task=None
         
         self.post_task=None
+        
+        self.error_post_task=''
 
     def prepare_connection(self):
         
@@ -592,9 +594,11 @@ class Task:
             if self.post_task(self):
                 self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'post_tasks_executed', 'Post tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
             else:
-                self.logtask.set_conditions('where id=%s', [last_log_id])
+                #self.logtask.set_conditions('where id=%s', [last_log_id])
                     
-                self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                #self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_post_tasks_executed', 'Error executing post task -> '+self.error_post_task), 'error': 1, 'status': 1, 'server': self.server})
                 
                 return False
                 
