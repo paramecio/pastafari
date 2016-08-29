@@ -11,6 +11,8 @@
     yes_position=0;
     last_status=0;
     
+    text_complete="Complete!";
+    
     var progressbar = $( "#progressbar" ),
     progressLabel = $( ".progress-label" );
     
@@ -32,7 +34,7 @@
             }
           },
           complete: function() {
-            progressLabel.text( "Complete!" );
+            progressLabel.text( text_complete );
           }
         });
     
@@ -124,7 +126,7 @@
                         
                         if(data[k].error==1)
                         {
-                            
+                            text_complete='ERROR, please see the log';
                             finish_progress_error(data[k].progress);
                             
                         }
