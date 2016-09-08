@@ -82,7 +82,7 @@
      }
      
      $.ajax({
-        url: "${make_url('pastafari/tasks')}?task_id=${task_id}&server=${server}&position="+position,
+        url: "${make_url('pastafari/showprogress/tasks')}?task_id=${task_id}&server=${server}&position="+position,
         method: "POST",
         dataType: "json",
         data: {}

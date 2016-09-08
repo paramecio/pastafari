@@ -303,8 +303,8 @@ def getprogress(task_id):
 
 # Get json data for a see progress in task in a server
 
-@route('/'+pastafari_folder+'/tasks')
-@post('/'+pastafari_folder+'/tasks')
+@route('/'+pastafari_folder+'/showprogress/tasks')
+@post('/'+pastafari_folder+'/showprogress/tasks')
 def gettasks():
     
     if check_login():

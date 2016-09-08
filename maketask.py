@@ -237,7 +237,7 @@ def executetask():
                 
                 content_index=t.load_template('pastafari/maketask.phtml', form=task_first.form(t, yes_error=True, pass_values=True, **getpost.post), post=post_task, group_id=group_id)
                 
-            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server...'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+            return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'making_task', 'Making task in server')+': '+task_first.name_task, content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
         
     else:
     

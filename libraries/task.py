@@ -26,6 +26,12 @@ class ArgsTask:
         
         self.delete_directories=[]
         
+        self.name_task=''
+        
+        self.description_task=''
+        
+        self.codename_task=''
+        
         self.one_time=False
         
         self.version='1.0'
@@ -401,8 +407,8 @@ class Task:
             self.id=self.task.insert_id()
         
         if not self.prepare_connection():
-            self.task.conditions=['WHERE id=%s', [self.id]]
-            self.task.update({'error': 1, 'status': 1})
+            #self.task.conditions=['WHERE id=%s', [self.id]]
+            #self.task.update({'error': 1, 'status': 1})
             
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
@@ -449,8 +455,8 @@ class Task:
                         pass
         
         if not self.upload_files():
-            self.task.conditions=['WHERE id=%s', [self.id]]
-            self.task.update({'error': 1, 'status': 1})
+            #self.task.conditions=['WHERE id=%s', [self.id]]
+            #self.task.update({'error': 1, 'status': 1})
             
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
@@ -491,8 +497,8 @@ class Task:
                         json_code=json.loads(line)
                         
                         if not 'progress' in json_code or not 'message' in json_code or not 'error' in json_code:
-                            self.task.conditions=['WHERE id=%s', [self.id]]
-                            self.task.update({'error': 1, 'status': 1})
+                            #self.task.conditions=['WHERE id=%s', [self.id]]
+                            #self.task.update({'error': 1, 'status': 1})
                             
                             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': 'Malformed json code: '+str(line), 'error': 1, 'server': self.server})
                             
@@ -527,8 +533,8 @@ class Task:
                     #logging.warning(action.codename+" WARNING: "+line)
                     final_text='Error executing the command: %s' % command
                     
-                    self.task.conditions=['WHERE id=%s', [self.id]]
-                    self.task.update({'error': 1, 'status': 1})
+                    #self.task.conditions=['WHERE id=%s', [self.id]]
+                    #self.task.update({'error': 1, 'status': 1})
                     
                     for line in stdout:
                         final_text+=' '+line
@@ -544,8 +550,8 @@ class Task:
                 
             except:
                 
-                self.task.conditions=['WHERE id=%s', [self.id]]
-                self.task.update({'error': 1, 'status': 1})
+                #self.task.conditions=['WHERE id=%s', [self.id]]
+                #self.task.update({'error': 1, 'status': 1})
                 
                 self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': traceback.format_exc(), 'error': 1, 'status': 1, 'server': self.server})
 
@@ -555,8 +561,8 @@ class Task:
         
         if not self.delete_files_and_dirs():
             
-            self.task.conditions=['WHERE id=%s', [self.id]]
-            self.task.update({'error': 1, 'status': 1})
+            #self.task.conditions=['WHERE id=%s', [self.id]]
+            #self.task.update({'error': 1, 'status': 1})
                 
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
@@ -614,11 +620,25 @@ class Task:
         
         self.taskdone.insert({'name_task': self.codename, 'ip': self.server})
         
-        self.task.conditions=['WHERE id=%s', [self.id]]
-        self.task.update({'error': 0, 'status': 1})
+        #self.task.conditions=['WHERE id=%s', [self.id]]
+        #self.task.update({'error': 0, 'status': 1})
         
         #connection.close()
         return True
+        
+    def make_error_task(self):
+        
+        if self.error_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'error_tasks', 'Pre tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
+            
+            if self.error_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_tasks_executed', 'Pre tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                return False
         
     def __del__(self):
         

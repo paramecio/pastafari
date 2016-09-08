@@ -100,9 +100,13 @@ def admin(**args):
     
     server.forms['password'].label=I18n.lang('pastafari', 'password', 'Password')
     
-    server.forms['delete_root_password']=SelectForm('delete_root_password', '', {'0': 'No', '1': 'Yes'})
+    server.forms['delete_root_password']=SelectForm('delete_root_password', '1', {'0': 'No', '1': 'Yes'})
     
     server.forms['delete_root_password'].label=I18n.lang('pastafari', 'delete_root_password', 'Disable root password')
+    
+    server.forms['clean_gcc']=SelectForm('clean_gcc', '1', {'0': 'No', '1': 'Yes'})
+    
+    server.forms['clean_gcc'].label=I18n.lang('pastafari', 'clean_gcc', 'Clean build dependencies for soft monitoring install?,if you want gcc in your server, answer NO')
     
     server.forms['group_id']=SelectModelForm('group_id', getpostfiles.get['group_id'], group_server, 'name', 'id', 'parent_id')
     
@@ -130,6 +134,7 @@ def admin(**args):
             post['password']=getpostfiles.post.get('password', '')
             post['delete_root_password']=getpostfiles.post.get('delete_root_password', '0')
             post['ip']=getpostfiles.post.get('ip', '')
+            post['clean_gcc']=getpostfiles.post.get('clean_gcc', '1')
             
             try:
             
@@ -198,6 +203,7 @@ def admin(**args):
                                 #files.append(['monit/'+os_server+'/files/alive.sh', 0o750];
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_info.py', 0o750])
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_updates.py', 0o750])
+                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/clean_gcc.sh', 0o750])
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/crontab/alive', 0o640])
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/sudoers.d/spanel', 0o640])
                                 files.append([config_task.public_key, 0o600])
@@ -217,11 +223,17 @@ def admin(**args):
                                 delete_files.append(config_task.public_key)
                                 
                                 delete_directories=['modules/pastafari']
+                                delete_directories=[os.path.dirname(config_task.public_key)]
                                 
                                 if post['delete_root_password']=='1':
                                     #delete_root_passwd.sh
                                     files.append(['modules/pastafari/scripts/standard/'+os_server+'/delete_root_passwd.sh', 0o750])
                                     commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/delete_root_passwd.sh', ''])
+                                    
+                                if post['clean_gcc']=='1':
+                                    #delete_root_passwd.sh
+                                    files.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', 0o750])
+                                    commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', ''])
                                     
                                 
                                 if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root'}):
@@ -494,247 +506,6 @@ def home():
     else:
         redirect(make_url(config.admin_folder))
         
-# Method for show the graphs
-@route('/'+pastafari_folder+'/servergraphs/<server_id:int>')
-def graphs(server_id):
-    
-    if check_login():
-        
-        s=get_session()
-        
-        #Load menu
-        
-        menu=get_menu(config_admin.modules_admin)
-
-        lang_selected=get_language(s)
-        
-        t=PTemplate(env)
-    
-        conn=WebModel.connection()
-        
-        server=servers.Server(conn)
-        
-        arr_server=server.select_a_row(server_id)
-    
-        if arr_server:
-        
-            content_index=t.load_template('pastafari/admin/graphs.phtml', server=arr_server, api_key=config_task.api_key)
-            
-        else:
-            
-            content_index=''
-
-        
-        if t.show_basic_template==True:
-
-            return t.load_template('admin/content.html', title='Servers', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
-        else:
-            
-            return content_index
-        
-    else:
-        redirect(make_url(config.admin_folder))
-
-# Method for get data for graphs
-@route('/'+pastafari_folder+'/getdatagraphs/<server_id:int>')
-def net_cpu_status(server_id):
-    
-    if check_login():
-        
-        s=get_session()
-    
-        conn=WebModel.connection()
-    
-        server=servers.Server(conn)
-        
-        arr_server=server.select_a_row(server_id)
-        
-        if arr_server:
-        
-            if 'ip' in arr_server:
-            
-                ip=arr_server['ip']
-                
-                now=datetime.obtain_timestamp(datetime.now(True))
-                
-                hours12=now-21600
-                
-                date_now=datetime.timestamp_to_datetime(now)
-                
-                date_hours12=datetime.timestamp_to_datetime(hours12)
-                
-                status_cpu=servers.StatusCpu(conn)
-                
-                status_cpu.set_conditions('where ip=%s and date>=%s and date<=%s', [ip, date_hours12, date_now])
-                
-                #arr_cpu=status_cpu.select_to_array(['idle', 'date'])
-                cur=status_cpu.select(['idle', 'date'])
-                
-                x=0
-                
-                arr_cpu=[]
-                
-                cur.fetchone()
-                
-                for cpu_info in cur:
-                    
-                    arr_cpu.append(cpu_info['idle'])
-                    
-                cur.close()
-                
-                status_mem=servers.StatusMemory(conn)
-                
-                status_mem.set_conditions('where ip=%s and date>=%s and date<=%s', [ip, date_hours12, date_now]) 
-                
-                #status_mem.set_order(['id', 'ASC'])
-                
-                #arr_mem=status_mem.select_to_array(['used', 'free', 'date'])
-                arr_mem=[]
-                with status_mem.select(['used', 'free', 'cached', 'date'])  as cur:
-                    #cur.fetchone()
-                    
-                    for mem_info in cur:
-                        mem_info['used']=((mem_info['used']/1024)/1024)/1024
-                        mem_info['free']=((mem_info['free']/1024)/1024)/1024
-                        mem_info['cached']=((mem_info['cached']/1024)/1024)/1024
-                        arr_mem.append(mem_info)
-                
-                if len(arr_mem)>2:
-                    arr_mem.pop(0)
-                
-                #arr_cpu=status_cpu.select_to_array(['idle', 'date'])
-                cur=status_cpu.select(['idle', 'date'])
-                
-                arr_net={}
-                
-                status_net=servers.StatusNet(conn)
-                
-                status_net.set_conditions('where ip=%s and date>=%s and date<=%s', [ip, date_hours12, date_now])
-                
-                arr_net=[]
-                
-                cur=status_net.select(['bytes_sent', 'bytes_recv', 'date'])
-                
-                substract_time=0 #datetime.obtain_timestamp(datetime.now())
-                
-                c_hours12=now
-                
-                c_elements=0
-                
-                c_count=cur.rowcount
-                
-                if c_count>0:
-                
-                    data_net=cur.fetchone()
-                    
-                    first_recv=data_net['bytes_recv']
-                    first_sent=data_net['bytes_sent']
-                    
-                    if len(arr_cpu)<(c_count-1):
-                        arr_cpu.append(arr_cpu[1:])
-                    
-                    for data_net in cur:
-                        
-                        timestamp=datetime.obtain_timestamp(data_net['date'], True)
-                        
-                        diff_time=timestamp-substract_time
-                        
-                        if substract_time!=0 and diff_time>300:
-                            
-                            count_time=timestamp
-                            
-                            while substract_time<=count_time:
-                    
-                                form_time=datetime.timestamp_to_datetime(substract_time)
-                                
-                                arr_net.append({'date': datetime.format_time(form_time)})
-                                        
-                                substract_time+=60
-                        
-                        bytes_sent=round((data_net['bytes_sent']-first_sent)/1024)
-                        bytes_recv=round((data_net['bytes_recv']-first_recv)/1024)
-                        cpu=arr_cpu[x]
-                        
-                        memory_used=arr_mem[x]['used']
-                        memory_free=arr_mem[x]['free']
-                        memory_cached=arr_mem[x]['cached']
-
-                        arr_net.append({'bytes_sent': bytes_sent, 'bytes_recv': bytes_recv, 'date': datetime.format_time(data_net['date']), 'cpu': cpu, 'memory_used': memory_used, 'memory_free': memory_free, 'memory_cached': memory_cached})
-                        
-                        first_sent=data_net['bytes_sent']
-                        first_recv=data_net['bytes_recv']
-                        
-                        c_hours12=timestamp
-                        
-                        substract_time=int(timestamp)
-                        
-                        c_elements+=1
-                        
-                        x+=1
-                        
-                    # If the last time is more little that now make a loop 
-                    
-                    while c_hours12<=now:
-                    
-                        form_time=datetime.timestamp_to_datetime(c_hours12)
-                        
-                        seconds=form_time[-2:]
-                            
-                        #print(form_time)
-                        
-                        if seconds=='00':
-                            
-                            arr_net.append({'date': datetime.format_time(form_time)})
-                                
-                            # if secons is 00 and z=1 put value
-                            #arr_net.append({'date': datetime.format_time(form_time)})
-                                
-                            pass
-                        
-                        c_hours12+=1
-                    
-                    cur.close()
-                    
-                    if c_elements>2:
-                        
-                        return filter_ajax(arr_net)
-                    else:
-                        
-                        return filter_ajax({})
-                        
-                    return filter_ajax({})
-        
-    return filter_ajax({})
-
-# Method for get data for graphs
-@route('/'+pastafari_folder+'/getdiskgraphs/<server_id:int>')
-def disk_status(server_id):
-    
-    if check_login():
-        
-        s=get_session()
-    
-        conn=WebModel.connection()
-    
-        server=servers.Server(conn)
-        
-        arr_server=server.select_a_row(server_id)
-        
-        if arr_server:
-        
-            if 'ip' in arr_server:
-            
-                ip=arr_server['ip']
-                
-                status_disk=servers.StatusDisk(conn)
-                
-                status_disk.set_conditions('where ip=%s', [ip])
-                
-                arr_disk=status_disk.select_to_array(['disk', 'used', 'free', 'date'])
-                
-                return filter_ajax(arr_disk)
-    return filter_ajax({})
-
 def server_options(url, id, arr_row):
     
     arr_options=[]
