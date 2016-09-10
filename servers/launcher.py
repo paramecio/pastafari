@@ -28,6 +28,8 @@ def start():
 
     task_model=tasks.Task(conn)
 
+    logtask=tasks.LogTask(conn)
+
     arr_task=task_model.select_a_row(task_id)
     
     if arr_task:
@@ -77,7 +79,7 @@ def start():
             task.delete_directories=[]
         
         # Functions for pre, post and error task
-        
+        """
         if arr_task['post_func']!='':
             try:
                 task_functions=importlib.import_module(arr_task['post_func'])
@@ -96,16 +98,18 @@ def start():
             try:
                 task_functions=importlib.import_module(arr_task['error_func'])
                 task.error_task=task_functions.error_task
+                
             except:
                 pass
+        """
         
         if arr_task['extra_data']!='':
             
             task.extra_data=json.loads(arr_task['extra_data'])
         
         if arr_task['where_sql_server']=='':
-            
             task.exec()
+                
         else:
             
             # Select the servers and make all tasks asynchronous

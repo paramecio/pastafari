@@ -236,7 +236,7 @@ def admin(**args):
                                     commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', ''])
                                     
                                 
-                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root'}):
+                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root', 'error_func': '', 'extra_data': {'server_id': server_id}}):
                                                     
                                     task_id=task.insert_id()
                                                     

@@ -1,6 +1,6 @@
 #/usr/bin/env python3
 
-from modules.pastafari.libraries.task import ArgsTask
+from modules.pastafari.libraries.task import ArgsTask, Task
 from modules.pastafari.models.tasks import Task
 from paramecio.cromosoma import coreforms
 from paramecio.cromosoma.formsutils import show_form
@@ -98,8 +98,9 @@ class MakeTask(ArgsTask):
         
         return True
     
-    def insert_task(self, post):
+    def update_task(self, post, task_id):
         
+        """
         self.task.create_forms()
         
         if self.task.insert({'name_task': self.name_task, 'description_task': self.description_task, 'codename_task': self.codename_task, 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version, 'simultaneous': self.simultaneous}):
@@ -107,4 +108,6 @@ class MakeTask(ArgsTask):
             return (self.task.insert_id(), 'Postfix Install server', 'Install a mail server with postfix/dovecot in your selected hosts, based in unix accounts')
         else:
             return (False, 'Postfix Install server', 'Install a mail server with postfix/dovecot in your selected hosts, based in unix accounts')
+        """
         
+        return True

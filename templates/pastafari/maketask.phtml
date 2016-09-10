@@ -1,8 +1,4 @@
-<form method="post" action="${make_url('pastafari/executetask')}?group_id=${group_id}">
+<form method="post" action="${make_url('pastafari/executetask/'+str(task_id))}">
 ${form|n}
-% for k,v in post.items():
-    <input type="hidden" name="${k}" value="${v}" />
-% endfor
-<input type="hidden" name="check_form" value="1" />
 <p><input  type="submit" value="${lang('pastafari','execute_task', 'Execute task')}" /></p>
 </form>
