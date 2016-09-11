@@ -199,11 +199,12 @@ def admin(**args):
                                 files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_curl.sh', 0o750])
                                 files.append(['modules/pastafari/scripts/standard/'+os_server+'/install_psutil.sh', 0o750])
                                 files.append(['modules/pastafari/scripts/standard/'+os_server+'/upgrade.sh', 0o750])
+                                files.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', 0o750])
+                                
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/alive.py', 0o750])
                                 #files.append(['monit/'+os_server+'/files/alive.sh', 0o750];
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_info.py', 0o750])
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/get_updates.py', 0o750])
-                                files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/clean_gcc.sh', 0o750])
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/crontab/alive', 0o640])
                                 files.append(['modules/pastafari/scripts/monit/'+os_server+'/files/sudoers.d/spanel', 0o640])
                                 files.append([config_task.public_key, 0o600])
@@ -236,7 +237,7 @@ def admin(**args):
                                     commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', ''])
                                     
                                 
-                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root', 'error_func': '', 'extra_data': {'server_id': server_id}}):
+                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root', 'error_func': 'modules.pastafari.tasks.system.install.task_functions', 'extra_data': {'server_id': server_id}}):
                                                     
                                     task_id=task.insert_id()
                                                     

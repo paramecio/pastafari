@@ -166,7 +166,7 @@ def form_task(connection, t, s, **args):
         return 'Task no exists'
 
 
-@post('/'+pastafari_folder+'/executetask/<task_id:int>')
+@get('/'+pastafari_folder+'/executetask/<task_id:int>')
 def executetask(task_id):
     
     args={}

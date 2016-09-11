@@ -117,17 +117,11 @@ class Task:
         
         self.extra_data={}
         
-    def pre_task(self):
+        self.pre_task=None
         
-        return True
-    
-    def error_task(self):
+        self.error_task=None
         
-        return True
-        
-    def post_task(self):
-        
-        return True
+        self.post_task=None
 
     def prepare_connection(self):
         
@@ -405,19 +399,19 @@ class Task:
         
         # Pre task
         
-        #if self.pre_task!=None:
-        self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'pre_tasks', 'Pre tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
-            
-        if self.pre_task():
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'pre_tasks_executed', 'Pre tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
-        else:
-            self.logtask.set_conditions('where id=%s', [last_log_id])
+        if self.pre_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'pre_tasks', 'Pre tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
                 
-            self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
-            
-            self.make_error_task()
-            
-            return False
+            if self.pre_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'pre_tasks_executed', 'Pre tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                self.make_error_task()
+                
+                return False
         
         #Check if script was executed
         
@@ -588,19 +582,19 @@ class Task:
                     with sftp.file(path_check+self.codename, 'w') as f:
                         f.write(self.version)
                         
-        #if self.post_task!=None:
-        self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'post_tasks', 'Post tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
-        
-        if self.post_task():
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'post_tasks_executed', 'Post tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
-        else:
-            #self.logtask.set_conditions('where id=%s', [last_log_id])
-                
-            #self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+        if self.post_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'post_tasks', 'Post tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
             
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_post_tasks_executed', 'Error executing post task -> '+self.error_post_task), 'error': 1, 'status': 1, 'server': self.server})
-            self.make_error_task()
-            return False
+            if self.post_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'post_tasks_executed', 'Post tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                #self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                #self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_post_tasks_executed', 'Error executing post task -> '+self.error_post_task), 'error': 1, 'status': 1, 'server': self.server})
+                self.make_error_task()
+                return False
                 
 
         if 'progress' in json_code:
@@ -622,17 +616,15 @@ class Task:
         
     def make_error_task(self):
         
-        #if self.error_task!=None:
-        self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'error_tasks', 'Pre tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
-        
-        if self.error_task():
-            self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_tasks_executed', 'Pre tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
-        else:
-            self.logtask.set_conditions('where id=%s', [last_log_id])
-                
-            self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+        if self.error_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'error_tasks', 'Error tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
             
-            return False
+            if self.error_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_tasks_executed', 'Error tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_tasks_executed', 'Error Post task cannot be executed...'), 'error': 0, 'status': 1, 'server': self.server})
+                
+                return False
         
     def __del__(self):
         

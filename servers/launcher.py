@@ -79,29 +79,29 @@ def start():
             task.delete_directories=[]
         
         # Functions for pre, post and error task
-        """
+        
         if arr_task['post_func']!='':
-            try:
-                task_functions=importlib.import_module(arr_task['post_func'])
-                task.post_task=task_functions.post_task
-            except:
-                pass
+            #try:
+            task_functions_post=importlib.import_module(arr_task['post_func'])
+            task.post_task=task_functions_post.post_task
+            #except:
+            #pass
         
         if arr_task['pre_func']!='':
-            try:
-                task_functions=importlib.import_module(arr_task['pre_func'])
-                task.pre_task=task_functions.pre_task
-            except:
-                pass
+            #try:
+            task_functions_pre=importlib.import_module(arr_task['pre_func'])
+            task.pre_task=task_functions_pre.pre_task
+            #except:
+            #pass
                 
         if arr_task['error_func']!='':
-            try:
-                task_functions=importlib.import_module(arr_task['error_func'])
-                task.error_task=task_functions.error_task
+            #try:
+            task_functions_error=importlib.import_module(arr_task['error_func'])
+            task.error_task=task_functions_error.error_task
                 
-            except:
-                pass
-        """
+            #except:
+            #pass
+        
         
         if arr_task['extra_data']!='':
             

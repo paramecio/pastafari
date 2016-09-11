@@ -1,6 +1,6 @@
 #/usr/bin/env python3
 
-from modules.pastafari.libraries.task import ArgsTask
+from modules.pastafari.libraries.task import ArgsTask, Task
 from modules.pastafari.models.tasks import Task
 from paramecio.cromosoma import coreforms
 from paramecio.cromosoma.formsutils import show_form
