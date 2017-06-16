@@ -16,6 +16,8 @@ network_devices=psutil.net_if_addrs()
 
 cpu_idle=psutil.cpu_percent(interval=1)
 
+cpu_number=psutil.cpu_count()
+
 disk_info=psutil.disk_partitions()
 
 partitions={}
@@ -40,7 +42,7 @@ mem_info=psutil.virtual_memory()
 #for device, info in network_devices.items():
     
     #print(info)
-json_info=json.dumps({'net_info': network_info, 'cpu_idle': cpu_idle, 'disks_info': partitions, 'mem_info': mem_info})
+json_info=json.dumps({'net_info': network_info, 'cpu_idle': cpu_idle, 'cpu_number': cpu_number, 'disks_info': partitions, 'mem_info': mem_info})
 
 data = urllib.parse.urlencode({'data_json': json_info})
 

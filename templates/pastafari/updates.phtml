@@ -140,9 +140,9 @@
                             
                             setTimeout(function () {
                                 
-                                server_dom.fadeOut(1000, function() {
+                                $(document.getElementById(data[x].server)).fadeOut(1000, function() {
                                     
-                                    this.remove();
+                                    $(document.getElementById(data[x].server)).remove();
                                     
                                 });
                                 

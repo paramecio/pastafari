@@ -1,6 +1,6 @@
 #/usr/bin/env python3
 
-from modules.pastafari.libraries.task import ArgsTask
+from modules.pastafari.libraries.task import ArgsTask, Task
 from modules.pastafari.models.tasks import Task
 from paramecio.cromosoma import coreforms
 from paramecio.cromosoma.formsutils import show_form
@@ -71,6 +71,12 @@ class MakeTask(ArgsTask):
         
         self.task=Task(conn)
         
+        self.name_task='Postfix server'
+        
+        self.description_task='Install a mail server in your selected hosts with postfix, dovecot, sqlgrey based in unix accounts'
+        
+        self.codename_task='standalone_postfix'
+        
         self.one_time=True
         
         self.version='1.0'
@@ -86,43 +92,22 @@ class MakeTask(ArgsTask):
     
     def form(self, t, yes_error=False, pass_values=False, **args):
         
-        #Here load the form for it task
-        
-        
-        
-        #return "The MySQL password used by all servers: <input type=\"password\" name=\"mysql_password\"/>"
-        
-        #return t.load_template('forms/modelform.phtml', forms=self.arr_form)
-        # def show_form(post, arr_form, t, yes_error=True, pass_values=True, modelform_tpl='forms/modelform.phtml'):
-        
-        return show_form(args, self.arr_form, t, yes_error, pass_values)
+        return "" 
         
     def check_form(self, **args):
         
         return True
     
-    def insert_task(self, post):
+    def update_task(self, post, task_id):
         
+        """
         self.task.create_forms()
         
-        """
-        if 'mysql_password' in post and 'repeat_mysql_password' in post:
-            
-            if post['mysql_password'].strip()!='' and post['mysql_password']==post['repeat_mysql_password']:
-                
-                self.commands_to_execute=[['modules/pastafari/scripts/servers/databases/mariadb/${os_server}/install_mariadb.py', '--password=%s' % post['mysql_password']]]
-                
-                if self.task.insert({'name_task': 'Postfix Install server', 'description_task': 'Install a mariadb/Mysql server in your selected hosts', 'codename_task': 'mariadb_simple_server', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version}):
-                    
-                    return (self.task.insert_id(), 'Postfix Install server', 'Install a mariadb/Mysql server in your selected hosts')
-            else:
-                self.arr_form['mysql_password'].txt_error='Passwords doesn\'t match'
-                
-        return (False, 'Mariadb Install server', 'Install a mariadb/Mysql server in your selected hosts')
-        """
-        if self.task.insert({'name_task': 'Postfix server', 'description_task': 'Install a mail server in your selected hosts with postfix, dovecot, sqlgrey based in unix accounts', 'codename_task': 'standalone_postfix', 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version, 'simultaneous': self.simultaneous}):
+        if self.task.insert({'name_task': self.name_task, 'description_task': self.description_task, 'codename_task': self.codename_task, 'files': self.files, 'commands_to_execute': self.commands_to_execute, 'delete_files': self.delete_files, 'delete_directories': self.delete_directories, 'one_time': self.one_time, 'version': self.version, 'simultaneous': self.simultaneous}):
                     
             return (self.task.insert_id(), 'Postfix Install server', 'Install a mail server with postfix/dovecot in your selected hosts, based in unix accounts')
         else:
             return (False, 'Postfix Install server', 'Install a mail server with postfix/dovecot in your selected hosts, based in unix accounts')
+        """
         
+        return True

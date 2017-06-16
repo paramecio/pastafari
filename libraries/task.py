@@ -26,21 +26,37 @@ class ArgsTask:
         
         self.delete_directories=[]
         
+        self.name_task=''
+        
+        self.description_task=''
+        
+        self.codename_task=''
+        
+        self.url_return=''
+        
         self.one_time=False
         
         self.version='1.0'
         
         self.simultaneous=False
+        
+        self.path=''
+        
+        self.yes_form=False
+        
+        # Field for save extra_data used for pre_,post_error _ tasks.
+        
+        self.extra_data={}
 
     def form(self):
         
         return ""
         
-    def insert_task(self, post):
+    def update_task(self, post, task_id):
         
-        # Insert task
+        # Update task
         
-        pass
+        return True
 
 class Task:
 
@@ -50,11 +66,11 @@ class Task:
         
         self.server=server
         
-        self.name=''
+        self.name_task=''
         
-        self.codename=''
+        self.codename_task=''
         
-        self.description=''
+        self.description_task=''
 
         self.txt_error=''
         
@@ -97,7 +113,15 @@ class Task:
         
         self.simultaneous=False
         
-        pass
+        self.error_post_task=''
+        
+        self.extra_data={}
+        
+        self.pre_task=None
+        
+        self.error_task=None
+        
+        self.post_task=None
 
     def prepare_connection(self):
         
@@ -124,33 +148,6 @@ class Task:
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             
             add_host=True
-            
-            #self.ssh.save_host_keys(config_task.ssh_directory)
-            
-            #Add host to known_hosts file
-            
-            #hashed_host=check_ssh_host.hash_host(self.server)
-            
-            #print(hashed_host)
-        #Prepare ssh keys
-        
-        #rsa=prepare_ssh_keys(self.config.password_key)
-        """
-        rsa=None
-        
-        if self.config.remote_password is None:
-        
-            try:
-            
-                rsa=paramiko.RSAKey.from_private_key_file(self.config.private_key, self.config.password_key)
-            
-            except (paramiko.ssh_exception.PasswordRequiredException, paramiko.ssh_exception.SSHException):
-                rsa=None
-                self.txt_error='Error: you need a valid password for rsa key'
-            
-            if rsa==None:
-                return False
-        """
         
         rsa=paramiko.RSAKey.from_private_key_file(self.config.private_key, self.config.password_key)
         
@@ -386,17 +383,35 @@ class Task:
             
             self.task.reset_require()
             
-            self.task.insert({'name_task': self.name, 'description_task': self.description, 'server': self.server})
+            self.task.insert({'name_task': self.name_task, 'description_task': self.description_task, 'server': self.server})
             
             self.id=self.task.insert_id()
         
         if not self.prepare_connection():
-            self.task.conditions=['WHERE id=%s', [self.id]]
-            self.task.update({'error': 1, 'status': 1})
+            #self.task.conditions=['WHERE id=%s', [self.id]]
+            #self.task.update({'error': 1, 'status': 1})
             
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
             
+            self.make_error_task()
+            
             return False
+        
+        # Pre task
+        
+        if self.pre_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'pre_tasks', 'Pre tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
+                
+            if self.pre_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'pre_tasks_executed', 'Pre tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                self.make_error_task()
+                
+                return False
         
         #Check if script was executed
         
@@ -425,16 +440,20 @@ class Task:
                         pass
         
         if not self.upload_files():
-            self.task.conditions=['WHERE id=%s', [self.id]]
-            self.task.update({'error': 1, 'status': 1})
+            #self.task.conditions=['WHERE id=%s', [self.id]]
+            #self.task.update({'error': 1, 'status': 1})
             
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
+            
+            self.make_error_task()
             
             return False
 
         self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': 'Executing commands...', 'error': 0, 'status': 0, 'server': self.server})
 
         # Execute commands
+        
+        json_code=[]
         
         for c in self.commands_to_execute:
         
@@ -465,11 +484,11 @@ class Task:
                         json_code=json.loads(line)
                         
                         if not 'progress' in json_code or not 'message' in json_code or not 'error' in json_code:
-                            self.task.conditions=['WHERE id=%s', [self.id]]
-                            self.task.update({'error': 1, 'status': 1})
+                            #self.task.conditions=['WHERE id=%s', [self.id]]
+                            #self.task.update({'error': 1, 'status': 1})
                             
                             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': 'Malformed json code: '+str(line), 'error': 1, 'server': self.server})
-                            
+                            self.make_error_task()
                             return False
                             
                         else:
@@ -479,6 +498,10 @@ class Task:
                             json_code['server']=self.server
                     
                             self.logtask.insert(json_code)
+                            
+                            if json_code['error']==1:
+                                self.make_error_task()
+                                return False
                                                 
                     
                     
@@ -498,8 +521,8 @@ class Task:
                     #logging.warning(action.codename+" WARNING: "+line)
                     final_text='Error executing the command: %s' % command
                     
-                    self.task.conditions=['WHERE id=%s', [self.id]]
-                    self.task.update({'error': 1, 'status': 1})
+                    #self.task.conditions=['WHERE id=%s', [self.id]]
+                    #self.task.update({'error': 1, 'status': 1})
                     
                     for line in stdout:
                         final_text+=' '+line
@@ -510,27 +533,27 @@ class Task:
                     self.logtask.set_conditions('where id=%s', [last_log_id])
                     
                     self.logtask.update({'progress': 100, 'error': 1, 'message': final_text, 'status': 1, 'server': self.server})
-                    
+                    self.make_error_task()
                     return False
                 
             except:
                 
-                self.task.conditions=['WHERE id=%s', [self.id]]
-                self.task.update({'error': 1, 'status': 1})
+                #self.task.conditions=['WHERE id=%s', [self.id]]
+                #self.task.update({'error': 1, 'status': 1})
                 
                 self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': traceback.format_exc(), 'error': 1, 'status': 1, 'server': self.server})
-
+                self.make_error_task()
                 return False
         
         # Clean files
         
         if not self.delete_files_and_dirs():
             
-            self.task.conditions=['WHERE id=%s', [self.id]]
-            self.task.update({'error': 1, 'status': 1})
+            #self.task.conditions=['WHERE id=%s', [self.id]]
+            #self.task.update({'error': 1, 'status': 1})
                 
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': self.txt_error, 'error': 1, 'status': 1, 'server': self.server})
-            
+            self.make_error_task()
             return False
         
         #Upload files
@@ -558,8 +581,26 @@ class Task:
                 
                     with sftp.file(path_check+self.codename, 'w') as f:
                         f.write(self.version)
-                     
-        if json_code['progress']!=100:
+                        
+        if self.post_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'post_tasks', 'Post tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
+            
+            if self.post_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'post_tasks_executed', 'Post tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                #self.logtask.set_conditions('where id=%s', [last_log_id])
+                    
+                #self.logtask.update({'progress': 100, 'error': 1, 'message': "Error executing post task", 'status': 1, 'server': self.server})
+                
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_post_tasks_executed', 'Error executing post task -> '+self.error_post_task), 'error': 1, 'status': 1, 'server': self.server})
+                self.make_error_task()
+                return False
+                
+
+        if 'progress' in json_code:
+            if json_code['progress']!=100:
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+        else:
             self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'finished_successfully', 'All tasks done successfully...'), 'error': 0, 'status': 1, 'server': self.server})
         
         # Add 
@@ -567,11 +608,23 @@ class Task:
         
         self.taskdone.insert({'name_task': self.codename, 'ip': self.server})
         
-        self.task.conditions=['WHERE id=%s', [self.id]]
-        self.task.update({'error': 0, 'status': 1})
+        #self.task.conditions=['WHERE id=%s', [self.id]]
+        #self.task.update({'error': 0, 'status': 1})
         
         #connection.close()
         return True
+        
+    def make_error_task(self):
+        
+        if self.error_task!=None:
+            self.logtask.insert({'task_id': self.id, 'progress': 0, 'message': I18n.lang('pastafari', 'error_tasks', 'Error tasks executing...'), 'error': 0, 'status': 1, 'server': self.server})
+            
+            if self.error_task(self):
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_tasks_executed', 'Error tasks executed successfully...'), 'error': 0, 'status': 1, 'server': self.server})
+            else:
+                self.logtask.insert({'task_id': self.id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_tasks_executed', 'Error Post task cannot be executed...'), 'error': 0, 'status': 1, 'server': self.server})
+                
+                return False
         
     def __del__(self):
         

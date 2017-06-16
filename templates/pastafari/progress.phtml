@@ -11,16 +11,30 @@
     yes_position=0;
     last_status=0;
     
+    text_complete="Complete!";
+    
     var progressbar = $( "#progressbar" ),
     progressLabel = $( ".progress-label" );
     
         progressbar.progressbar({
           value: false,
           change: function() {
-            progressLabel.text( progressbar.progressbar( "value" ) + "%" );
+              
+            if(progressbar.progressbar( "value" )>0)
+            {
+              
+                progressLabel.text( progressbar.progressbar( "value" ) + "%" );
+                
+            }
+            else
+            {
+                progressbar.progressbar( "value", false);
+                progressLabel.text( "Processing task..." );
+                
+            }
           },
           complete: function() {
-            progressLabel.text( "Complete!" );
+            progressLabel.text( text_complete );
           }
         });
     
@@ -68,7 +82,7 @@
      }
      
      $.ajax({
-        url: "${make_url('pastafari/tasks')}?task_id=${task_id}&server=${server}&position="+position,
+        url: "${make_url('pastafari/showprogress/tasks')}?task_id=${task_id}&server=${server}&position="+position,
         method: "POST",
         dataType: "json",
         data: {}
@@ -112,7 +126,7 @@
                         
                         if(data[k].error==1)
                         {
-                            
+                            text_complete='ERROR, please see the log';
                             finish_progress_error(data[k].progress);
                             
                         }

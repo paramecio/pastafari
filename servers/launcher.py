@@ -8,6 +8,7 @@ from modules.pastafari.models import servers, tasks
 from modules.pastafari.libraries.task import Task
 from modules.pastafari.libraries.configclass import config_task
 from multiprocessing.pool import Pool
+import importlib
 
 num_tasks=10
 
@@ -26,6 +27,8 @@ def start():
     conn=WebModel.connection()
 
     task_model=tasks.Task(conn)
+
+    logtask=tasks.LogTask(conn)
 
     arr_task=task_model.select_a_row(task_id)
     
@@ -75,9 +78,38 @@ def start():
         if task.delete_directories==False:
             task.delete_directories=[]
         
-        if arr_task['where_sql_server']=='':
+        # Functions for pre, post and error task
+        
+        if arr_task['post_func']!='':
+            #try:
+            task_functions_post=importlib.import_module(arr_task['post_func'])
+            task.post_task=task_functions_post.post_task
+            #except:
+            #pass
+        
+        if arr_task['pre_func']!='':
+            #try:
+            task_functions_pre=importlib.import_module(arr_task['pre_func'])
+            task.pre_task=task_functions_pre.pre_task
+            #except:
+            #pass
+                
+        if arr_task['error_func']!='':
+            #try:
+            task_functions_error=importlib.import_module(arr_task['error_func'])
+            task.error_task=task_functions_error.error_task
+                
+            #except:
+            #pass
+        
+        
+        if arr_task['extra_data']!='':
             
+            task.extra_data=json.loads(arr_task['extra_data'])
+        
+        if arr_task['where_sql_server']=='':
             task.exec()
+                
         else:
             
             # Select the servers and make all tasks asynchronous

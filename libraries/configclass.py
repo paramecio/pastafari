@@ -14,7 +14,7 @@ class ConfigClass:
 
         self.base_path=os.path.dirname(os.path.dirname(__file__))
 
-        self.tasks_path=['tasks', 'parameciossh.tasks']
+        self.tasks_path=['tasks', 'modules/pastafari/tasks']
 
         self.scripts_path=['scripts', 'modules/pastafari/scripts']
 
