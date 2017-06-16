@@ -56,11 +56,8 @@ else:
 
 password=create_key(20)
 
-try:
+if not os.path.isdir('ssh'):
     os.mkdir('ssh/')
-except:
-    print('Error, cannot  install ssh keyfiles')
-    exit(1)
 
 private_key_file='ssh/id_rsa'
 pub_key_file='ssh/id_rsa.pub'
