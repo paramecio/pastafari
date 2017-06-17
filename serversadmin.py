@@ -236,8 +236,8 @@ def admin(**args):
                                     files.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', 0o750])
                                     commands_to_execute.append(['modules/pastafari/scripts/standard/'+os_server+'/clean_gcc.sh', ''])
                                     
-                                
-                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root', 'error_func': 'modules.pastafari.tasks.system.install.task_functions', 'extra_data': {'server_id': server_id}}):
+                                #'modules.pastafari.tasks.system.install.task_functions'
+                                if task.insert({'name_task': 'monit_server','description_task': I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), 'url_return': url, 'files': files, 'commands_to_execute': commands_to_execute, 'delete_files': delete_files, 'delete_directories': delete_directories, 'server': ip, 'user': 'root', 'password': post['password'], 'path': '/root', 'error_func': '', 'extra_data': {'server_id': server_id}}):
                                                     
                                     task_id=task.insert_id()
                                                     
@@ -273,9 +273,11 @@ def admin(**args):
                                         
                                         return "Error:cannot connect to task server, check the url for it..."
                                     
-                                    return t.load_template('pastafari/progress.phtml', name_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), description_task=I18n.lang('pastafari', 'add_monit_explain', 'Installing the basic scripts for send info from server to monit module'), task_id=task_id, server=ip, position=0)
+                                    #return t.load_template('pastafari/progress.phtml', name_task=I18n.lang('pastafari', 'add_monit', 'Adding monitoritation to the server...'), description_task=I18n.lang('pastafari', 'add_monit_explain', 'Installing the basic scripts for send info from server to monit module'), task_id=task_id, server=ip, position=0)
                                     #return "Server is building..."
                                     #redirect('servers?op=2&task_id='+str(task_id))
+                                    #@get('/'+pastafari_folder+'/showprogress/<task_id:int>/<server>')
+                                    redirect(make_url(pastafari_folder+'/showprogress/'+str(task_id)+'/'+ip))
                     
                                 else:
                                     

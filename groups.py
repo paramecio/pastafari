@@ -28,14 +28,14 @@ env=env_theme(__file__)
 
 env.directories.insert(1, config.paramecio_root+'/modules/admin/templates')
 
+t=PTemplate(env)
+
 @get('/'+pastafari_folder+'/groups')
 @post('/'+pastafari_folder+'/groups')
 def home():
     
     connection=WebModel.connection()
     #Fix, make local variable
-    
-    t=PTemplate(env)
     
     s=get_session()
     
@@ -80,7 +80,7 @@ def home():
         
         content_index=t.load_template('pastafari/groups.phtml', group_list=group_list, hierarchy_links=hierarchy, son_id=parent_id)
         #group_list.show()
-
+        
         return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'servers_groups', 'Server\'s Group'), content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
         
     else:

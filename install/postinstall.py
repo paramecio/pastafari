@@ -9,7 +9,7 @@ working_directory=os.getcwd()
 sys.path.insert(0, working_directory)
 
 import argparse
-from paramecio.citoplasma.keyutils import create_key
+from paramecio.citoplasma.keyutils import create_key_encrypt
 from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models import servers
 from settings import config
@@ -77,7 +77,8 @@ with open(pub_key_file, 'w') as f:
 
 # Open the config and write this data
 
-api_key=create_key(50).replace('/', '#')
+api_key=create_key_encrypt(50)
+#create_key(50).replace('/', '#')
 
 add_config=[]
 

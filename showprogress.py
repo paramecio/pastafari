@@ -111,9 +111,11 @@ def home():
         
             content_index='Log no exists'
             
+        connection.close()
         return t.load_template('admin/content.html', title='Servers log'+ server_hostname, content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
         
     else:
+        connection.close()
         redirect(make_url(config.admin_folder))
 
 # Show progress of a task in a server
@@ -155,10 +157,11 @@ def showprogress(task_id, server):
                 #arr_task=
                 
                 content_index=t.load_template('pastafari/progress.phtml', name_task=arr_task['name_task']+' - '+arr_server['hostname'], description_task=arr_task['description_task'], task_id=task_id, server=server, position=0)
-    
+        conn.close()
         return t.load_template('admin/content.html', title='Servers log', content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)    
             
     else:
+        conn.close()
         return ""
 
 
@@ -188,28 +191,28 @@ def getservers(task_id, position):
         response.set_header('Content-type', 'text/plain')
         
         if arr_server:
-            
+            conn.close()
             return filter_ajax({'servers': arr_server, 'error': 0})
             
         else:
             
             logtask.set_conditions('where task_id=%s and server=""', [task_id])
             
-            logtask.set_order(['id'], ['DESC'])
+            logtask.set_order({'id': 1})
             
             arr_tasklog=logtask.select_a_row_where([], True)
             
             if arr_tasklog:
                 
                 if arr_tasklog['error']==1:
-                    
+                    conn.close()        
                     return arr_tasklog
                 else:
-                    
+                    conn.close()
                     return filter_ajax({'error': 0, 'servers': []})
                     
             else:
-                
+                conn.close()
                 return filter_ajax({'error': 0, 'servers': []})
                 
             
@@ -217,6 +220,7 @@ def getservers(task_id, position):
         
 
     else:
+        conn.close()
         return filter_ajax({})
 
 # Get json format log of a server group executing a task
@@ -252,7 +256,7 @@ def getprogress(task_id):
         
         if len(servers)>0:
         
-            logtask.set_order(['id'], ['DESC'])
+            logtask.set_order({'id': 1})
             
             logtask.set_conditions('WHERE task_id=%s and status=1 and error=1 and server=""', [task_id])
             
@@ -260,13 +264,13 @@ def getprogress(task_id):
             
             if c_error==0:
             
-                logtask.set_order(['id'], ['DESC'])
+                logtask.set_order({'id': 1})
                 
                 logtask.set_conditions('WHERE task_id=%s and status=1 and server IN %s and server!=""', [task_id, servers])
                 
                 arr_log=logtask.select_to_array(['status', 'error', 'server'])
                 
-                logtask.set_order(['id'], ['DESC'])
+                logtask.set_order({'id': 1})
                 
                 logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN %s and server!=""', [task_id, servers])
                 
@@ -288,17 +292,22 @@ def getprogress(task_id):
                     
             response.set_header('Content-type', 'text/plain')
             
+            conn.close()
+            
             return filter_ajax(arr_log)
             
         response.set_header('Content-type', 'text/plain')    
         
         arr_log=[]
         
+        conn.close()        
+        
         return filter_ajax(arr_log)
                 
                 
 
     else:
+        conn.close()
         return filter_ajax({})
 
 # Get json data for a see progress in task in a server
@@ -342,74 +351,109 @@ def gettasks():
             position=0
         
         task=Task(conn)
-        tasklog=LogTask(conn)
+        logtask=LogTask(conn)
         
         arr_task=task.select_a_row(task_id)
         
         t.show_basic_template=False
         
+        arr_rows={'wait': 1}
+        
         if arr_task:
             
-            tasklog.set_limit([position, 20])
+            logtask.set_limit([position, 20])
                 
-            tasklog.set_order(['id'], ['ASC'])
+            logtask.set_order({'id': 0})
             
-            tasklog.conditions=['WHERE task_id=%s', [task_id]]
+            logtask.conditions=['WHERE task_id=%s', [task_id]]
             
             if getpostfiles.get['server']!='':
-                tasklog.conditions=['WHERE task_id=%s and logtask.server=%s', [task_id, getpostfiles.get['server']]]
+                logtask.conditions=['WHERE task_id=%s and logtask.server=%s', [task_id, getpostfiles.get['server']]]
                 
-            #tasklog.set_limit([position, 1])
+            #logtask.set_limit([position, 1])
             
-            #arr_row=tasklog.select_a_row_where([], 1, position)
+            #arr_row=logtask.select_a_row_where([], 1, position)
             
-            tasklog.yes_reset_conditions=False
+            logtask.yes_reset_conditions=False
             
-            c=tasklog.select_count()
+            c=logtask.select_count()
             
             if c>0:
                 
                 arr_rows=[]
                 
-                with tasklog.select() as cursor:            
+                with logtask.select([], True) as cursor:            
+                    for arr_row in cursor:
+                        arr_rows.append(arr_row)
+                
+            else:
+                arr_rows=[]
+                
+                with logtask.set_conditions('WHERE task_id=%s and logtask.error=1', [task_id]).select([], True) as cursor:            
+                    for arr_row in cursor:
+                        arr_rows.append(arr_row)
+
+                if arr_rows==0:
+                    
+                    arr_rows={'wait': 1}
+                else:
+
+                    with logtask.set_conditions('WHERE task_id=%s and logtask.server=%s and logtask.error=1', [task_id, getpostfiles.get['server']]).select([], True) as cursor:            
+                        for arr_row in cursor:
+                            arr_rows.append(arr_row)
+                    
+            """
+                
+                arr_rows=[]
+                
+                with logtask.select() as cursor:            
                     for arr_row in cursor:
                         arr_rows.append(arr_row)
                 
                 if len(arr_rows)==0:
-                    tasklog.set_limit([1])
+                    logtask.set_limit([1])
                 
-                    tasklog.set_order(['id'], ['ASC'])
+                    logtask.set_order({'id': 0})
                     
-                    tasklog.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
+                    logtask.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
                     
-                    if tasklog.select_count('id', True)==0:
+                    if logtask.select_count('id', True)==0:
                         
                         if arr_task['status']=='0' or arr_task['status']==0:
+                            conn.close()
                             return filter_ajax({'wait': 1})
                         else:
+                            conn.close()
                             return filter_ajax({})
                     else:
                         
-                        tasklog.set_limit([1])
+                        logtask.set_limit([1])
                     
-                        tasklog.set_order(['id'], ['ASC'])
+                        logtask.set_order({'id': 0})
                         
-                        tasklog.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
+                        logtask.conditions=['WHERE task_id=%s and status=1 and error=1  and server=""', [task_id]]
                         
-                        arr_rows=tasklog.select_to_array([], True)
+                        arr_rows=logtask.select_to_array([], True)
                 
                 #response.set_header('Content-type', 'text/plain')
-                
+                conn.close()
                 return filter_ajax(arr_rows)
                 
             else:
+                conn.close()
                 return filter_ajax({'wait': 1})
-                    
+            """
                     
         else:
-            return filter_ajax({})
+            
+            arr_task={'task_id': task_id, 'progress': 100, 'message': 'Error: no exists task', 'error': 1, 'status': 1}
+            
+        conn.close()
+        
+        return filter_ajax(arr_rows)
 
         
         
     else:
+
         redirect(make_url(config.admin_folder))

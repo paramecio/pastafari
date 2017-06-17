@@ -19,6 +19,7 @@ from modules.pastafari.libraries.configclass import config_task
 pastafari_scripts='./scripts'
 pastafari_host='127.0.0.1'
 pastafari_port=1337
+pastafari_py_command='python3'
 
 #parser.add_argument('--port', help='The port where the task server is executed', required=True)
 
@@ -31,9 +32,12 @@ if hasattr(config, 'pastafari_port'):
 if hasattr(config, 'pastafari_host'):
     pastafari_host=config.pastafari_host
 
+if hasattr(config, 'pastafari_py_command'):
+    pastafari_py_command=config.pastafari_py_command
+
 def execute_script(task_id):
     
-    args=['python3 launcher.py --task_id='+str(task_id)]
+    args=['%s launcher.py --task_id=%i' % (pastafari_py_command, task_id)]
     
     with Popen(args, bufsize=None, executable=None, stdin=None, stdout=PIPE, stderr=PIPE, preexec_fn=None, shell=True, cwd=None, env=None, universal_newlines=False, startupinfo=None, creationflags=0, threadpool=None) as proc:
         
@@ -53,12 +57,13 @@ def execute_script(task_id):
             
             line=proc.stdout.read().decode('utf-8')
             line_error=proc.stderr.read().decode('utf-8')
-            logtask.insert({'task_id': task_id, 'progress': 100, 'message': I18n.lang('pastafari', 'error_exec_launcher', 'Error executing launcher.py: ')+str(line)+"\n"+str(line_error), 'error': 1, 'status': 1})
+            logtask.insert({'task_id': task_id, 'progress': 100, 'message': 'Error executing launcher.py: '+str(line)+"\n"+str(line_error), 'error': 1, 'status': 1})
             #Status die
             task.set_conditions('where id=%s', [task_id])
             task.reset_require()
             task.update({'status': 1, 'error': 1})
     
+            connection.close()
 
 @route('/')
 def home():
