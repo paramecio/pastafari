@@ -266,13 +266,15 @@ def getprogress(task_id):
             
                 logtask.set_order({'id': 1})
                 
-                logtask.set_conditions('WHERE task_id=%s and status=1 and server IN %s and server!=""', [task_id, servers])
+                checked_servers=logtask.check_in_list_str('server', servers)
+
+                logtask.set_conditions('WHERE task_id=%s and status=1 and server IN '+checked_servers+' and server!=""', [task_id])
                 
                 arr_log=logtask.select_to_array(['status', 'error', 'server'])
                 
                 logtask.set_order({'id': 1})
                 
-                logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN %s and server!=""', [task_id, servers])
+                logtask.set_conditions('WHERE task_id=%s and status=0 and server NOT IN '+checked_servers+' and server!=""', [task_id])
                 
                 arr_log2=logtask.select_to_array(['status', 'error', 'server'])
                 

@@ -47,67 +47,16 @@ def start():
             
             task_model.update({'password': ''})
         
-        task=Task(arr_task['server'], task_id)
+        commands_to_execute=json.loads(arr_task['commands_to_execute'])
         
-        task.files=task_model.fields['files'].loads(arr_task['files'])
-        
-        if task.files==False:
-            task.files=[]
-        
-        task.commands_to_execute=task_model.fields['files'].loads(arr_task['commands_to_execute'])
-        
-        if task.commands_to_execute==False:
-            task.commands_to_execute=[]
-        
-        task.delete_files=task_model.fields['files'].loads(arr_task['delete_files'])
-        
-        if task.delete_files==False:
-            task.delete_files=[]
-        
-        task.delete_directories=task_model.fields['files'].loads(arr_task['delete_directories'])
-        
-        task.one_time=False
-        
-        if arr_task['one_time']==1:
-            task.one_time=True
-            
-        task.version=arr_task['version']
-        
-        task.codename=arr_task['codename_task']
-        
-        if task.delete_directories==False:
-            task.delete_directories=[]
-        
-        # Functions for pre, post and error task
-        
-        if arr_task['post_func']!='':
-            #try:
-            task_functions_post=importlib.import_module(arr_task['post_func'])
-            task.post_task=task_functions_post.post_task
-            #except:
-            #pass
-        
-        if arr_task['pre_func']!='':
-            #try:
-            task_functions_pre=importlib.import_module(arr_task['pre_func'])
-            task.pre_task=task_functions_pre.pre_task
-            #except:
-            #pass
-                
-        if arr_task['error_func']!='':
-            #try:
-            task_functions_error=importlib.import_module(arr_task['error_func'])
-            task.error_task=task_functions_error.error_task
-                
-            #except:
-            #pass
-        
-        
-        if arr_task['extra_data']!='':
-            
-            task.extra_data=json.loads(arr_task['extra_data'])
+        if not commands_to_execute:
+            print('Error: no task files')
+            exit(1)
         
         if arr_task['where_sql_server']=='':
+            
+            task=generate_task(arr_task, task_id)
+            
             task.exec()
                 
         else:
@@ -146,12 +95,12 @@ def start():
                 
                 with Pool(processes=num_pools) as pool:
 
-                    arr_task=[]
+                    arr_task_exec=[]
                     
                     for server in arr_servers:
-                        arr_task.append([task, server['ip'], server['os_codename']])
+                        arr_task_exec.append([arr_task, task_id, server['ip'], server['os_codename']])
                     
-                    pool.map(execute_multitask, arr_task)
+                    pool.map(execute_multitask, arr_task_exec)
                     
                     #for x in range(num_pools)
                         #pool.
@@ -160,10 +109,6 @@ def start():
                 z+=num_tasks
             
             pass
-        
-        if not task.commands_to_execute:
-            print('Error: no task files')
-            exit(1)
             
         # Task done
         
@@ -175,19 +120,91 @@ def start():
         
         task_model.update({'num_servers': 1})
 
+    conn.close()
+
     exit(0)
 
-def execute_multitask(arr_task=[]):
+def execute_multitask(arr_task_exec=[]):
     
     
-    task=arr_task[0]
-    server=arr_task[1]
-    os_server=arr_task[2]
+    arr_task=arr_task_exec[0]
+    task_id=arr_task_exec[1]
+    server=arr_task_exec[2]
+    os_server=arr_task_exec[3]
+    
+    task=generate_task(arr_task, task_id)
     
     task.server=server
     task.os_server=os_server
     
     task.exec()
+    
+    del task
+
+def generate_task(arr_task, task_id):
+    
+    task=Task(arr_task['server'], task_id)
+        
+    task.files=json.loads(arr_task['files'])
+    
+    if task.files==False:
+        task.files=[]
+    
+    task.commands_to_execute=json.loads(arr_task['commands_to_execute'])
+    
+    if task.commands_to_execute==False:
+        task.commands_to_execute=[]
+    
+    task.delete_files=json.loads(arr_task['delete_files'])
+    
+    if task.delete_files==False:
+        task.delete_files=[]
+    
+    task.delete_directories=json.loads(arr_task['delete_directories'])
+    
+    task.one_time=False
+    
+    if arr_task['one_time']==1:
+        task.one_time=True
+        
+    task.version=arr_task['version']
+    
+    task.codename=arr_task['codename_task']
+    
+    if task.delete_directories==False:
+        task.delete_directories=[]
+    
+    # Functions for pre, post and error task
+    
+    if arr_task['post_func']!='':
+        #try:
+        task_functions_post=importlib.import_module(arr_task['post_func'])
+        task.post_task=task_functions_post.post_task
+        #except:
+        #pass
+    
+    if arr_task['pre_func']!='':
+        #try:
+        task_functions_pre=importlib.import_module(arr_task['pre_func'])
+        task.pre_task=task_functions_pre.pre_task
+        #except:
+        #pass
+            
+    if arr_task['error_func']!='':
+        #try:
+        task_functions_error=importlib.import_module(arr_task['error_func'])
+        task.error_task=task_functions_error.error_task
+            
+        #except:
+        #pass
+    
+    
+    if arr_task['extra_data']!='':
+        
+        task.extra_data=json.loads(arr_task['extra_data'])
+        
+    return task
+    
 
 if __name__=='__main__':
     start()

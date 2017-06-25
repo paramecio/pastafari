@@ -96,11 +96,11 @@ class Task:
         self.user=''
         self.password=''
         
-        connection=WebModel.connection()
+        self.connection=WebModel.connection()
         
-        self.logtask=tasks.LogTask(connection)
-        self.task=tasks.Task(connection)
-        self.taskdone=ServerGroupTask(connection)
+        self.logtask=tasks.LogTask(self.connection)
+        self.task=tasks.Task(self.connection)
+        self.taskdone=ServerGroupTask(self.connection)
         
         self.ssh=paramiko.SSHClient()
         
@@ -627,6 +627,8 @@ class Task:
                 return False
         
     def __del__(self):
+        
+        self.connection.close()
         
         if self.ssh!=None:
             self.ssh.close()

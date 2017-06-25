@@ -32,7 +32,7 @@ from paramecio.citoplasma.adminutils import check_login, get_menu, get_language
 from settings import config
 from settings import config_admin
 from paramecio.citoplasma.sessions import get_session
-
+from paramecio.wsgiapp import app
 
 #t_admin=ptemplate('modules/pastafari')
 
@@ -479,8 +479,8 @@ def admin(**args):
     
     return ""
 
-@route('/'+pastafari_folder+'/servers')
-@post('/'+pastafari_folder+'/servers')
+@app.route('/'+pastafari_folder+'/servers')
+@app.post('/'+pastafari_folder+'/servers')
 def home():
     
     if check_login():

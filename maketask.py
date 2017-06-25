@@ -22,6 +22,7 @@ from paramecio.citoplasma.base_admin import base_admin
 import requests
 import json
 import re
+from paramecio.wsgiapp import app
 
 #Script  for make and show the  progress of the tasks.
 
@@ -45,7 +46,7 @@ env=env_theme(__file__)
 
 env.directories.insert(1, config.paramecio_root+'/modules/admin/templates')
 
-@post('/'+pastafari_folder+'/maketask')
+@app.post('/'+pastafari_folder+'/maketask')
 def home():
     
     return base_admin(admin_task, env, 'Make task')
@@ -131,7 +132,7 @@ def admin_task(connection, t, s, **args):
         
         #return where_sql_server
 
-@get('/'+pastafari_folder+'/formtask/<task_id:int>')
+@app.get('/'+pastafari_folder+'/formtask/<task_id:int>')
 def formtask(task_id):
     
     args={}
@@ -165,8 +166,8 @@ def form_task(connection, t, s, **args):
     
         return 'Task no exists'
 
-
-@get('/'+pastafari_folder+'/executetask/<task_id:int>')
+@app.post('/'+pastafari_folder+'/executetask/<task_id:int>')
+@app.get('/'+pastafari_folder+'/executetask/<task_id:int>')
 def executetask(task_id):
     
     args={}
@@ -247,7 +248,7 @@ def send_task(connection, t, s, **args):
     
         return 'Task no exists'
 
-@get('/'+pastafari_folder+'/showmultiprogress/<task_id:int>')
+@app.get('/'+pastafari_folder+'/showmultiprogress/<task_id:int>')
 def showmultiprogress(task_id):
     
     args={}

@@ -92,6 +92,7 @@ ${show_menu(type_op)}
 ${show_tasks('tasks')}
 % endif
 ${show_servers|n}
+${csrf_token()|n}
 % if yes_form==1 or yes_yorm==2:
 ${csrf_token()|n}
 % endif
