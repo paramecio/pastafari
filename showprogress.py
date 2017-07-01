@@ -15,6 +15,7 @@ from paramecio.cromosoma.webmodel import WebModel
 from modules.pastafari.models.tasks import Task, LogTask
 from modules.pastafari.models.servers import Server
 from modules.pastafari.libraries.configclass import config_task
+from paramecio.wsgiapp import app
 import requests
 import json
 
@@ -45,9 +46,67 @@ env=env_theme(__file__)
 
 env.directories.insert(1, config.paramecio_root+'/modules/admin/templates')
 
+t=PTemplate(env)
+
+# Server tasks list
+
+@app.get('/'+pastafari_folder+'/tasklist/<server_id:int>')
+def tasklist(server_id):
+    
+    content_index=''
+    
+    if check_login():
+
+        conn=WebModel.connection()
+
+        server=Server(conn)
+        
+        arr_server=server.select_a_row(server_id)
+        
+        if arr_server:
+
+            s=get_session()
+
+            menu=get_menu(config_admin.modules_admin)
+        
+            lang_selected=get_language(s)           
+
+            task=Task(conn)
+            
+            arr_task_id=[]
+            
+            with task.query('select DISTINCT task_id from logtask where server=%s', [arr_server['ip']]) as cursor:
+                for arr_task in cursor:
+                    arr_task_id.append(arr_task['task_id'])
+            
+            task.set_conditions('WHERE id IN '+task.check_in_list_str('id', arr_task_id), [])
+            
+            task_list=SimpleList(task, make_url(pastafari_folder+'/tasklist/'+str(server_id), {}), t)
+        
+            task_list.fields_showed=['id', 'name_task', 'description_task', 'error', 'status']
+        
+            task_list.yes_search=False
+
+            task_list.order_field='id'
+            task_list.order=1
+            
+            return_url=make_url('pastafari/servers')
+        
+            content_index=t.load_template('pastafari/admin/showtasks.phtml', task_list=task_list, server=arr_server, return_url=return_url)
+            
+        else:
+            cont_index=I18n.lang('pastafari', 'sorry_i_cannot_find_the_server', 'Sorry, i cannot find the server')
+        
+        conn.close()  
+        
+        return t.load_template('admin/content.html', title=I18n.lang('pastafari', 'task_list_of', 'Task list of')+ ' %s' % arr_server['hostname'], content_index=content_index, menu=menu, lang_selected=lang_selected, arr_i18n=I18n.dict_i18n)
+    
+    return ""
+
+
 # A list of messages in tasks for a server
 
-@get('/'+pastafari_folder+'/serverslogs')
+@app.get('/'+pastafari_folder+'/serverslogs')
 def home():
     
     connection=WebModel.connection()
@@ -87,15 +146,16 @@ def home():
             
             logtask.set_conditions('WHERE server=%s', [ip])
             
-            logtask_list=SimpleList(logtask, '', t)
+            logtask_list=SimpleList(logtask, make_url(pastafari_folder+'/serverslogs', {'id':server_id }), t)
             
             logtask_list.limit_pages=100
             
             logtask_list.yes_search=False
             
-            logtask_list.s['order']=1
+            logtask_list.order_field='id'
+            logtask_list.order=1
             
-            logtask_list.fields_showed=['server', 'message', 'error', 'status']
+            logtask_list.fields_showed=['id', 'server', 'message', 'error', 'status']
             
             logtask_list.arr_extra_fields=[]
             logtask_list.arr_extra_options=[]
@@ -120,7 +180,7 @@ def home():
 
 # Show progress of a task in a server
 
-@get('/'+pastafari_folder+'/showprogress/<task_id:int>/<server>')
+@app.get('/'+pastafari_folder+'/showprogress/<task_id:int>/<server>')
 def showprogress(task_id, server):
     
     # Need check the server
@@ -167,7 +227,7 @@ def showprogress(task_id, server):
 
 # Get json data of the servers executing same task
 
-@get('/'+pastafari_folder+'/getservers/<task_id:int>/<position:int>')
+@app.get('/'+pastafari_folder+'/getservers/<task_id:int>/<position:int>')
 def getservers(task_id, position):
     
     conn=WebModel.connection()
@@ -225,7 +285,7 @@ def getservers(task_id, position):
 
 # Get json format log of a server group executing a task
 
-@post('/'+pastafari_folder+'/getprogress/<task_id:int>')
+@app.post('/'+pastafari_folder+'/getprogress/<task_id:int>')
 def getprogress(task_id):
     
     conn=WebModel.connection()
@@ -314,8 +374,8 @@ def getprogress(task_id):
 
 # Get json data for a see progress in task in a server
 
-@route('/'+pastafari_folder+'/showprogress/tasks')
-@post('/'+pastafari_folder+'/showprogress/tasks')
+@app.route('/'+pastafari_folder+'/showprogress/tasks')
+@app.post('/'+pastafari_folder+'/showprogress/tasks')
 def gettasks():
     
     if check_login():

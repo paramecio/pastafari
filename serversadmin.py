@@ -514,7 +514,7 @@ def server_options(url, id, arr_row):
     arr_options=[]
     
     arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/servergraphs/'+str(id)), 'Server graphs'))
-    arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/serverslogs', {'id': str(id)}), 'Server logs'))
+    arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/tasklist/'+str(id)), 'Server logs'))
     arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/servers', {'op': '5', 'id': str(id)}), 'Delete server from db'))
     
     return arr_options
