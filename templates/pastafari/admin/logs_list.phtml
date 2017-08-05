@@ -1,2 +1,2 @@
-<p><a href="${return_url}">${lang('pastafari', 'servers', 'Servers')}</a> &gt;&gt; ${server['hostname']}</p>
+<p><a href="${return_url}">${lang('pastafari', 'servers', 'Servers')}</a> &gt;&gt; <a href="${make_url('pastafari/tasklist')}/${server['id']}">${lang('pastafari', 'task_list_of', 'Task list of')} ${server['hostname']}</a></p>
 ${logtask_list.show()|n}

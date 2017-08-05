@@ -16,6 +16,7 @@ from modules.pastafari.models.tasks import Task, LogTask
 from modules.pastafari.models.servers import Server
 from modules.pastafari.libraries.configclass import config_task
 from paramecio.wsgiapp import app
+from bottle import request
 import requests
 import json
 
@@ -90,6 +91,10 @@ def tasklist(server_id):
             task_list.order_field='id'
             task_list.order=1
             
+            request.environ['server_id']=arr_server['id']
+
+            task_list.arr_extra_options=[server_task_options]
+            
             return_url=make_url('pastafari/servers')
         
             content_index=t.load_template('pastafari/admin/showtasks.phtml', task_list=task_list, server=arr_server, return_url=return_url)
@@ -104,10 +109,19 @@ def tasklist(server_id):
     return ""
 
 
+def server_task_options(url, id, arr_row):
+    
+    arr_options=[]
+    
+    arr_options.append('<a href="%s">%s</a>' % (make_url(pastafari_folder+'/serverslogs/'+str(request.environ['server_id'])+'/'+str(id)), 'Logs'))
+    
+    return arr_options
+
+
 # A list of messages in tasks for a server
 
-@app.get('/'+pastafari_folder+'/serverslogs')
-def home():
+@app.get('/'+pastafari_folder+'/serverslogs/<server_id:int>/<task_id:int>')
+def home(server_id, task_id):
     
     connection=WebModel.connection()
     #Fix, make local variable
@@ -132,7 +146,7 @@ def home():
     
         lang_selected=get_language(s)           
         
-        server_id=getpost.get.get('id', 0)
+        # server_id=getpost.get.get('id', 0)
         
         server_hostname=''
         
@@ -146,7 +160,7 @@ def home():
             
             logtask.set_conditions('WHERE server=%s', [ip])
             
-            logtask_list=SimpleList(logtask, make_url(pastafari_folder+'/serverslogs', {'id':server_id }), t)
+            logtask_list=SimpleList(logtask, make_url(pastafari_folder+'/serverslogs', {'id':str(server_id) }), t)
             
             logtask_list.limit_pages=100
             
